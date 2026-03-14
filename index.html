@@ -690,12 +690,29 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         <div class="adm-tabs">
           <button class="adm-tab active" id="tab-specs" onclick="showAdmTab('specs')">Specs</button>
           <button class="adm-tab" id="tab-cats" onclick="showAdmTab('cats')">Categories</button>
+          <button class="adm-tab" id="tab-settings" onclick="showAdmTab('settings')">Settings</button>
         </div>
       </div>
       <button class="sheet-x" onclick="closeAdmin()">&#x2715;</button>
     </div>
     <div class="adm-pane" id="adm-specs-pane"></div>
     <div class="adm-pane hidden" id="adm-cats-pane"></div>
+    <div class="adm-pane hidden" id="adm-settings-pane">
+      <div style="padding:24px;max-width:520px">
+        <h3 style="margin:0 0 6px;font-size:15px;font-weight:600">GitHub Integration</h3>
+        <p style="margin:0 0 16px;font-size:13px;color:var(--txt3)">A Personal Access Token (PAT) is required to upload PDF die lines to the GitHub repository. The token is stored only in your browser.</p>
+        <div class="fg" style="margin-bottom:12px">
+          <label>GitHub Personal Access Token</label>
+          <input id="gh-pat-inp" type="password" placeholder="ghp_xxxxxxxxxxxx" style="font-family:monospace;font-size:13px"/>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="sf-save" style="width:auto;padding:0 20px" onclick="saveGhPat()">Save Token</button>
+          <button class="sf-cancel" style="width:auto;padding:0 16px" onclick="clearGhPat()">Clear</button>
+          <span id="gh-pat-status" style="font-size:12px;color:var(--txt3)"></span>
+        </div>
+        <p style="margin:20px 0 6px;font-size:12px;color:var(--txt3)">To create a token: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token. Select <strong>repo</strong> scope.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1039,9 +1056,70 @@ function dlDL() {
   var s = SPECS[curSpec];
   if (!s.dl_name) { showToast('No die line available for this spec','err'); return; }
   var a = document.createElement('a');
-  a.href = 'pi-specs-dielines/' + s.dl_name;
+  a.href = 'https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-dielines/' + encodeURIComponent(s.dl_name);
   a.download = s.dl_name;
+  a.target = '_blank';
   a.click();
+}
+
+/* ═══ GITHUB API ════════════════════════════════════════════════════ */
+function getGhPat() { return localStorage.getItem('pi_gh_token') || ''; }
+function saveGhPat() {
+  var v = document.getElementById('gh-pat-inp').value.trim();
+  if (!v) { showToast('Enter a token first','err'); return; }
+  localStorage.setItem('pi_gh_token', v);
+  document.getElementById('gh-pat-inp').value = '';
+  document.getElementById('gh-pat-status').textContent = '✓ Token saved';
+  showToast('GitHub token saved','ok');
+}
+function clearGhPat() {
+  localStorage.removeItem('pi_gh_token');
+  document.getElementById('gh-pat-inp').value = '';
+  document.getElementById('gh-pat-status').textContent = 'Token cleared';
+}
+function ghUploadPdf(file, cb) {
+  var pat = getGhPat();
+  if (!pat) { showToast('No GitHub token — add one in Admin → Settings','err'); cb(null); return; }
+  var filename = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  var path = 'pi-specs-dielines/' + filename;
+  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var reader = new FileReader();
+  reader.onload = function() {
+    var b64 = reader.result.split(',')[1];
+    // Check if file already exists (need SHA for updates)
+    fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(existing) {
+        var body = { message: 'Add die line: ' + filename, content: b64 };
+        if (existing && existing.sha) body.sha = existing.sha;
+        return fetch(apiBase + path, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      })
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(){ cb(filename); })
+      .catch(function(e){ console.error(e); showToast('PDF upload to GitHub failed — check your token','err'); cb(null); });
+  };
+  reader.readAsDataURL(file);
+}
+function ghDeletePdf(filename) {
+  var pat = getGhPat();
+  if (!pat || !filename) return;
+  var path = 'pi-specs-dielines/' + filename;
+  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(existing) {
+      if (!existing || !existing.sha) return;
+      return fetch(apiBase + path, {
+        method: 'DELETE',
+        headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Remove die line: ' + filename, sha: existing.sha })
+      });
+    })
+    .catch(function(){});
 }
 
 /* ═══ AUTH ══════════════════════════════════════════════════════════ */
@@ -1078,8 +1156,14 @@ function showAdmTab(tab) {
   admCurTab = tab;
   document.getElementById('adm-specs-pane').classList.toggle('hidden', tab!=='specs');
   document.getElementById('adm-cats-pane').classList.toggle('hidden', tab!=='cats');
+  document.getElementById('adm-settings-pane').classList.toggle('hidden', tab!=='settings');
   document.getElementById('tab-specs').classList.toggle('active', tab==='specs');
   document.getElementById('tab-cats').classList.toggle('active', tab==='cats');
+  document.getElementById('tab-settings').classList.toggle('active', tab==='settings');
+  if (tab === 'settings') {
+    var status = document.getElementById('gh-pat-status');
+    if (status) status.textContent = getGhPat() ? '✓ Token stored' : 'No token set';
+  }
 }
 
 function renderAdminSpecs() {
@@ -1242,12 +1326,8 @@ function saveSpecForm() {
     showToast((editingKey ? 'Updated: ' : 'Added: ') + name,'ok');
   };
   if (sfPdfFile) {
-    var fd = new FormData();
-    fd.append('file', sfPdfFile, sfPdfFile.name);
-    fetch('/upload-dieline', { method: 'POST', body: fd })
-      .then(function(r){ return r.json(); })
-      .then(function(j){ doSave(j.filename); })
-      .catch(function(){ showToast('PDF upload failed — is the server running?','err'); doSave(null); });
+    showToast('Uploading PDF to GitHub…','ok');
+    ghUploadPdf(sfPdfFile, function(filename) { doSave(filename); });
   } else {
     doSave(null);
   }
@@ -1261,9 +1341,7 @@ function confirmDeleteSpec(key) {
   }
   // Clean up image store and server-side die line file
   try { var im=JSON.parse(localStorage.getItem('pi_images')||'{}'); delete im[key]; localStorage.setItem('pi_images',JSON.stringify(im)); } catch(e){}
-  if (SPECS[key].dl_name) {
-    fetch('/delete-dieline?file=' + encodeURIComponent(SPECS[key].dl_name), { method:'DELETE' }).catch(function(){});
-  }
+  if (SPECS[key].dl_name) { ghDeletePdf(SPECS[key].dl_name); }
   delete SPECS[key];
   saveStoredSpecs();
   renderNav();
