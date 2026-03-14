@@ -1244,7 +1244,7 @@ function saveSpecForm() {
   if (sfPdfFile) {
     var fd = new FormData();
     fd.append('file', sfPdfFile, sfPdfFile.name);
-    fetch('http://localhost:3000/upload-dieline', { method: 'POST', body: fd })
+    fetch('/upload-dieline', { method: 'POST', body: fd })
       .then(function(r){ return r.json(); })
       .then(function(j){ doSave(j.filename); })
       .catch(function(){ showToast('PDF upload failed — is the server running?','err'); doSave(null); });
@@ -1262,7 +1262,7 @@ function confirmDeleteSpec(key) {
   // Clean up image store and server-side die line file
   try { var im=JSON.parse(localStorage.getItem('pi_images')||'{}'); delete im[key]; localStorage.setItem('pi_images',JSON.stringify(im)); } catch(e){}
   if (SPECS[key].dl_name) {
-    fetch('http://localhost:3000/delete-dieline?file=' + encodeURIComponent(SPECS[key].dl_name), { method:'DELETE' }).catch(function(){});
+    fetch('/delete-dieline?file=' + encodeURIComponent(SPECS[key].dl_name), { method:'DELETE' }).catch(function(){});
   }
   delete SPECS[key];
   saveStoredSpecs();

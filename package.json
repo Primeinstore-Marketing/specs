@@ -1,0 +1,12 @@
+{
+  "name": "pi-specs",
+  "version": "1.0.0",
+  "description": "Primedia Instore Media Specs browser",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

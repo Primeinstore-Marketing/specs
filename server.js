@@ -101,7 +101,8 @@ const server = http.createServer(function(req, res) {
   });
 });
 
-server.listen(3000, function() {
-  console.log('PI Specs running at http://localhost:3000');
+var PORT = process.env.PORT || 3000;
+server.listen(PORT, function() {
+  console.log('PI Specs running at http://localhost:' + PORT);
   console.log('Die lines saved to: ' + DIELINES);
 });
