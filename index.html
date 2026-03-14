@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Media Specs — Primedia Instore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;
+  --bg1:#f4f6fb;
+  --bg2:#eef1f8;
+  --bg3:#e4e9f4;
+  --line:rgba(27,55,105,.08);
+  --line2:rgba(27,55,105,.14);
+  --line3:rgba(27,55,105,.22);
+  --txt:#0d1e3f;
+  --txt2:rgba(13,30,63,.55);
+  --txt3:rgba(13,30,63,.35);
+  --acc:#2861fd;
+  --acc2:#1a4fd6;
+  --acc-dim:rgba(40,97,253,.1);
+  --navy:#1b3769;
+  --navy-dim:rgba(27,55,105,.08);
+  --red:#ff4d4d;
+  --blue:#4d8fff;
+  --nav:260px;
+  --top:52px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --ease2:cubic-bezier(.4,0,.2,1);
+  --F:'Montserrat',sans-serif;
+  --FD:'Wix Madefor Display',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;font-size:13px}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--line3);border-radius:2px}
+
+/* ═══ TOPBAR ════════════════════════════════════════════════════════════ */
+#bar{
+  position:fixed;top:0;left:0;right:0;height:var(--top);z-index:200;
+  display:flex;align-items:center;padding:0 20px 0 0;
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 1px 0 var(--line2);
+  border-bottom:1px solid var(--line);
+}
+.bar-brand{
+  width:var(--nav);flex-shrink:0;
+  display:flex;align-items:center;
+  padding:0 20px;gap:10px;cursor:pointer;
+  border-right:none;background:#1b3769;height:100%;
+}
+.logo-img{height:30px;width:auto;opacity:.95}
+.login-logo .logo-img{filter:brightness(0);opacity:.8}
+.bar-center{flex:1;display:flex;align-items:center;padding:0 24px;gap:8px}
+.bar-breadcrumb{
+  font-family:var(--FD);font-size:10px;font-weight:400;
+  color:var(--txt3);letter-spacing:.06em;
+  display:flex;align-items:center;gap:8px;
+}
+.bar-breadcrumb .sep{color:var(--line3)}
+.bar-breadcrumb .active{color:var(--txt2)}
+.bar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.topbtn{
+  height:30px;padding:0 14px;border-radius:6px;border:1px solid var(--line2);
+  background:transparent;color:var(--txt2);font:12px var(--F);
+  cursor:pointer;transition:all .18s var(--ease2);display:flex;align-items:center;gap:6px;
+}
+.topbtn:hover{background:var(--bg3);border-color:var(--line3);color:var(--txt)}
+.topbtn.admin-on{border-color:rgba(40,97,253,.35);color:var(--acc);background:var(--acc-dim)}
+.topbtn svg{width:11px;height:11px;opacity:.7}
+
+/* ═══ LAYOUT ════════════════════════════════════════════════════════════ */
+#shell{display:flex;margin-top:var(--top);height:calc(100vh - var(--top))}
+
+/* ═══ SIDEBAR ════════════════════════════════════════════════════════════ */
+#nav{
+  width:var(--nav);flex-shrink:0;
+  border-right:none;
+  overflow-y:auto;overflow-x:hidden;
+  background:#1b3769;
+  padding:0 0 32px;
+}
+#nav::-webkit-scrollbar{width:0}
+.nav-section{padding:20px 16px 4px}
+.nav-section-label{
+  font-family:var(--FD);font-size:8.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);padding:0 4px;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+.nav-item{
+  width:100%;display:flex;align-items:center;
+  padding:7px 8px;border-radius:7px;
+  border:none;background:transparent;
+  color:rgba(255,255,255,.75);font:12.5px/1 var(--F);font-weight:500;
+  cursor:pointer;transition:all .15s var(--ease2);
+  text-align:left;gap:8px;position:relative;
+  margin-bottom:1px;
+}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#ffffff}
+.nav-item.has-sub .ni-chev{
+  margin-left:auto;width:14px;height:14px;opacity:.5;flex-shrink:0;
+  transition:transform .2s var(--ease2);
+}
+.nav-item.has-sub.open .ni-chev{transform:rotate(90deg);opacity:.7}
+.nav-item.selected{
+  background:rgba(40,97,253,.25);color:#ffffff;
+}
+.nav-item.selected::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:2px;height:60%;background:#2861fd;border-radius:0 2px 2px 0;
+}
+.ni-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.3);flex-shrink:0;margin-left:2px}
+/* Sub-items */
+.sub-list{
+  overflow:hidden;max-height:0;
+  transition:max-height .28s var(--ease);
+  padding-left:16px;
+}
+.sub-list.open{max-height:600px}
+.sub-item{
+  width:100%;display:flex;align-items:center;gap:7px;
+  padding:6px 8px;border-radius:6px;
+  border:none;background:transparent;
+  color:rgba(255,255,255,.6);font:12px/1 var(--F);
+  cursor:pointer;transition:all .15s;
+  text-align:left;margin-bottom:1px;
+}
+.sub-item:hover{background:rgba(255,255,255,.1);color:#ffffff}
+.sub-item.selected{color:#ffffff;background:rgba(40,97,253,.3)}
+.sub-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.4);flex-shrink:0}
+
+/* ═══ MAIN ════════════════════════════════════════════════════════════ */
+#main{flex:1;overflow:hidden;position:relative}
+
+/* ═══ HOME ════════════════════════════════════════════════════════════ */
+#home{
+  position:absolute;inset:0;
+  display:flex;flex-direction:row;align-items:center;
+  padding:0 0 0 8vw;
+  overflow:hidden;
+  transition:opacity .35s var(--ease),transform .35s var(--ease);
+}
+#home.out{opacity:0;transform:scale(.98) translateY(-8px);pointer-events:none}
+.home-content{flex:0 0 auto;max-width:480px;position:relative;z-index:1}
+.home-visual{
+  flex:1;height:100%;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+.home-visual img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center center;
+  display:block;
+}
+.home-visual::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to right, var(--bg) 0%, rgba(255,255,255,0) 35%);
+  z-index:1;pointer-events:none;
+}
+.home-visual::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom, rgba(255,255,255,.15) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, var(--bg) 100%);
+  z-index:1;pointer-events:none;
+}
+
+/* Noise texture overlay */
+#home::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+/* Accent glow */
+#home::after{
+  content:'';position:absolute;
+  top:-20%;right:-10%;width:50vw;height:70vh;
+  background:radial-gradient(ellipse at center, rgba(40,97,253,.08) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.home-kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 12px 5px 6px;border-radius:100px;
+  border:1px solid rgba(40,97,253,.25);background:var(--acc-dim);
+  margin-bottom:28px;
+  font-family:var(--FD);font-size:8.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc);
+}
+.kicker-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.home-h{
+  font-family:var(--FD);
+  font-size:clamp(52px,8vw,100px);
+  font-weight:900;line-height:.92;
+  letter-spacing:-.04em;
+  color:var(--txt);
+  margin-bottom:20px;
+}
+.home-h span{
+  color:transparent;
+  -webkit-text-stroke:2px rgba(27,55,105,.15);
+}
+.home-sub{
+  font-size:14px;font-weight:400;color:var(--txt2);
+  max-width:400px;line-height:1.7;margin-bottom:44px;
+}
+.home-meta{
+  display:flex;gap:0;
+  border:1px solid var(--line2);border-radius:10px;overflow:hidden;
+  width:fit-content;
+}
+.hm-item{
+  padding:14px 24px;border-right:1px solid var(--line2);
+}
+.hm-item:last-child{border-right:none}
+.hm-n{
+  font-family:var(--FD);font-size:24px;font-weight:900;
+  color:var(--txt);letter-spacing:-.03em;line-height:1;margin-bottom:5px;
+}
+.hm-l{font-size:10px;font-weight:400;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em}
+
+/* Grid decoration */
+.home-grid{
+  position:absolute;right:0;top:0;bottom:0;width:42%;
+  pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:40px 40px;
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 100%);
+  mask-image:linear-gradient(to right, transparent 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 100%);
+}
+.home-grid::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 70% 50%, transparent 30%, var(--bg) 80%);
+}
+
+/* ═══ SPEC VIEW ════════════════════════════════════════════════════════ */
+#specview{
+  position:absolute;inset:0;
+  display:flex;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease);
+  transform:translateY(10px);
+}
+#specview.in{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* Left: spec data panel */
+#spec-panel{
+  width:50%;background:var(--bg);color:var(--txt);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+/* Spec top bar */
+.spec-topbar{
+  height:48px;display:flex;align-items:center;
+  padding:0 24px;gap:10px;flex-shrink:0;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+}
+.back-btn{
+  height:28px;padding:0 10px;border-radius:6px;
+  border:1px solid var(--line2);background:transparent;
+  color:var(--txt2);font:11.5px var(--F);cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;gap:5px;
+}
+.back-btn:hover{background:#f0f4ff;border-color:var(--acc)}
+.back-btn svg{width:11px;height:11px}
+.pi-chip{
+  height:22px;padding:0 9px;border-radius:100px;
+  background:var(--acc-dim);border:1px solid rgba(40,97,253,.2);
+  font-family:var(--FD);font-size:9px;font-weight:600;
+  color:var(--acc);letter-spacing:.06em;
+  display:flex;align-items:center;
+}
+/* Spec content */
+.spec-scroll{flex:1;overflow-y:auto;padding:28px 32px}
+.spec-scroll::-webkit-scrollbar{width:3px}
+.spec-scroll::-webkit-scrollbar-thumb{background:var(--line2)}
+.spec-h{
+  font-family:var(--FD);font-size:26px;font-weight:800;
+  color:var(--navy);letter-spacing:-.02em;line-height:1.15;
+  margin-bottom:10px;
+}
+.spec-desc{
+  font-size:13px;font-weight:300;color:var(--txt2);line-height:1.75;
+  margin-bottom:24px;
+}
+.spec-block{margin-bottom:22px}
+.spec-block-label{
+  font-family:var(--FD);font-size:9px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--txt3);
+  margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.spec-block-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.spec-rows{display:flex;flex-direction:column;gap:0}
+.spec-row{
+  display:flex;align-items:baseline;gap:10px;
+  padding:5px 0;
+  font-size:12.5px;color:var(--txt);line-height:1.6;
+}
+.spec-row::before{
+  content:'';flex-shrink:0;
+  width:4px;height:4px;border-radius:50%;
+  background:var(--acc);opacity:.5;margin-top:6px;
+}
+.spec-row .ref{color:var(--acc);font-weight:700}
+.spec-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spec-col-box{background:var(--bg1);border-radius:8px;padding:12px 14px;border:1px solid var(--line)}
+.spec-col-box-label{font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
+.spec-col-box .spec-row::before{background:var(--navy)}
+/* Download bar */
+.dl-bar{
+  flex-shrink:0;padding:16px 32px;
+  border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(0deg,var(--bg1),var(--bg));
+}
+.dl-bar-info{font-size:12px;color:var(--txt2)}
+.dl-bar-info strong{display:block;font-family:var(--FD);font-size:12px;font-weight:700;color:var(--navy);letter-spacing:-.01em;margin-bottom:2px}
+.dl-bar-btn{
+  height:36px;padding:0 18px;border-radius:8px;
+  background:var(--navy);color:#fff;font:600 12px var(--F);
+  border:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:all .18s var(--ease2);
+}
+.dl-bar-btn:hover{background:var(--acc2);transform:translateY(-1px)}
+.dl-bar-btn svg{width:13px;height:13px}
+
+/* Right: photo */
+#spec-photo-pane{
+  flex:1;background:var(--navy);overflow:hidden;position:relative;
+}
+#spec-photo-pane img{
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  display:block;transition:transform .7s var(--ease);
+}
+#spec-photo-pane:hover img{transform:scale(1.04)}
+.photo-vignette{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(to right, rgba(255,255,255,.2) 0%, transparent 10%),
+    linear-gradient(to top, rgba(27,55,105,.8) 0%, transparent 30%),
+    linear-gradient(to bottom, rgba(27,55,105,.4) 0%, transparent 15%);
+}
+
+/* ═══ MODALS ════════════════════════════════════════════════════════════ */
+.curtain{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.curtain.open{opacity:1;pointer-events:all}
+.sheet{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:18px;
+  width:min(840px,100%);max-height:88vh;overflow-y:auto;
+  transform:translateY(20px) scale(.96);
+  transition:transform .28s var(--ease);
+}
+.curtain.open .sheet{transform:translateY(0) scale(1)}
+.sheet::-webkit-scrollbar{width:0}
+.sheet-head{
+  padding:22px 26px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--bg2);z-index:1;
+  border-radius:18px 18px 0 0;
+}
+.sheet-title{font-family:var(--FD);font-size:14px;font-weight:700;letter-spacing:-.01em}
+.sheet-badge{
+  padding:3px 10px;border-radius:100px;margin-left:10px;
+  background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);
+  font:700 8.5px var(--FD);letter-spacing:.12em;text-transform:uppercase;color:var(--red);
+}
+.sheet-x{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--line2);
+  color:var(--txt2);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.sheet-x:hover{background:var(--line);color:var(--txt)}
+.sheet-body{padding:22px 26px 26px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+
+/* drop zone */
+.dz{
+  border:1px dashed var(--line2);border-radius:12px;
+  padding:26px 18px;text-align:center;cursor:pointer;
+  transition:all .18s;
+}
+.dz:hover,.dz.drag{border-color:rgba(40,97,253,.35);background:rgba(40,97,253,.04)}
+.dz-ico{font-size:28px;margin-bottom:8px;line-height:1}
+.dz-t{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
+.dz-s{font-size:11px;color:var(--txt3);margin-bottom:14px}
+.dz-b{
+  height:30px;padding:0 14px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--line2);
+  color:var(--txt);font:600 11.5px var(--F);cursor:pointer;transition:all .15s;
+}
+.dz-b:hover{background:var(--line);border-color:var(--line3)}
+.fi-list{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.fi-row{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  border-radius:7px;background:var(--bg3);border:1px solid var(--line);font-size:11px;
+}
+.fi-name{flex:1;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-size{color:var(--txt3);font-size:10px;flex-shrink:0}
+
+/* form */
+.aform{display:flex;flex-direction:column;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-family:var(--FD);font-size:8px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--txt3)}
+.fg input,.fg select,.fg textarea{
+  background:var(--bg3);border:1px solid var(--line2);border-radius:7px;
+  color:var(--txt);font:13px var(--F);padding:8px 11px;outline:none;
+  transition:border-color .15s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:rgba(40,97,253,.35)}
+.fg select option{background:var(--bg2)}
+.fg textarea{resize:vertical;min-height:58px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-submit{
+  height:40px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--acc);color:#ffffff;
+  font-family:var(--FD);font-size:11px;font-weight:700;letter-spacing:.08em;
+  transition:all .18s;
+}
+.form-submit:hover{background:var(--acc2);transform:translateY(-1px)}
+
+/* login */
+.login-card{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:18px;
+  padding:34px;width:min(370px,92vw);
+  transform:translateY(16px) scale(.96);transition:transform .28s var(--ease);
+}
+.curtain.open .login-card{transform:translateY(0) scale(1)}
+.login-logo{margin-bottom:22px}
+.login-logo .logo-img{height:26px}
+.login-h{font-family:var(--FD);font-size:20px;font-weight:700;margin-bottom:5px;letter-spacing:-.02em}
+.login-sub{font-size:12.5px;font-weight:300;color:var(--txt2);margin-bottom:22px}
+.login-inp{
+  width:100%;background:var(--bg3);border:1px solid var(--line2);
+  border-radius:8px;color:var(--txt);font:13.5px var(--F);
+  padding:10px 13px;outline:none;margin-bottom:9px;
+  transition:border-color .15s;
+}
+.login-inp:focus{border-color:rgba(40,97,253,.35)}
+.login-err{min-height:16px;font-size:11.5px;color:var(--red);margin-bottom:10px}
+.login-acts{display:flex;gap:9px}
+.login-ok{
+  flex:1;height:40px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--acc);color:#ffffff;
+  font-family:var(--FD);font-size:11px;font-weight:700;letter-spacing:.06em;
+  transition:all .18s;
+}
+.login-ok:hover{background:var(--acc2)}
+.login-cancel{
+  height:40px;padding:0 16px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--line2);
+  color:var(--txt2);font:12.5px var(--F);cursor:pointer;transition:all .15s;
+}
+.login-cancel:hover{background:var(--line);color:var(--txt)}
+
+/* toast */
+#toast{
+  position:fixed;bottom:22px;right:22px;z-index:999;
+  display:flex;align-items:center;gap:9px;
+  padding:10px 16px 10px 12px;border-radius:10px;
+  background:var(--bg2);border:1px solid var(--line2);
+  font-size:12.5px;font-weight:500;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  transform:translateY(12px);opacity:0;transition:all .25s var(--ease);pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.ok{border-color:rgba(74,222,128,.3);color:#4ade80}
+#toast.err{border-color:rgba(255,77,77,.3);color:var(--red)}
+.t-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* Responsive */
+@media(max-width:880px){
+  #spec-photo-pane{display:none}
+  #spec-panel{width:100%}
+}
+@media(max-width:680px){
+  :root{--nav:240px}
+  #home{flex-direction:column;padding:0 6vw;justify-content:center}
+  .home-visual{display:none}
+  .home-h{font-size:clamp(40px,11vw,70px)}
+  .sheet-body{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr}
+  .hm-item{padding:12px 16px}
+}
+/* ═══ NAV SEARCH ═════════════════════════════════════════════════════ */
+.nav-search-wrap{padding:14px 16px 6px;position:relative}
+.nav-search-ico{position:absolute;left:26px;top:50%;transform:translateY(-50%);pointer-events:none;color:rgba(255,255,255,.35)}
+.nav-search-inp{
+  width:100%;height:32px;padding:0 10px 0 32px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;color:#fff;font:12px var(--F);outline:none;
+  transition:all .15s;
+}
+.nav-search-inp::placeholder{color:rgba(255,255,255,.35)}
+.nav-search-inp:focus{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.28)}
+
+/* ═══ ADMIN PANEL ════════════════════════════════════════════════════ */
+.admin-sheet{width:min(960px,100%) !important}
+.adm-tabs{display:flex;gap:2px;margin-left:16px}
+.adm-tab{
+  height:28px;padding:0 14px;border-radius:6px;border:none;
+  background:transparent;color:var(--txt3);font:600 11px var(--F);
+  cursor:pointer;transition:all .15s;
+}
+.adm-tab.active{background:var(--acc-dim);color:var(--acc)}
+.adm-tab:hover:not(.active){background:var(--bg3);color:var(--txt2)}
+.adm-pane{padding:20px 26px 26px}
+.adm-pane.hidden{display:none}
+.adm-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.adm-toolbar-left{display:flex;align-items:center;gap:10px}
+.adm-search{
+  height:32px;padding:0 10px;border-radius:7px;
+  background:var(--bg3);border:1px solid var(--line2);
+  color:var(--txt);font:12px var(--F);outline:none;width:200px;
+}
+.adm-search:focus{border-color:rgba(40,97,253,.35)}
+.adm-add-btn{
+  height:32px;padding:0 14px;border-radius:7px;border:none;
+  background:var(--acc);color:#fff;font:600 11px var(--F);
+  cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;
+}
+.adm-add-btn:hover{background:var(--acc2)}
+.adm-add-btn svg{width:12px;height:12px}
+.adm-count{font-size:11px;color:var(--txt3)}
+.adm-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.adm-row{
+  display:grid;grid-template-columns:1fr 140px 140px 88px;
+  align-items:center;padding:10px 14px;gap:12px;
+  border-bottom:1px solid var(--line);background:var(--bg);transition:background .12s;
+}
+.adm-row:last-child{border-bottom:none}
+.adm-row:hover{background:var(--bg1)}
+.adm-row-head{background:var(--bg2) !important;font-family:var(--FD);font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3)}
+.adm-row-head:hover{background:var(--bg2) !important}
+.adm-cell{font-size:12px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-cell.muted{color:var(--txt3);font-size:11px}
+.adm-cell.code{font-family:monospace;font-size:11px;color:var(--acc)}
+.adm-actions{display:flex;gap:5px;justify-content:flex-end}
+.adm-btn{
+  height:26px;padding:0 10px;border-radius:5px;
+  border:1px solid var(--line2);background:var(--bg2);
+  color:var(--txt2);font:500 10.5px var(--F);cursor:pointer;transition:all .12s;
+}
+.adm-btn:hover{background:var(--bg3);color:var(--txt)}
+.adm-btn.del{border-color:rgba(255,77,77,.25);color:rgba(255,77,77,.7)}
+.adm-btn.del:hover{background:rgba(255,77,77,.08);border-color:rgba(255,77,77,.4);color:var(--red)}
+.adm-cat-list{display:flex;flex-direction:column;gap:10px}
+.adm-cat{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.adm-cat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg)}
+.adm-cat-label{font-family:var(--FD);font-size:13px;font-weight:700;color:var(--navy)}
+.adm-cat-actions{display:flex;gap:6px;align-items:center}
+.adm-cat-body{padding:0 16px 14px;background:var(--bg)}
+.adm-group-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;margin-top:10px}
+.adm-group-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:6px;background:var(--bg1);border:1px solid var(--line)}
+.adm-group-label{font-size:12px;color:var(--txt2)}
+.adm-add-inline{display:flex;gap:6px;align-items:center;margin-top:6px}
+.adm-inline-inp{height:28px;padding:0 10px;border-radius:6px;flex:1;background:var(--bg2);border:1px solid var(--line2);color:var(--txt);font:12px var(--F);outline:none}
+.adm-inline-inp:focus{border-color:rgba(40,97,253,.35)}
+.adm-inline-btn{height:28px;padding:0 12px;border-radius:6px;border:none;background:var(--navy);color:#fff;font:600 11px var(--F);cursor:pointer;white-space:nowrap}
+.adm-inline-btn:hover{background:var(--acc)}
+.adm-add-cat-row{display:flex;gap:8px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.spec-form-sheet{width:min(720px,100%) !important}
+.sf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px 26px 26px}
+.sf-full{grid-column:1/-1}
+.img-upload{border:1px dashed var(--line2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .18s;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.img-upload:hover,.img-upload.drag{border-color:rgba(40,97,253,.4);background:rgba(40,97,253,.03)}
+.img-upload-t{font-size:12px;font-weight:600;color:var(--txt2)}
+.img-upload-s{font-size:10.5px;color:var(--txt3)}
+.img-preview{width:100%;height:160px;object-fit:cover;border-radius:8px;margin-top:10px;border:1px solid var(--line)}
+.sf-actions{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--line);margin-top:4px}
+.sf-cancel{height:36px;padding:0 18px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font:500 12px var(--F);cursor:pointer;transition:all .15s}
+.sf-cancel:hover{background:var(--bg3)}
+.sf-save{height:36px;padding:0 22px;border-radius:8px;border:none;background:var(--acc);color:#fff;font:700 12px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.sf-save:hover{background:var(--acc2);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="bar">
+  <div class="bar-brand" onclick="goHome()"><img src="pi-specs-assets/logo-white.png" alt="Primedia Instore" class="logo-img"/></div>
+  <div class="bar-center">
+    <div class="bar-breadcrumb">
+      <span>Media Specs</span>
+      <span class="sep">/</span>
+      <span class="active" id="bc-spec" style="display:none"></span>
+    </div>
+  </div>
+  <div class="bar-right">
+    <button class="topbtn" id="admin-btn" onclick="openLogin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Admin
+    </button>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="shell">
+
+  <!-- SIDEBAR NAV -->
+  <nav id="nav"></nav>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- HOME -->
+    <div id="home">
+      <div class="home-grid"></div>
+      <div class="home-content">
+        <div class="home-kicker">
+          <span class="kicker-dot"></span>
+          Primedia Instore
+        </div>
+        <h1 class="home-h">Media<br/><span>Specs</span></h1>
+        <p class="home-sub">Browse technical specifications, design guidelines, and artwork requirements for every in-store media format.</p>
+        <div class="home-meta">
+          <div class="hm-item"><div class="hm-n">50+</div><div class="hm-l">Formats</div></div>
+          <div class="hm-item"><div class="hm-n">6</div><div class="hm-l">Categories</div></div>
+          <div class="hm-item"><div class="hm-n">Die Lines</div><div class="hm-l">Available</div></div>
+        </div>
+      </div>
+      <div class="home-visual">
+        <img src="pi-specs-assets/hero-store.png" alt="In-store media placements"/>
+      </div>
+    </div>
+
+    <!-- SPEC VIEW -->
+    <div id="specview">
+      <div id="spec-panel">
+        <div class="spec-topbar">
+          <button class="back-btn" onclick="goHome()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            All Formats
+          </button>
+          <div id="pi-chip" style="display:none"></div>
+        </div>
+        <div class="spec-scroll" id="spec-content"></div>
+        <div class="dl-bar">
+          <div class="dl-bar-info">
+            <strong>Download Die Line</strong>
+            Vector artwork file for print production
+          </div>
+          <button class="dl-bar-btn" onclick="dlDL()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
+      <div id="spec-photo-pane">
+        <img id="spec-img" src="" alt=""/>
+        <div class="photo-vignette"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="curtain" id="login-curtain">
+  <div class="login-card">
+    <div class="login-logo"><img src="pi-specs-assets/logo-white.png" alt="Primedia Instore" class="logo-img"/></div>
+    <h2 class="login-h">Admin Access</h2>
+    <p class="login-sub">Sign in to upload spec formats and dieline assets.</p>
+    <input class="login-inp" id="lu" type="text" placeholder="Username" autocomplete="username"/>
+    <input class="login-inp" id="lp" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div class="login-err" id="le"></div>
+    <div class="login-acts">
+      <button class="login-ok" onclick="doLogin()">Sign In</button>
+      <button class="login-cancel" onclick="closeLogin()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="curtain" id="admin-curtain">
+  <div class="sheet admin-sheet">
+    <div class="sheet-head">
+      <div style="display:flex;align-items:center">
+        <span class="sheet-title">Manage Specs</span>
+        <span class="sheet-badge">Admin</span>
+        <div class="adm-tabs">
+          <button class="adm-tab active" id="tab-specs" onclick="showAdmTab('specs')">Specs</button>
+          <button class="adm-tab" id="tab-cats" onclick="showAdmTab('cats')">Categories</button>
+        </div>
+      </div>
+      <button class="sheet-x" onclick="closeAdmin()">&#x2715;</button>
+    </div>
+    <div class="adm-pane" id="adm-specs-pane"></div>
+    <div class="adm-pane hidden" id="adm-cats-pane"></div>
+  </div>
+</div>
+
+<!-- SPEC FORM -->
+<div class="curtain" id="spec-form-curtain">
+  <div class="sheet spec-form-sheet">
+    <div class="sheet-head">
+      <div style="display:flex;align-items:center">
+        <span class="sheet-title" id="sf-title">Add Spec</span>
+        <span class="sheet-badge">Admin</span>
+      </div>
+      <button class="sheet-x" onclick="closeSpecForm()">&#x2715;</button>
+    </div>
+    <div class="sf-grid">
+      <div class="fg sf-full"><label>Format Name *</label><input id="sf-name" type="text" placeholder="e.g. Aisle Wing Medium Pop-Out"/></div>
+      <div class="fg"><label>Category *</label><select id="sf-cat" onchange="sfUpdateGroups(null)"></select></div>
+      <div class="fg"><label>Sub-Group</label><select id="sf-group"></select></div>
+      <div class="fg sf-full"><label>Description</label><textarea id="sf-desc" rows="2" placeholder="Brief description of this format..."></textarea></div>
+      <div class="fg sf-full"><label>Design Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span></label><textarea id="sf-ds" rows="3" placeholder="Overall size: Width 180mm × Height 455mm *[PI130]&#10;Portrait — Printed both sides."></textarea></div>
+      <div class="fg sf-full"><label>Artwork Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span></label><textarea id="sf-ar" rows="2" placeholder="All images 300 dpi CMYK 100% scale.&#10;Material supplied in Adobe PDF format."></textarea></div>
+      <div class="fg sf-full"><label>Printing Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span></label><textarea id="sf-pr" rows="2" placeholder="HI-Q Titan (Gloss) 200g/m² White, 4 Process full colour."></textarea></div>
+      <div class="fg sf-full"><label>Packaging</label><textarea id="sf-pk" rows="2" placeholder="All printed material packed flat in corrugated boxes."></textarea></div>
+      <div class="fg sf-full"><label>Media Image</label>
+        <div class="img-upload" id="sf-img-zone" onclick="document.getElementById('sf-img-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="sfImgDrop(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="color:var(--txt3)"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <div class="img-upload-t">Drop image or click to browse</div>
+          <div class="img-upload-s">PNG, JPG — Recommended: 1200×800px</div>
+          <input type="file" id="sf-img-inp" accept="image/*" style="display:none" onchange="sfImgPick(this)"/>
+        </div>
+        <img id="sf-img-preview" class="img-preview" src="" alt="" style="display:none"/>
+      </div>
+      <div class="fg sf-full"><label>Die Line PDF</label>
+        <div class="img-upload" id="sf-pdf-zone" onclick="document.getElementById('sf-pdf-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="sfPdfDrop(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26" style="color:var(--txt3)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <div class="img-upload-t" id="sf-pdf-label">Drop PDF or click to browse</div>
+          <div class="img-upload-s">PDF only — Die line vector file</div>
+          <input type="file" id="sf-pdf-inp" accept=".pdf,application/pdf" style="display:none" onchange="sfPdfPick(this)"/>
+        </div>
+      </div>
+      <div class="sf-actions">
+        <button class="sf-cancel" onclick="closeSpecForm()">Cancel</button>
+        <button class="sf-save" onclick="saveSpecForm()">Save Spec</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span class="t-dot"></span><span id="toast-msg"></span></div>
+
+<script>
+var DROPS_UNUSED = {
+  'aw':[
+    {l:'Aisle Wing Medium',k:'aw-med'},
+    {l:'Aisle Wing Medium Pop-Out',k:'aw-med-po'},
+    {l:'Aisle Wing w/ Spinning Core',k:'aw-spin'},
+    {l:'Large + Hanging Packshot',k:'aw-lg-pack'},
+    {l:'Medium + Hanging Packshot',k:'aw-med-pack'},
+    {l:'Clicks Aisle Wing',k:'clicks-aw'},
+    {l:'Clicks Aisle Wing Pop-Out',k:'clicks-aw-po'},
+    {l:'Clicks Dome Aisle Wing',k:'clicks-aw-dome'}
+  ],
+  'sw':[
+    {l:'Shelf Wing Landscape',k:'sw-land'},
+    {l:'Shelf Wing Portrait',k:'sw-port'},
+    {l:'Shelf Wing 230\u00d7230mm',k:'sw-230'}
+  ],
+  'ill':[{l:'Illuminating Aisle Wing Medium',k:'ill-aw-med'}],
+  'pst':[
+    {l:'Product Wing Glorifier',k:'pst-wg'},
+    {l:'Product Pack Showcase',k:'pst-pack'},
+    {l:'Product Showcase',k:'pst-main'},
+    {l:'Product Tester 200 Large',k:'pst-test'},
+    {l:'Wine Showcase',k:'pst-wine'}
+  ],
+  'pg':[
+    {l:'Price Glorifier: Standard',k:'pg-std'},
+    {l:'Price Glorifier: Rectangular',k:'pg-rect'},
+    {l:'Price Glorifier: Round',k:'pg-round'},
+    {l:'ABS Price Glorifier Rectangular',k:'pg-abs'},
+    {l:'PRIPLAK Rect. w/ Portrait Wing',k:'pg-priplak'}
+  ],
+  'sf':[
+    {l:'Shelf Talk',k:'sf-talk'},
+    {l:'ABS Shelf Front',k:'sf-abs'},
+    {l:'90\u00b0 Shelf Front + ABS Wing',k:'sf-90abs'},
+    {l:'Premium Shelf Defender',k:'sf-prem'},
+    {l:'Winged Shelf Front',k:'sf-wing'}
+  ],
+  'baw':[
+    {l:'Clicks Box Aisle Wing',k:'baw-clicks'},
+    {l:'Large Box Aisle Wing',k:'baw-lg'},
+    {l:'Medium Box Aisle Wing',k:'baw-med'},
+    {l:'Boxed Aisle Wing Large',k:'baw-blg'},
+    {l:'Boxed Aisle Wing Medium',k:'baw-bmed'}
+  ],
+  'fridge':[
+    {l:'Freezer Divider Boxed',k:'fr-dbox'},
+    {l:'Freezer Divider',k:'fr-div'},
+    {l:'Fridge Frame Decal',k:'fr-decal'}
+  ]
+};
+
+var SPECS = {
+  'aw-med':{t:'Aisle Wing Medium',p:'pi-specs-assets/Aisle Wing M.jpg',c:'PI130',d:'An Aisle Wing is placed at a 90\u00b0 angle to the shelf, allowing for highly impactful brand communication in-store.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI130]','Portrait \u2014 Printed both sides. Mirror images to be supplied.','Primedia Instore Logo or \u201cPRIMEDIA INSTORE\u201d copy (Arial 6pt) required on artwork.','Bleed: minimum 5mm added to overall size'],ar:['All images 300 dpi CMYK 100% scale. Adobe Photoshop standard profile \u2013 US Web Coated (SWOP) V2','Material supplied in Adobe PDF format, page setup to include bleed.','Fonts embedded in PDF or converted to paths. Mirror images to be supplied.','All die lines in spot colour set to overprint.'],pr:['Printed 4 Process (full colour) on HI-Q Titan (Gloss) 200g/m\u00b2 White, front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex','Custom die from supplied die trace \u2014 Die Cutting'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'aw-med-po':{t:'Aisle Wing Medium Pop-Out',p:'pi-specs-assets/Aisle Wing M  Pop-out.jpg',c:'PI134',d:'An Aisle Wing placed at 90\u00b0 to the shelf with a pop-out element for additional brand messaging impact.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI134]','Portrait \u2014 Printed both sides. Mirror images to be supplied.','Pop-Out size: Width 148mm \u00d7 Height 210mm (max A5), placeable anywhere on wing.','Bleed: minimum 5mm added to overall size'],ar:['All images 300 dpi CMYK 100% scale. US Web Coated (SWOP) V2','Material supplied in Adobe PDF format including bleed.','Fonts embedded or converted to paths. All die lines in spot colour, set to overprint.'],p2:{l:{h:'Forex Material Spec',i:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex','Custom die from supplied die trace']},r:{h:'Pop-Out Material Spec',i:['300 Gsm Printkote, CMYK one side only','Gloss laminated \u2014 Die cut to shape','Attached using SVA45 Foam']}},pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'aw-spin':{t:'Aisle Wing with Spinning Core',p:'pi-specs-assets/Aisle Wing With Spinning Core Medium.jpg',c:'PI138',d:'A premium Aisle Wing featuring a spinning core mechanism for maximum 360\u00b0 shopper attention in-store.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI138]','Spinning core: Width 100mm \u00d7 Height 300mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale.','Material supplied in Adobe PDF format including bleed.','Fonts embedded or converted to paths.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex','Spinning core mechanism supplied by Primedia Instore'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'aw-lg-pack':{t:'Large Aisle Wing + Hanging Packshot',p:'pi-specs-assets/LARGE AISLE WING WITH HANGING PACKSHOT.jpg',c:'PI145',d:'A large Aisle Wing with a hanging packshot element for enhanced product visibility and dual communication.',ds:['Overall size: Width 230mm \u00d7 Height 600mm *[PI145]','Packshot: Width 200mm \u00d7 Height 200mm (round or custom die)','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'aw-med-pack':{t:'Medium Aisle Wing + Hanging Packshot',p:'pi-specs-assets/MEDIUM AISLE WING WITH HANGING PACKSHOT.jpg',c:'PI143',d:'Medium Aisle Wing with a hanging packshot element for dual brand and product communication.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI143]','Packshot: Width 150mm \u00d7 Height 150mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'clicks-aw':{t:'Clicks Aisle Wing',p:'pi-specs-assets/Clicks Aisle Wing.jpg',c:'PI108',d:'A Clicks-format Aisle Wing at 90\u00b0 to the shelf, sized for the Clicks retail environment.',ds:['Overall size: Width 150mm \u00d7 Height 400mm *[PI108]','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.','Fonts embedded or converted. All die lines in spot colour set to overprint.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex','Custom die from supplied die trace \u2014 Die Cutting'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'clicks-aw-po':{t:'Clicks Aisle Wing Pop-Out',p:'pi-specs-assets/Clicks Aisle Wing Pop-out.jpg',c:'PI109',d:'Clicks-format Aisle Wing with pop-out element for dual-impact brand communication.',ds:['Overall size: Width 150mm \u00d7 Height 400mm *[PI109]','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'clicks-aw-dome':{t:'Clicks Dome Aisle Wing',p:'pi-specs-assets/Clicks Dome Aisle Wing Medium-1.jpg',c:'PI112',d:'Dome-topped Clicks Aisle Wing variant with a rounded top profile for premium shelf presence.',ds:['Overall size: Width 150mm \u00d7 Height 420mm (dome top) *[PI112]','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. All die lines in spot colour set to overprint.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex \u2014 Die Cutting'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sw-land':{t:'Shelf Wing \u2014 Landscape',p:'pi-specs-assets/SHELF WING-LANDSCAPE.jpg',c:'PI155',d:'Landscape-format shelf wing for horizontal brand messaging at shelf edge.',ds:['Overall size: Width 300mm \u00d7 Height 120mm *[PI155]','Landscape \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sw-port':{t:'Shelf Wing \u2014 Portrait',p:'pi-specs-assets/SHELF WING-LANDSCAPE \u2013 1.jpg',c:'PI156',d:'Portrait-format shelf wing for vertical brand messaging at shelf edge.',ds:['Overall size: Width 120mm \u00d7 Height 300mm *[PI156]','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sw-230':{t:'Shelf Wing 230\u00d7230mm',p:'pi-specs-assets/Shelf Wing 230mm x 230mm.jpg',c:'PI157',d:'Square shelf wing at 230\u00d7230mm for prominent shelf-edge branding.',ds:['Overall size: Width 230mm \u00d7 Height 230mm *[PI157]','Printed both sides. Mirror images to be supplied. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'ill-aw-med':{t:'Illuminating Aisle Wing Medium',p:'pi-specs-assets/ILLUMINATING AISLE WING MEDIUM.jpg',c:'PI160',d:'LED-backlit Aisle Wing for premium brand presence in any retail lighting environment.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI160]','Portrait \u2014 Translucent substrate for backlit illumination. Bleed: minimum 5mm.','Design must account for backlighting \u2014 avoid solid dark fills over key messaging.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['4 Process full colour on translucent Duratrans material','Mounted in illuminated chassis \u2014 LED module provided and installed by Primedia Instore'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pst-wg':{t:'Product Wing Glorifier \u2014 Small',p:'pi-specs-assets/Product Wing Glorifier - Small.jpg',c:'PI170',d:'A compact wing glorifier designed to highlight individual products at shelf level.',ds:['Overall size: Width 100mm \u00d7 Height 200mm *[PI170]','Single sided, portrait format. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 250g/m\u00b2 White, 4 Process full colour','Gloss Laminated \u2014 Die Cut to shape'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pst-pack':{t:'Product Pack Showcase',p:'pi-specs-assets/Product Pack Showcase 1.jpg',c:'PI173',d:'A product pack showcase unit to display and highlight product packaging for brand visibility.',ds:['Overall size: Width 300mm \u00d7 Height 400mm \u00d7 Depth 200mm *[PI173]','3D showcase unit \u2014 artwork wraps all visible faces. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['400g/m\u00b2 White Board, 4 Process full colour','Gloss Laminated \u2014 Die Cut, Creased and assembled'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pst-main':{t:'Product Showcase',p:'pi-specs-assets/PRODUCT SHOWCASE \u2013 2.jpg',c:'PI175',d:'A full product showcase unit for floor or shelf placement, providing effective brand communication in front of your product.',ds:['Overall size: As per product dimensions \u2014 confirm with Primedia Instore *[PI175]','All visible surfaces to receive printed artwork. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['4 Process full colour \u2014 substrate and mounting as per product brief'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pst-test':{t:'Product Tester 200 Large',p:'pi-specs-assets/PRODUCT TESTER 200 LARGE.jpg',c:'PI178',d:'Large product tester unit for up to 200 samples. Designed for beauty and personal care categories.',ds:['Overall size: Width 200mm \u00d7 Height 300mm \u00d7 Depth 150mm *[PI178]','Artwork panels per visible face. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour','Gloss Laminated \u2014 Die Cut and assembled by Primedia Instore'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pst-wine':{t:'Wine Showcase',p:'pi-specs-assets/Wine Showcase.jpg',c:'PI180',d:'A dedicated showcase unit for the wine and spirits category, designed for floor or gondola end placement.',ds:['Overall size: Width 250mm \u00d7 Height 500mm *[PI180]','Artwork to wrap all visible surfaces. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['400g/m\u00b2 White Board, 4 Process full colour','Gloss Laminated \u2014 Die Cut and assembled'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pg-std':{t:'Price Glorifier: Standard',p:'pi-specs-assets/PRICE GLORIFIER \u2013 1.jpg',c:'PI190',d:'Standard price glorifier for shelf-front price communication, sitting in the ABS rail system at shelf edge.',ds:['Overall size: Width 63mm \u00d7 Height 73mm *[PI190]','Single sided, portrait. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut and Heat Bent'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pg-rect':{t:'Price Glorifier: Rectangular',p:'pi-specs-assets/PRICE GLORIFIER RECTANGULAR.jpg',c:'PI192',d:'Rectangular price glorifier for shelf-front price and promotion communication.',ds:['Overall size: Width 100mm \u00d7 Height 73mm *[PI192]','Single sided, landscape. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut and Heat Bent'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pg-round':{t:'Price Glorifier: Round',p:'pi-specs-assets/PRICE GLORIFIER ROUND.jpg',c:'PI194',d:'Round format price glorifier for an eye-catching alternative to standard rectangular options.',ds:['Overall size: Diameter 80mm *[PI194]','Single sided. Bleed: minimum 3mm. Artwork must extend to die cut edge.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut to circular shape'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pg-abs':{t:'ABS Price Glorifier Rectangular',p:'pi-specs-assets/ABS PRICE GLORIFIER RECTANGULAR.jpg',c:'PI196',d:'ABS-substrate rectangular price glorifier for durable shelf-front price communication.',ds:['Overall size: Width 100mm \u00d7 Height 73mm *[PI196]','Single sided, landscape. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to ABS substrate \u2014 Die Cut and formed'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pg-priplak':{t:'PRIPLAK Price Glorifier: Rect. + Portrait Wing',p:'pi-specs-assets/PRIPLAK PRICE GLORIFIER RECTANGLE WITH PORTRAIT WING(WING-75mmX110mm).jpg',c:'PI198',d:'PRIPLAK rectangular price glorifier with an integrated portrait wing element for enhanced shelf presence.',ds:['Base size: Width 100mm \u00d7 Height 73mm *[PI198]','Wing size: Width 75mm \u00d7 Height 110mm. Bleed: minimum 3mm on all elements.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to ABS substrate \u2014 Die Cut and assembled'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sf-talk':{t:'Shelf Talk',p:'pi-specs-assets/SHELF TALK.jpg',c:'PI200',d:'A shelf talker for direct product communication at shelf edge. Ideal for promotions and new product launches.',ds:['Overall size: Width 80mm \u00d7 Height 120mm *[PI200]','Single sided, portrait. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['300g/m\u00b2 Silk Art Board, 4 Process full colour','Gloss Laminated \u2014 Die Cut to shape'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sf-abs':{t:'ABS Shelf Front',p:'pi-specs-assets/ABS SHELF FRONT \u2013 1.jpg',c:'PI205',d:'ABS plastic shelf front for durable brand messaging directly at the shelf edge.',ds:['Overall size: Width 900mm \u00d7 Height 37mm *[PI205]','Landscape. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut and Heat Bent'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sf-90abs':{t:'90\u00b0 Shelf Front + ABS Wing',p:'pi-specs-assets/90 DEGREE SHELF FRONT WITH ABS WING.jpg',c:'PI207',d:'90-degree shelf front combining a shelf strip with an integrated ABS wing for dual-format brand communication.',ds:['Shelf front: Width 900mm \u00d7 Height 37mm *[PI207]','Wing: Width 120mm \u00d7 Height 150mm. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut and Heat Bent. Wing mounted perpendicular.'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'sf-prem':{t:'Premium Shelf Defender',p:'pi-specs-assets/PREMIUM SHELF FRONT.jpg',c:'PI225',d:'Premium Shelf Defender provides effective brand communication directly in front of your product.',ds:['Overall size: Width 900mm \u00d7 Height 37mm *[PI225]','Bleed: minimum 5mm added to overall size.'],ar:['All images 300 dpi CMYK 100% scale. Adobe Photoshop standard profile \u2013 US Web Coated (SWOP) V2','Material in Adobe PDF with bleed. Fonts embedded or converted to paths.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut and Heat Bent'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, Premium Shelf Defender and quantity supplied.'},
+  'sf-wing':{t:'Winged Shelf Front',p:'pi-specs-assets/WINGED SHEL FFRONT \u2013 1.jpg',c:'PI230',d:'Shelf front unit with integrated side wings for enhanced brand visibility from multiple angles.',ds:['Shelf front: Width 900mm \u00d7 Height 37mm *[PI230]','Wings: Width 120mm \u00d7 Height 180mm each. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK OSO on White Vinyl','Mounted to 1mm ABS plastic \u2014 Die Cut, Heat Bent and assembled'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'crs':{t:'Clicks Rail Strip',p:'pi-specs-assets/CLICKS RAIL STRIP.jpg',c:'PI240',d:'Printed rail strip for the Clicks retail rail system, providing shelf-level brand and promotional communication.',ds:['Overall size: Width 600mm \u00d7 Height 30mm *[PI240]','Landscape. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['200g/m\u00b2 Silk Art Board, 4 Process full colour. Gloss Laminated.'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'fd':{t:'Floor Decal',p:'pi-specs-assets/Floor Decal.jpg',c:'PI250',d:'Floor-applied vinyl decal for impactful brand messaging at floor level in-store.',ds:['Standard size: Width 500mm \u00d7 Height 500mm (custom sizes available) *[PI250]','Bleed: minimum 5mm. Anti-slip surface required.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK on non-slip floor vinyl','Anti-slip laminate applied \u2014 Die cut to shape or square'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pnt':{t:'Product Neck Tags',p:'pi-specs-assets/PRODUCT NECK TAGS.jpg',c:'PI255',d:'Printed neck tag for individual product bottles, providing promotional messaging directly on the product.',ds:['Overall size: Width 80mm \u00d7 Height 120mm folded *[PI255]','Hole diameter: 10mm at top for bottle neck. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['300g/m\u00b2 Silk Art Board, 4 Process full colour','Gloss Laminated \u2014 Die Cut with neck hole punched'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'baw-clicks':{t:'Clicks Box Aisle Wing',p:'pi-specs-assets/CLICKS BOX AISLE WING1.jpg',c:'PI278',d:'Clicks-specific box aisle wing for the Clicks retail environment, with integrated literature box.',ds:['Overall size: Width 150mm \u00d7 Height 400mm *[PI278]','Box attachment: Width 100mm \u00d7 Height 150mm \u00d7 Depth 30mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. All die lines in spot colour set to overprint.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'baw-lg':{t:'Large Box Aisle Wing',p:'pi-specs-assets/LARGE BOX AISLE WING.jpg',c:'PI276',d:'Large box aisle wing with maximum literature capacity for high-traffic sampling or leaflet campaigns.',ds:['Overall size: Width 230mm \u00d7 Height 600mm *[PI276]','Box: Width 200mm \u00d7 Height 250mm \u00d7 Depth 50mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'baw-med':{t:'Medium Box Aisle Wing',p:'pi-specs-assets/MEDIUM BOX AISLE WING1.jpg',c:'PI274',d:'Medium box aisle wing combining brand messaging with an integrated literature or sample box.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI274]','Box: Width 130mm \u00d7 Height 180mm \u00d7 Depth 40mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'baw-blg':{t:'Boxed Aisle Wing Large',p:'pi-specs-assets/BOXED AISLE WING LARGE.jpg',c:'PI272',d:'Large Boxed Aisle Wing with integrated leaflet distribution for maximum visibility.',ds:['Overall size: Width 230mm \u00d7 Height 600mm *[PI272]','Leaflet box: Width 150mm \u00d7 Height 200mm \u00d7 Depth 30mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'baw-bmed':{t:'Boxed Aisle Wing Medium',p:'pi-specs-assets/BOXED AISLE WING MEDIUM \u2013 1.jpg',c:'PI270',d:'Boxed Aisle Wing with integrated leaflet box, combining brand communication with literature distribution.',ds:['Overall size: Width 180mm \u00d7 Height 455mm *[PI270]','Leaflet box: Width 100mm \u00d7 Height 150mm \u00d7 Depth 30mm','Portrait \u2014 Printed both sides. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. All die lines in spot colour set to overprint.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex \u2014 Custom die from trace'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'pour':{t:'Pouring Aisle Wing \u2014 Medium',p:'pi-specs-assets/Pouring Aisle Wing - Medium.jpg',c:'PI280',d:'Medium Pouring Aisle Wing with a shaped top element simulating a pouring action \u2014 ideal for beverage and sauce brands.',ds:['Overall size: Width 180mm \u00d7 Height 500mm (including pour element) *[PI280]','Portrait \u2014 Printed both sides. Custom pour-shape die required from client. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. All die lines in spot colour set to overprint.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex \u2014 Custom die from trace'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'fr-dbox':{t:'Freezer Divider Boxed',p:'pi-specs-assets/FREEZER DIVIDERBOXED.jpg',c:'PI290',d:'Boxed freezer divider for vertical brand communication inside freezer units, with integrated literature slot.',ds:['Overall size: Width 80mm \u00d7 Height 300mm *[PI290]','Single sided, portrait. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK on White Vinyl \u2014 Mounted to 2mm forex \u2014 Die Cut'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'fr-div':{t:'Freezer Divider',p:'pi-specs-assets/FREEZER DIVIDER \u2013 1.jpg',c:'PI292',d:'Standard freezer divider for vertical brand communication inside freezer units.',ds:['Overall size: Width 50mm \u00d7 Height 300mm *[PI292]','Single sided, portrait. Bleed: minimum 3mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK on White Vinyl \u2014 Mounted to 2mm forex \u2014 Die Cut'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'fr-decal':{t:'Fridge Frame Decal',p:'pi-specs-assets/FRIDGE FRAME DECAL.jpg',c:'PI295',d:'Vinyl decal applied to the fridge door frame for prominent brand messaging at point of purchase.',ds:['Overall size: Width 600mm \u00d7 Height 1800mm (standard fridge door) *[PI295]','Bleed: minimum 5mm all sides. Critical artwork safe zone: 20mm from all edges.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['Digitally printed CMYK on clear or white vinyl','UV laminate for durability \u2014 Applied by Primedia Instore installation team'],pk:'All printed material rolled on core.\nRolls labelled: Client name, brand name, media service descriptor and quantity supplied.'},
+  'bqw':{t:'Bollard Queue Wing',p:'pi-specs-assets/Home.jpg',c:'PI300',d:'Wing unit mounted on till-point bollards for brand messaging in the queue area, maximising dwell-time shopper engagement.',ds:['Overall size: Width 200mm \u00d7 Height 400mm *[PI300]','Portrait \u2014 Printed both sides. Mirror images to be supplied. Bleed: minimum 5mm.'],ar:['All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.'],pr:['HI-Q Titan (Gloss) 200g/m\u00b2 White, 4 Process full colour front only','Gloss Laminated one side only \u2014 Mounted to both sides of 2mm forex'],pk:'All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.'}
+};
+
+/* ═══ DEFAULT CATEGORIES ═══════════════════════════════════════════ */
+var DEFAULT_CATS = [
+  {id:'90-degree',label:'90 Degree',groups:[{id:'aw',label:'Aisle Wing'},{id:'sw',label:'Shelf Wing'}]},
+  {id:'illuminated',label:'Illuminated',groups:[]},
+  {id:'shopper-facing',label:'Shopper Facing',groups:[{id:'pst',label:'Product Showcase / Tester'},{id:'pg',label:'Price Glorifier'},{id:'sf',label:'Shelf Front'}]},
+  {id:'leaflet',label:'Leaflet',groups:[{id:'baw',label:'Boxed Aisle Wing'}]},
+  {id:'fridge',label:'Fridge',groups:[{id:'fridge-grp',label:'Fridge and Freezer'}]},
+  {id:'till-point',label:'Till Point',groups:[]}
+];
+var SPEC_CAT_MAP = {
+  'aw-med':{cat:'90-degree',group:'aw'},'aw-med-po':{cat:'90-degree',group:'aw'},
+  'aw-spin':{cat:'90-degree',group:'aw'},'aw-lg-pack':{cat:'90-degree',group:'aw'},
+  'aw-med-pack':{cat:'90-degree',group:'aw'},'clicks-aw':{cat:'90-degree',group:'aw'},
+  'clicks-aw-po':{cat:'90-degree',group:'aw'},'clicks-aw-dome':{cat:'90-degree',group:'aw'},
+  'sw-land':{cat:'90-degree',group:'sw'},'sw-port':{cat:'90-degree',group:'sw'},
+  'sw-230':{cat:'90-degree',group:'sw'},'ill-aw-med':{cat:'illuminated',group:''},
+  'pst-wg':{cat:'shopper-facing',group:'pst'},'pst-pack':{cat:'shopper-facing',group:'pst'},
+  'pst-main':{cat:'shopper-facing',group:'pst'},'pst-test':{cat:'shopper-facing',group:'pst'},
+  'pst-wine':{cat:'shopper-facing',group:'pst'},'pg-std':{cat:'shopper-facing',group:'pg'},
+  'pg-rect':{cat:'shopper-facing',group:'pg'},'pg-round':{cat:'shopper-facing',group:'pg'},
+  'pg-abs':{cat:'shopper-facing',group:'pg'},'pg-priplak':{cat:'shopper-facing',group:'pg'},
+  'sf-talk':{cat:'shopper-facing',group:'sf'},'sf-abs':{cat:'shopper-facing',group:'sf'},
+  'sf-90abs':{cat:'shopper-facing',group:'sf'},'sf-prem':{cat:'shopper-facing',group:'sf'},
+  'sf-wing':{cat:'shopper-facing',group:'sf'},'crs':{cat:'shopper-facing',group:''},
+  'fd':{cat:'shopper-facing',group:''},'pnt':{cat:'shopper-facing',group:''},
+  'baw-clicks':{cat:'leaflet',group:'baw'},'baw-lg':{cat:'leaflet',group:'baw'},
+  'baw-med':{cat:'leaflet',group:'baw'},'baw-blg':{cat:'leaflet',group:'baw'},
+  'baw-bmed':{cat:'leaflet',group:'baw'},'pour':{cat:'leaflet',group:''},
+  'fr-dbox':{cat:'fridge',group:'fridge-grp'},'fr-div':{cat:'fridge',group:'fridge-grp'},
+  'fr-decal':{cat:'fridge',group:'fridge-grp'},'bqw':{cat:'till-point',group:''}
+};
+var CATS = JSON.parse(JSON.stringify(DEFAULT_CATS));
+
+function initData() {
+  try { var sc = localStorage.getItem('pi_cats'); if(sc) CATS = JSON.parse(sc); } catch(e){}
+  // Apply cat/group to ALL base specs
+  Object.keys(SPECS).forEach(function(k){
+    if (SPEC_CAT_MAP[k]) { SPECS[k].cat = SPEC_CAT_MAP[k].cat; SPECS[k].group = SPEC_CAT_MAP[k].group; }
+  });
+  // Load admin-added/edited specs (stored separately from base specs)
+  try {
+    var ss = localStorage.getItem('pi_specs');
+    if (ss) { var stored = JSON.parse(ss); Object.keys(stored).forEach(function(k){ SPECS[k] = stored[k]; }); }
+  } catch(e){}
+  // Restore images stored separately (avoids quota issues)
+  try {
+    var im = localStorage.getItem('pi_images');
+    if (im) { var imgs = JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k]) SPECS[k].p = imgs[k]; }); }
+  } catch(e){}
+  // Apply deletions of base specs
+  try {
+    var del = JSON.parse(localStorage.getItem('pi_deleted') || '[]');
+    del.forEach(function(k){ delete SPECS[k]; });
+  } catch(e){}
+}
+
+function saveCats() { try { localStorage.setItem('pi_cats', JSON.stringify(CATS)); } catch(e){} }
+
+function saveStoredSpecs() {
+  // Only persist admin-added specs — base specs live in code, not localStorage
+  var stored = {}, imgs = {};
+  Object.keys(SPECS).forEach(function(k) {
+    if (!SPECS[k]._admin) return;
+    var spec = {};
+    Object.keys(SPECS[k]).forEach(function(f){ spec[f] = SPECS[k][f]; });
+    // Split out base64 images to a separate key to avoid quota issues
+    if (spec.p && spec.p.indexOf('data:') === 0) { imgs[k] = spec.p; delete spec.p; }
+    stored[k] = spec;
+  });
+  try { localStorage.setItem('pi_specs', JSON.stringify(stored)); } catch(e){ console.warn('Spec save failed',e); }
+  try { localStorage.setItem('pi_images', JSON.stringify(imgs)); } catch(e){ console.warn('Image save failed — image may be too large'); }
+}
+
+/* ═══ NAV RENDERING ════════════════════════════════════════════════ */
+function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function filterNav(value) {
+  var q = value.toLowerCase().trim();
+  document.querySelectorAll('#nav .nav-item, #nav .sub-item').forEach(function(el){
+    el.style.display = (!q || el.textContent.toLowerCase().indexOf(q)!==-1) ? '' : 'none';
+  });
+  document.querySelectorAll('#nav .nav-section').forEach(function(sec){
+    var any = Array.from(sec.querySelectorAll('.nav-item,.sub-item')).some(function(e){ return e.style.display!=='none'; });
+    sec.style.display = any ? '' : 'none';
+  });
+  // Auto-expand sub-lists when searching
+  document.querySelectorAll('#nav .sub-list').forEach(function(sl){ sl.classList.toggle('open', !!q); });
+  document.querySelectorAll('#nav .nav-item.has-sub').forEach(function(b){ b.classList.toggle('open', !!q); });
+  if (!q) openSec = null;
+}
+
+function renderNav() {
+  var nav = document.getElementById('nav');
+  var prevSearch = document.getElementById('nav-search-inp') ? document.getElementById('nav-search-inp').value : '';
+  var html = '<div class="nav-search-wrap">';
+  html += '<svg class="nav-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+  html += '<input class="nav-search-inp" id="nav-search-inp" type="text" placeholder="Search formats..." oninput="filterNav(this.value)"/>';
+  html += '</div>';
+  CATS.forEach(function(cat) {
+    var catHasContent = false;
+    var catHtml = '<div class="nav-section"><div class="nav-section-label">' + escH(cat.label) + '</div>';
+    cat.groups.forEach(function(grp) {
+      var items = Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===cat.id && SPECS[k].group===grp.id; });
+      if (!items.length) return;
+      catHasContent = true;
+      catHtml += '<button class="nav-item has-sub" id="nb-' + escH(grp.id) + '" onclick="toggleSec(\'' + grp.id + '\',this)">';
+      catHtml += '<span class="ni-dot"></span>' + escH(grp.label);
+      catHtml += '<svg class="ni-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>';
+      catHtml += '<div class="sub-list" id="sl-' + escH(grp.id) + '">';
+      items.forEach(function(k){ catHtml += '<button class="sub-item" data-key="' + k + '" onclick="openSpec(\'' + k + '\')"><span class="sub-dot"></span>' + escH(SPECS[k].t) + '</button>'; });
+      catHtml += '</div>';
+    });
+    var standalone = Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===cat.id && !SPECS[k].group; });
+    standalone.forEach(function(k){
+      catHasContent = true;
+      catHtml += '<button class="nav-item" data-key="' + k + '" onclick="openSpec(\'' + k + '\')"><span class="ni-dot"></span>' + escH(SPECS[k].t) + '</button>';
+    });
+    catHtml += '</div>';
+    if (catHasContent) html += catHtml;
+  });
+  nav.innerHTML = html;
+  if (prevSearch) { document.getElementById('nav-search-inp').value = prevSearch; filterNav(prevSearch); }
+}
+
+/* ═══ STATE ════════════════════════════════════════════════════════ */
+var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfPdfFile = null, admCurTab = 'specs';
+
+function toggleSec(id, btn) {
+  var list = document.getElementById('sl-' + id);
+  if (!list) return;
+  var same = openSec === id;
+  if (openSec) {
+    var prev = document.getElementById('sl-' + openSec); if(prev) prev.classList.remove('open');
+    var pb = document.getElementById('nb-' + openSec); if(pb) pb.classList.remove('open');
+  }
+  openSec = same ? null : id;
+  if (!same) { list.classList.add('open'); btn.classList.add('open'); }
+}
+
+/* ═══ SPEC VIEW ════════════════════════════════════════════════════ */
+function openSpec(key) {
+  var s = SPECS[key];
+  if (!s) { showToast('Spec coming soon','err'); return; }
+  curSpec = key;
+  document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
+  var nb = document.querySelector('[data-key="' + key + '"]');
+  if (nb) nb.classList.add('selected');
+  var h = '<h1 class="spec-h">' + escH(s.t) + '</h1><p class="spec-desc">' + escH(s.d) + '</p>';
+  if (s.ds && s.ds.length) {
+    h += '<div class="spec-block"><div class="spec-block-label">Design Specifications</div><div class="spec-rows">';
+    s.ds.forEach(function(x){ h += '<div class="spec-row">' + escH(x.replace(/\s*\*\[[A-Z0-9]+\]/g,'')) + '</div>'; });
+    h += '</div></div>';
+  }
+  if (s.ar && s.ar.length) {
+    h += '<div class="spec-block"><div class="spec-block-label">Artwork Specifications</div><div class="spec-rows">';
+    s.ar.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    h += '</div></div>';
+  }
+  if (s.p2) {
+    h += '<div class="spec-block"><div class="spec-block-label">Printing Specifications</div><div class="spec-2col">';
+    h += '<div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.p2.l.h) + '</div><div class="spec-rows">';
+    s.p2.l.i.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    h += '</div></div><div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.p2.r.h) + '</div><div class="spec-rows">';
+    s.p2.r.i.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    h += '</div></div></div></div>';
+  } else if (s.pr && s.pr.length) {
+    h += '<div class="spec-block"><div class="spec-block-label">Printing Specifications</div><div class="spec-rows">';
+    s.pr.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    h += '</div></div>';
+  }
+  if (s.pk) {
+    h += '<div class="spec-block"><div class="spec-block-label">Packaging</div><div class="spec-rows">';
+    s.pk.split('\n').forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    h += '</div></div>';
+  }
+  document.getElementById('spec-content').innerHTML = h;
+  document.getElementById('spec-panel').scrollTop = 0;
+  document.getElementById('pi-chip').textContent = s.c || '';
+  var img = document.getElementById('spec-img'); img.src = s.p||''; img.alt = s.t;
+  document.getElementById('bc-spec').textContent = s.t;
+  document.getElementById('bc-spec').style.display = '';
+  document.getElementById('home').classList.add('out');
+  document.getElementById('specview').classList.add('in');
+}
+
+function goHome() {
+  curSpec = null;
+  document.getElementById('home').classList.remove('out');
+  document.getElementById('specview').classList.remove('in');
+  document.getElementById('bc-spec').style.display = 'none';
+  document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
+}
+
+function dlDL() {
+  if (!curSpec) return;
+  var s = SPECS[curSpec];
+  if (!s.dl_name) { showToast('No die line available for this spec','err'); return; }
+  var a = document.createElement('a');
+  a.href = 'pi-specs-dielines/' + s.dl_name;
+  a.download = s.dl_name;
+  a.click();
+}
+
+/* ═══ AUTH ══════════════════════════════════════════════════════════ */
+function openLogin() {
+  if (isAdmin) { openAdminPanel(); return; }
+  document.getElementById('login-curtain').classList.add('open');
+  setTimeout(function(){ document.getElementById('lu').focus(); }, 100);
+}
+function closeLogin() { document.getElementById('login-curtain').classList.remove('open'); document.getElementById('le').textContent=''; }
+function doLogin() {
+  if (document.getElementById('lu').value.trim()==='admin' && document.getElementById('lp').value==='primedia2025') {
+    isAdmin=true; closeLogin();
+    var b=document.getElementById('admin-btn');
+    b.classList.add('admin-on');
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
+    openAdminPanel();
+    showToast('Admin access granted','ok');
+  } else { document.getElementById('le').textContent='Incorrect credentials.'; }
+}
+
+/* ═══ ADMIN PANEL ══════════════════════════════════════════════════ */
+function openAdminPanel() {
+  // Reset panes so toolbar re-renders fresh on each open
+  document.getElementById('adm-specs-pane').innerHTML = '';
+  document.getElementById('adm-cats-pane').innerHTML = '';
+  renderAdminSpecs();
+  renderAdminCats();
+  showAdmTab(admCurTab);
+  document.getElementById('admin-curtain').classList.add('open');
+}
+function closeAdmin() { document.getElementById('admin-curtain').classList.remove('open'); }
+
+function showAdmTab(tab) {
+  admCurTab = tab;
+  document.getElementById('adm-specs-pane').classList.toggle('hidden', tab!=='specs');
+  document.getElementById('adm-cats-pane').classList.toggle('hidden', tab!=='cats');
+  document.getElementById('tab-specs').classList.toggle('active', tab==='specs');
+  document.getElementById('tab-cats').classList.toggle('active', tab==='cats');
+}
+
+function renderAdminSpecs() {
+  // Render toolbar once; only update the list on re-render
+  var pane = document.getElementById('adm-specs-pane');
+  if (!document.getElementById('adm-search-inp')) {
+    var toolbar = '<div class="adm-toolbar"><div class="adm-toolbar-left">';
+    toolbar += '<input class="adm-search" id="adm-search-inp" placeholder="Search specs..." oninput="filterAdminSpecs(this.value)"/>';
+    toolbar += '<span class="adm-count" id="adm-count"></span></div>';
+    toolbar += '<button class="adm-add-btn" onclick="openSpecForm(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Spec</button></div>';
+    toolbar += '<div id="adm-list-wrap"></div>';
+    pane.innerHTML = toolbar;
+  }
+  var inp = document.getElementById('adm-search-inp');
+  filterAdminSpecs(inp ? inp.value : '');
+}
+
+function filterAdminSpecs(filter) {
+  var listWrap = document.getElementById('adm-list-wrap');
+  if (!listWrap) return;
+  var allKeys = Object.keys(SPECS);
+  var keys = filter ? allKeys.filter(function(k){ return SPECS[k].t.toLowerCase().indexOf(filter.toLowerCase())!==-1; }) : allKeys;
+  var count = document.getElementById('adm-count');
+  if (count) count.textContent = filter ? (keys.length + ' of ' + allKeys.length) : (allKeys.length + ' specs');
+  var html = '<div class="adm-list">';
+  html += '<div class="adm-row adm-row-head"><div class="adm-cell">Name</div><div class="adm-cell">Category</div><div class="adm-cell">Group</div><div class="adm-cell"></div></div>';
+  if (!keys.length) {
+    html += '<div style="padding:24px;text-align:center;color:var(--txt3);font-size:12px">No specs found.</div>';
+  } else {
+    keys.forEach(function(k) {
+      var s = SPECS[k];
+      var catLabel='', grpLabel='';
+      if (s.cat) {
+        var cat = CATS.find(function(c){ return c.id===s.cat; });
+        if (cat) { catLabel=cat.label; if(s.group){ var grp=cat.groups.find(function(g){return g.id===s.group;}); if(grp) grpLabel=grp.label; } }
+      }
+      html += '<div class="adm-row"><div class="adm-cell">' + escH(s.t) + '</div>';
+      html += '<div class="adm-cell muted">' + escH(catLabel||'—') + '</div>';
+      html += '<div class="adm-cell muted">' + escH(grpLabel||'—') + '</div>';
+      html += '<div class="adm-actions"><button class="adm-btn" onclick="openSpecForm(\'' + k + '\')">Edit</button>';
+      html += '<button class="adm-btn del" onclick="confirmDeleteSpec(\'' + k + '\')">Delete</button></div></div>';
+    });
+  }
+  html += '</div>';
+  listWrap.innerHTML = html;
+}
+
+function renderAdminCats() {
+  var html = '<div class="adm-cat-list">';
+  CATS.forEach(function(cat) {
+    html += '<div class="adm-cat"><div class="adm-cat-header"><span class="adm-cat-label">' + escH(cat.label) + '</span>';
+    html += '<div class="adm-cat-actions"><button class="adm-btn del" onclick="confirmDeleteCat(\'' + cat.id + '\')">Delete Category</button></div></div>';
+    html += '<div class="adm-cat-body">';
+    if (cat.groups.length) {
+      html += '<div class="adm-group-list">';
+      cat.groups.forEach(function(grp) {
+        html += '<div class="adm-group-row"><span class="adm-group-label">' + escH(grp.label) + '</span>';
+        html += '<button class="adm-btn del" onclick="confirmDeleteGroup(\'' + cat.id + '\',\'' + grp.id + '\')">Remove</button></div>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="adm-add-inline"><input class="adm-inline-inp" id="grp-inp-' + cat.id + '" placeholder="New sub-group name..." onkeydown="if(event.key===\'Enter\')addGroup(\'' + cat.id + '\')"/>';
+    html += '<button class="adm-inline-btn" onclick="addGroup(\'' + cat.id + '\')">Add Group</button></div></div></div>';
+  });
+  html += '</div><div class="adm-add-cat-row"><input class="adm-inline-inp" id="cat-inp" placeholder="New category name..." onkeydown="if(event.key===\'Enter\')addCategory()"/>';
+  html += '<button class="adm-inline-btn" onclick="addCategory()">Add Category</button></div>';
+  document.getElementById('adm-cats-pane').innerHTML = html;
+}
+
+/* ═══ SPEC FORM ════════════════════════════════════════════════════ */
+function openSpecForm(key) {
+  editingKey = key;
+  sfImgData = null;
+  var catSel = document.getElementById('sf-cat');
+  catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('');
+  var s = key ? SPECS[key] : null;
+  document.getElementById('sf-title').textContent = key ? 'Edit Spec' : 'Add Spec';
+  document.getElementById('sf-name').value = s ? s.t : '';
+  sfPdfFile = null;
+  if (key && s && s.dl_name) {
+    document.getElementById('sf-pdf-label').textContent = '✓ ' + s.dl_name;
+  } else {
+    document.getElementById('sf-pdf-label').textContent = 'Drop PDF or click to browse';
+  }
+  document.getElementById('sf-desc').value = s ? (s.d||'') : '';
+  document.getElementById('sf-ds').value = s&&s.ds ? s.ds.join('\n') : '';
+  document.getElementById('sf-ar').value = s&&s.ar ? s.ar.join('\n') : '';
+  document.getElementById('sf-pr').value = s&&s.pr ? s.pr.join('\n') : '';
+  document.getElementById('sf-pk').value = s ? (s.pk||'') : '';
+  if (s&&s.cat) catSel.value = s.cat;
+  sfUpdateGroups(s ? s.group : null);
+  var prev = document.getElementById('sf-img-preview');
+  if (s&&s.p) { prev.src=s.p; prev.style.display='block'; sfImgData=s.p; } else { prev.src=''; prev.style.display='none'; }
+  document.getElementById('spec-form-curtain').classList.add('open');
+}
+
+function sfUpdateGroups(selectedGroup) {
+  var catId = document.getElementById('sf-cat').value;
+  var cat = CATS.find(function(c){ return c.id===catId; });
+  var opts = '<option value="">— None (standalone) —</option>';
+  if (cat) cat.groups.forEach(function(g){ opts += '<option value="' + g.id + '"' + (selectedGroup===g.id?' selected':'') + '>' + escH(g.label) + '</option>'; });
+  document.getElementById('sf-group').innerHTML = opts;
+}
+
+function sfImgPick(input) {
+  if (!input.files||!input.files[0]) return;
+  var r = new FileReader();
+  r.onload = function(e) { sfImgData=e.target.result; var p=document.getElementById('sf-img-preview'); p.src=sfImgData; p.style.display='block'; };
+  r.readAsDataURL(input.files[0]);
+}
+
+function sfImgDrop(event) {
+  event.preventDefault();
+  document.getElementById('sf-img-zone').classList.remove('drag');
+  var file = event.dataTransfer.files[0];
+  if (!file||!file.type.startsWith('image/')) return;
+  var r = new FileReader();
+  r.onload = function(e) { sfImgData=e.target.result; var p=document.getElementById('sf-img-preview'); p.src=sfImgData; p.style.display='block'; };
+  r.readAsDataURL(file);
+}
+
+function sfPdfPick(input) {
+  if (!input.files||!input.files[0]) return;
+  sfPdfFile = input.files[0];
+  document.getElementById('sf-pdf-label').textContent = '✓ ' + sfPdfFile.name;
+}
+function sfPdfDrop(event) {
+  event.preventDefault();
+  document.getElementById('sf-pdf-zone').classList.remove('drag');
+  var file = event.dataTransfer.files[0];
+  if (!file || file.type !== 'application/pdf') { showToast('Please drop a PDF file','err'); return; }
+  sfPdfFile = file;
+  document.getElementById('sf-pdf-label').textContent = '✓ ' + file.name;
+}
+function closeSpecForm() { document.getElementById('spec-form-curtain').classList.remove('open'); }
+
+function saveSpecForm() {
+  var name = document.getElementById('sf-name').value.trim();
+  if (!name) { showToast('Format name is required','err'); return; }
+  var catId = document.getElementById('sf-cat').value;
+  var groupId = document.getElementById('sf-group').value;
+  var key = editingKey || ('spec-' + Date.now());
+  SPECS[key] = {
+    t: name,
+    d: document.getElementById('sf-desc').value.trim(),
+    ds: document.getElementById('sf-ds').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
+    ar: document.getElementById('sf-ar').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
+    pr: document.getElementById('sf-pr').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
+    pk: document.getElementById('sf-pk').value.trim(),
+    p: sfImgData || (editingKey&&SPECS[editingKey] ? SPECS[editingKey].p : ''),
+    dl_name: sfPdfFile ? sfPdfFile.name : (editingKey&&SPECS[editingKey] ? SPECS[editingKey].dl_name : null),
+    cat: catId, group: groupId, _admin: true
+  };
+  var doSave = function(savedFilename) {
+    if (savedFilename) SPECS[key].dl_name = savedFilename;
+    saveStoredSpecs();
+    renderNav();
+    renderAdminSpecs();
+    closeSpecForm();
+    showToast((editingKey ? 'Updated: ' : 'Added: ') + name,'ok');
+  };
+  if (sfPdfFile) {
+    var fd = new FormData();
+    fd.append('file', sfPdfFile, sfPdfFile.name);
+    fetch('http://localhost:3000/upload-dieline', { method: 'POST', body: fd })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ doSave(j.filename); })
+      .catch(function(){ showToast('PDF upload failed — is the server running?','err'); doSave(null); });
+  } else {
+    doSave(null);
+  }
+}
+
+function confirmDeleteSpec(key) {
+  if (!confirm('Delete "' + SPECS[key].t + '"? This cannot be undone.')) return;
+  // Base specs (not admin-added) need to be tracked in deleted list so they don't reappear on reload
+  if (!SPECS[key]._admin) {
+    try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1)d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } catch(e){}
+  }
+  // Clean up image store and server-side die line file
+  try { var im=JSON.parse(localStorage.getItem('pi_images')||'{}'); delete im[key]; localStorage.setItem('pi_images',JSON.stringify(im)); } catch(e){}
+  if (SPECS[key].dl_name) {
+    fetch('http://localhost:3000/delete-dieline?file=' + encodeURIComponent(SPECS[key].dl_name), { method:'DELETE' }).catch(function(){});
+  }
+  delete SPECS[key];
+  saveStoredSpecs();
+  renderNav();
+  renderAdminSpecs();
+  showToast('Spec deleted','ok');
+}
+
+/* ═══ CATEGORY CRUD ════════════════════════════════════════════════ */
+function addCategory() {
+  var inp = document.getElementById('cat-inp');
+  var label = inp.value.trim();
+  if (!label) { showToast('Enter a category name','err'); return; }
+  var id = 'cat-' + label.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Date.now();
+  CATS.push({id:id, label:label, groups:[]});
+  saveCats(); renderNav(); renderAdminCats();
+  inp.value = '';
+  showToast('Category added: ' + label,'ok');
+}
+
+function confirmDeleteCat(catId) {
+  var cat = CATS.find(function(c){ return c.id===catId; });
+  if (!cat) return;
+  var sc = Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===catId; }).length;
+  if (!confirm('Delete "' + cat.label + '"?' + (sc?' '+sc+' spec(s) will also be removed.':''))) return;
+  Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===catId; }).forEach(function(k){ delete SPECS[k]; });
+  CATS = CATS.filter(function(c){ return c.id!==catId; });
+  saveCats(); saveStoredSpecs(); renderNav(); renderAdminCats(); renderAdminSpecs();
+  showToast('Category deleted','ok');
+}
+
+function addGroup(catId) {
+  var inp = document.getElementById('grp-inp-' + catId);
+  if (!inp) return;
+  var label = inp.value.trim();
+  if (!label) { showToast('Enter a group name','err'); return; }
+  var cat = CATS.find(function(c){ return c.id===catId; });
+  if (!cat) return;
+  var id = 'grp-' + label.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + Date.now();
+  cat.groups.push({id:id, label:label});
+  saveCats(); renderNav(); renderAdminCats();
+  showToast('Group added: ' + label,'ok');
+}
+
+function confirmDeleteGroup(catId, groupId) {
+  var cat = CATS.find(function(c){ return c.id===catId; });
+  if (!cat) return;
+  var grp = cat.groups.find(function(g){ return g.id===groupId; });
+  if (!grp) return;
+  var sc = Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===catId&&SPECS[k].group===groupId; }).length;
+  if (!confirm('Remove group "' + grp.label + '"?' + (sc?' '+sc+' spec(s) will become standalone.':''))) return;
+  Object.keys(SPECS).filter(function(k){ return SPECS[k].cat===catId&&SPECS[k].group===groupId; }).forEach(function(k){ SPECS[k].group=''; });
+  cat.groups = cat.groups.filter(function(g){ return g.id!==groupId; });
+  saveCats(); saveStoredSpecs(); renderNav(); renderAdminCats();
+  showToast('Group removed','ok');
+}
+
+/* ═══ TOAST ════════════════════════════════════════════════════════ */
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'toast ' + (type||'ok') + ' show';
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.className = 'toast ' + (type||'ok'); }, 3000);
+}
+
+/* ═══ INDEXEDDB — DIE LINE STORAGE ═════════════════════════════════ */
+var _db = null;
+function _openDB(cb) {
+  if (_db) { cb(_db); return; }
+  var req = indexedDB.open('pi_dielines', 1);
+  req.onupgradeneeded = function(e) { e.target.result.createObjectStore('files'); };
+  req.onsuccess = function(e) { _db = e.target.result; cb(_db); };
+  req.onerror = function() { cb(null); };
+}
+function dbPut(key, file, cb) {
+  _openDB(function(d) {
+    if (!d) { cb&&cb(false); return; }
+    var tx = d.transaction('files','readwrite');
+    tx.objectStore('files').put(file, key);
+    tx.oncomplete = function(){ cb&&cb(true); };
+    tx.onerror = function(){ cb&&cb(false); };
+  });
+}
+function dbGet(key, cb) {
+  _openDB(function(d) {
+    if (!d) { cb(null); return; }
+    var req = d.transaction('files','readonly').objectStore('files').get(key);
+    req.onsuccess = function(){ cb(req.result||null); };
+    req.onerror = function(){ cb(null); };
+  });
+}
+function dbDel(key) {
+  _openDB(function(d) {
+    if (!d) return;
+    d.transaction('files','readwrite').objectStore('files').delete(key);
+  });
+}
+
+/* ═══ INIT ══════════════════════════════════════════════════════════ */
+initData();
+renderNav();
+</script>
+</body>
+</html>
