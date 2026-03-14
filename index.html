@@ -1039,7 +1039,6 @@ function openSpec(key) {
   var img = document.getElementById('spec-img'); img.src = s.p||''; img.alt = s.t;
   document.getElementById('bc-spec').textContent = s.t;
   document.getElementById('bc-spec').style.display = '';
-  document.getElementById('dl-bar').style.display = s.dl_name ? '' : 'none';
   document.getElementById('home').classList.add('out');
   document.getElementById('specview').classList.add('in');
 }
