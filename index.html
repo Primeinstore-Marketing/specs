@@ -983,7 +983,7 @@ function renderNav() {
 }
 
 /* ═══ STATE ════════════════════════════════════════════════════════ */
-var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfPdfFile = null, admCurTab = 'specs';
+var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfPdfFile = null, admCurTab = 'specs';
 
 function toggleSec(id, btn) {
   var list = document.getElementById('sl-' + id);
@@ -1118,6 +1118,50 @@ function ghDeletePdf(filename) {
     .catch(function(){});
 }
 
+function ghUploadImage(file, cb) {
+  var pat = getGhPat();
+  if (!pat) { showToast('No GitHub token — add one in Admin → Settings','err'); cb(null); return; }
+  var filename = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  var path = 'pi-specs-images/' + filename;
+  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var reader = new FileReader();
+  reader.onload = function() {
+    var b64 = reader.result.split(',')[1];
+    fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(existing) {
+        var body = { message: 'Add image: ' + filename, content: b64 };
+        if (existing && existing.sha) body.sha = existing.sha;
+        return fetch(apiBase + path, {
+          method: 'PUT',
+          headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      })
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(){ cb(filename); })
+      .catch(function(e){ console.error(e); showToast('Image upload to GitHub failed — check your token','err'); cb(null); });
+  };
+  reader.readAsDataURL(file);
+}
+function ghDeleteImage(filename) {
+  var pat = getGhPat();
+  if (!pat || !filename) return;
+  var path = 'pi-specs-images/' + filename;
+  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(existing) {
+      if (!existing || !existing.sha) return;
+      return fetch(apiBase + path, {
+        method: 'DELETE',
+        headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Remove image: ' + filename, sha: existing.sha })
+      });
+    })
+    .catch(function(){});
+}
+
 /* ═══ AUTH ══════════════════════════════════════════════════════════ */
 function openLogin() {
   if (isAdmin) { openAdminPanel(); return; }
@@ -1232,7 +1276,7 @@ function renderAdminCats() {
 /* ═══ SPEC FORM ════════════════════════════════════════════════════ */
 function openSpecForm(key) {
   editingKey = key;
-  sfImgData = null;
+  sfImgData = null; sfImgFile = null;
   var catSel = document.getElementById('sf-cat');
   catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('');
   var s = key ? SPECS[key] : null;
@@ -1266,9 +1310,10 @@ function sfUpdateGroups(selectedGroup) {
 
 function sfImgPick(input) {
   if (!input.files||!input.files[0]) return;
+  sfImgFile = input.files[0];
   var r = new FileReader();
-  r.onload = function(e) { sfImgData=e.target.result; var p=document.getElementById('sf-img-preview'); p.src=sfImgData; p.style.display='block'; };
-  r.readAsDataURL(input.files[0]);
+  r.onload = function(e) { var p=document.getElementById('sf-img-preview'); p.src=e.target.result; p.style.display='block'; };
+  r.readAsDataURL(sfImgFile);
 }
 
 function sfImgDrop(event) {
@@ -1276,9 +1321,10 @@ function sfImgDrop(event) {
   document.getElementById('sf-img-zone').classList.remove('drag');
   var file = event.dataTransfer.files[0];
   if (!file||!file.type.startsWith('image/')) return;
+  sfImgFile = file;
   var r = new FileReader();
-  r.onload = function(e) { sfImgData=e.target.result; var p=document.getElementById('sf-img-preview'); p.src=sfImgData; p.style.display='block'; };
-  r.readAsDataURL(file);
+  r.onload = function(e) { var p=document.getElementById('sf-img-preview'); p.src=e.target.result; p.style.display='block'; };
+  r.readAsDataURL(sfImgFile);
 }
 
 function sfPdfPick(input) {
@@ -1309,23 +1355,29 @@ function saveSpecForm() {
     ar: document.getElementById('sf-ar').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
     pr: document.getElementById('sf-pr').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
     pk: document.getElementById('sf-pk').value.trim(),
-    p: sfImgData || (editingKey&&SPECS[editingKey] ? SPECS[editingKey].p : ''),
+    p: editingKey&&SPECS[editingKey] ? SPECS[editingKey].p : '',
     dl_name: sfPdfFile ? sfPdfFile.name : (editingKey&&SPECS[editingKey] ? SPECS[editingKey].dl_name : null),
     cat: catId, group: groupId, _admin: true
   };
-  var doSave = function(savedFilename) {
-    if (savedFilename) SPECS[key].dl_name = savedFilename;
+  var doSave = function(savedPdf, savedImg) {
+    if (savedPdf) SPECS[key].dl_name = savedPdf;
+    if (savedImg) SPECS[key].p = 'https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/' + savedImg;
     saveStoredSpecs();
     renderNav();
     renderAdminSpecs();
     closeSpecForm();
     showToast((editingKey ? 'Updated: ' : 'Added: ') + name,'ok');
   };
-  if (sfPdfFile) {
-    showToast('Uploading PDF to GitHub…','ok');
-    ghUploadPdf(sfPdfFile, function(filename) { doSave(filename); });
+  var imgFile = sfImgFile;
+  var pdfFile = sfPdfFile;
+  if (imgFile || pdfFile) {
+    showToast('Uploading to GitHub…','ok');
+    var savedPdf = null, savedImg = null, pending = 0;
+    var done = function() { if (--pending === 0) doSave(savedPdf, savedImg); };
+    if (pdfFile) { pending++; ghUploadPdf(pdfFile, function(f){ savedPdf=f; done(); }); }
+    if (imgFile) { pending++; ghUploadImage(imgFile, function(f){ savedImg=f; done(); }); }
   } else {
-    doSave(null);
+    doSave(null, null);
   }
 }
 
@@ -1335,9 +1387,10 @@ function confirmDeleteSpec(key) {
   if (!SPECS[key]._admin) {
     try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1)d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } catch(e){}
   }
-  // Clean up image store and server-side die line file
-  try { var im=JSON.parse(localStorage.getItem('pi_images')||'{}'); delete im[key]; localStorage.setItem('pi_images',JSON.stringify(im)); } catch(e){}
   if (SPECS[key].dl_name) { ghDeletePdf(SPECS[key].dl_name); }
+  if (SPECS[key].p && SPECS[key].p.indexOf('pi-specs-images/') !== -1) {
+    ghDeleteImage(SPECS[key].p.split('pi-specs-images/')[1]);
+  }
   delete SPECS[key];
   saveStoredSpecs();
   renderNav();
