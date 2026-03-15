@@ -1425,9 +1425,8 @@ function saveSpecForm() {
   var doSave = function(newPdfs, savedImg) {
     SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
     if (savedImg) SPECS[key].p = 'https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-images/' + savedImg;
-    if (sfImgRemoved && editingKey && SPECS[editingKey] && SPECS[editingKey].p && SPECS[editingKey].p.indexOf('pi-specs-images/') !== -1) {
-      ghDeleteImage(SPECS[editingKey].p.split('pi-specs-images/')[1]);
-    }
+    var oldImg = editingKey && SPECS[editingKey] && SPECS[editingKey].p && SPECS[editingKey].p.indexOf('pi-specs-images/') !== -1 ? SPECS[editingKey].p.split('pi-specs-images/')[1] : null;
+    if (oldImg && (sfImgRemoved || savedImg)) ghDeleteImage(oldImg);
     saveStoredSpecs();
     renderNav();
     renderAdminSpecs();
