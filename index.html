@@ -555,6 +555,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .adm-btn:hover{background:var(--bg3);color:var(--txt)}
 .adm-btn.del{border-color:rgba(255,77,77,.25);color:rgba(255,77,77,.7)}
 .adm-btn.del:hover{background:rgba(255,77,77,.08);border-color:rgba(255,77,77,.4);color:var(--red)}
+.adm-btn.icon{width:26px;padding:0;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
 .adm-cat-list{display:flex;flex-direction:column;gap:10px}
 .adm-cat{border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .adm-cat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg)}
@@ -1273,7 +1274,7 @@ function filterAdminSpecs(filter) {
       html += '<div class="adm-cell muted">' + escH(grpLabel||'—') + '</div>';
       html += '<div class="adm-actions"><button class="adm-btn" onclick="openSpecForm(\'' + k + '\')">Edit</button>';
       html += '<button class="adm-btn" onclick="duplicateSpec(\'' + k + '\')">Duplicate</button>';
-      html += '<button class="adm-btn del" onclick="confirmDeleteSpec(\'' + k + '\')">Delete</button></div></div>';
+      html += '<button class="adm-btn del icon" onclick="confirmDeleteSpec(\'' + k + '\')" title="Delete">&#x2715;</button></div></div>';
     });
   }
   html += '</div>';
