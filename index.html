@@ -315,19 +315,21 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .dl-bar{
   flex-shrink:0;padding:16px 32px;
   border-top:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;
   background:linear-gradient(0deg,var(--bg1),var(--bg));
 }
-.dl-bar-info{font-size:12px;color:var(--txt2)}
+.dl-bar-info{font-size:12px;color:var(--txt2);margin-bottom:10px}
 .dl-bar-info strong{display:block;font-family:var(--FD);font-size:12px;font-weight:700;color:var(--navy);letter-spacing:-.01em;margin-bottom:2px}
+.dl-file-row{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.dl-file-name{flex:1;font-size:12px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dl-bar-btn{
-  height:36px;padding:0 18px;border-radius:8px;
-  background:var(--navy);color:#fff;font:600 12px var(--F);
-  border:none;cursor:pointer;display:flex;align-items:center;gap:7px;
-  transition:all .18s var(--ease2);
+  height:32px;padding:0 14px;border-radius:7px;
+  background:var(--navy);color:#fff;font:600 11px var(--F);
+  border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:all .18s var(--ease2);flex-shrink:0;
 }
-.dl-bar-btn:hover{background:var(--acc2);transform:translateY(-1px)}
-.dl-bar-btn svg{width:13px;height:13px}
+.dl-bar-btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}
+.dl-bar-btn:hover{background:var(--acc2);color:#fff;transform:translateY(-1px)}
+.dl-bar-btn svg{width:12px;height:12px}
 
 /* Right: photo */
 #spec-photo-pane{
@@ -646,13 +648,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         <div class="spec-scroll" id="spec-content"></div>
         <div class="dl-bar" id="dl-bar">
           <div class="dl-bar-info">
-            <strong>Download Die Line</strong>
-            Vector artwork file for print production
+            <strong>Die Line Files</strong>
+            Vector artwork files for print production
           </div>
-          <button class="dl-bar-btn" onclick="dlDL()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download
-          </button>
+          <div id="dl-files-list"></div>
         </div>
       </div>
       <div id="spec-photo-pane">
@@ -744,12 +743,13 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         </label>
         <img id="sf-img-preview" class="img-preview" src="" alt="" style="display:none"/>
       </div>
-      <div class="fg sf-full"><label>Die Line PDF</label>
-        <input type="file" id="sf-pdf-inp" accept=".pdf,application/pdf" style="display:none" onchange="sfPdfPick(this)"/>
-        <label class="img-upload" id="sf-pdf-zone" for="sf-pdf-inp" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="sfPdfDrop(event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26" style="color:var(--txt3)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-          <div class="img-upload-t" id="sf-pdf-label">Drop PDF or click to browse</div>
-          <div class="img-upload-s">PDF only — Die line vector file</div>
+      <div class="fg sf-full"><label>Die Line PDFs</label>
+        <input type="file" id="sf-pdf-inp" accept=".pdf,application/pdf" multiple style="display:none" onchange="sfPdfPick(this)"/>
+        <div id="sf-pdf-list" style="margin-bottom:8px"></div>
+        <label class="img-upload" id="sf-pdf-zone" for="sf-pdf-inp" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="sfPdfDrop(event)" style="min-height:70px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22" style="color:var(--txt3)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <div class="img-upload-t">Add PDF die line</div>
+          <div class="img-upload-s">PDF only — click or drag to add more</div>
         </label>
       </div>
       <div class="sf-actions">
@@ -985,7 +985,7 @@ function renderNav() {
 }
 
 /* ═══ STATE ════════════════════════════════════════════════════════ */
-var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfPdfFile = null, admCurTab = 'specs';
+var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfPdfFiles = [], sfExistingPdfs = [], admCurTab = 'specs';
 
 function toggleSec(id, btn) {
   var list = document.getElementById('sl-' + id);
@@ -1043,6 +1043,7 @@ function openSpec(key) {
   document.getElementById('bc-spec').style.display = '';
   document.getElementById('home').classList.add('out');
   document.getElementById('specview').classList.add('in');
+  renderDlBar();
 }
 
 function goHome() {
@@ -1053,11 +1054,36 @@ function goHome() {
   document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
 }
 
-function dlDL() {
-  if (!curSpec) return;
-  var s = SPECS[curSpec];
-  if (!s.dl_name) { showToast('No die line available for this spec','err'); return; }
-  window.open('https://docs.google.com/viewer?url=' + encodeURIComponent('https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-dielines/' + s.dl_name), '_blank');
+function renderDlBar() {
+  var s = curSpec ? SPECS[curSpec] : null;
+  var files = s ? (s.dl_files || (s.dl_name ? [s.dl_name] : [])) : [];
+  var list = document.getElementById('dl-files-list');
+  if (!list) return;
+  if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
+  list.innerHTML = files.map(function(f) {
+    return '<div class="dl-file-row">' +
+      '<span class="dl-file-name">📄 ' + escH(f) + '</span>' +
+      '<button class="dl-bar-btn ghost" onclick="dlView(\'' + escH(f) + '\')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View' +
+      '</button>' +
+      '<button class="dl-bar-btn" onclick="dlDownload(\'' + escH(f) + '\')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download' +
+      '</button>' +
+    '</div>';
+  }).join('');
+}
+function dlView(filename) {
+  window.open('https://docs.google.com/viewer?url=' + encodeURIComponent('https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-dielines/' + filename), '_blank');
+}
+function dlDownload(filename) {
+  var url = 'https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-dielines/' + encodeURIComponent(filename);
+  fetch(url).then(function(r){ return r.blob(); }).then(function(blob) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }).catch(function(){ showToast('Download failed','err'); });
 }
 
 /* ═══ GITHUB API ════════════════════════════════════════════════════ */
@@ -1278,18 +1304,14 @@ function renderAdminCats() {
 /* ═══ SPEC FORM ════════════════════════════════════════════════════ */
 function openSpecForm(key) {
   editingKey = key;
-  sfImgData = null; sfImgFile = null;
+  sfImgData = null; sfImgFile = null; sfPdfFiles = [];
+  sfExistingPdfs = key && SPECS[key] ? (SPECS[key].dl_files || (SPECS[key].dl_name ? [SPECS[key].dl_name] : [])) : [];
   var catSel = document.getElementById('sf-cat');
   catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('');
   var s = key ? SPECS[key] : null;
   document.getElementById('sf-title').textContent = key ? 'Edit Spec' : 'Add Spec';
   document.getElementById('sf-name').value = s ? s.t : '';
-  sfPdfFile = null;
-  if (key && s && s.dl_name) {
-    document.getElementById('sf-pdf-label').textContent = '✓ ' + s.dl_name;
-  } else {
-    document.getElementById('sf-pdf-label').textContent = 'Drop PDF or click to browse';
-  }
+  renderSfPdfList();
   document.getElementById('sf-desc').value = s ? (s.d||'') : '';
   document.getElementById('sf-ds').value = s&&s.ds ? s.ds.join('\n') : '';
   document.getElementById('sf-ar').value = s&&s.ar ? s.ar.join('\n') : '';
@@ -1330,18 +1352,38 @@ function sfImgDrop(event) {
 }
 
 function sfPdfPick(input) {
-  if (!input.files||!input.files[0]) return;
-  sfPdfFile = input.files[0];
-  document.getElementById('sf-pdf-label').textContent = '✓ ' + sfPdfFile.name;
+  if (!input.files || !input.files.length) return;
+  Array.from(input.files).forEach(function(f) {
+    if (f.type === 'application/pdf') sfPdfFiles.push(f);
+  });
+  input.value = '';
+  renderSfPdfList();
 }
 function sfPdfDrop(event) {
   event.preventDefault();
   document.getElementById('sf-pdf-zone').classList.remove('drag');
-  var file = event.dataTransfer.files[0];
-  if (!file || file.type !== 'application/pdf') { showToast('Please drop a PDF file','err'); return; }
-  sfPdfFile = file;
-  document.getElementById('sf-pdf-label').textContent = '✓ ' + file.name;
+  Array.from(event.dataTransfer.files).forEach(function(f) {
+    if (f.type === 'application/pdf') sfPdfFiles.push(f);
+    else showToast(f.name + ' is not a PDF','err');
+  });
+  renderSfPdfList();
 }
+function renderSfPdfList() {
+  var el = document.getElementById('sf-pdf-list');
+  if (!el) return;
+  var html = '';
+  sfExistingPdfs.forEach(function(name, i) {
+    html += '<div class="dl-file-row"><span class="dl-file-name">📄 ' + escH(name) + '</span>' +
+      '<button type="button" class="dl-bar-btn" style="background:#c0392b" onclick="sfRemoveExisting(' + i + ')">Remove</button></div>';
+  });
+  sfPdfFiles.forEach(function(f, i) {
+    html += '<div class="dl-file-row"><span class="dl-file-name">📄 ' + escH(f.name) + ' <span style="color:var(--txt3);font-weight:400">(new)</span></span>' +
+      '<button type="button" class="dl-bar-btn" style="background:#c0392b" onclick="sfRemoveNew(' + i + ')">Remove</button></div>';
+  });
+  el.innerHTML = html;
+}
+function sfRemoveExisting(i) { sfExistingPdfs.splice(i, 1); renderSfPdfList(); }
+function sfRemoveNew(i) { sfPdfFiles.splice(i, 1); renderSfPdfList(); }
 function closeSpecForm() { document.getElementById('spec-form-curtain').classList.remove('open'); }
 
 function saveSpecForm() {
@@ -1358,11 +1400,11 @@ function saveSpecForm() {
     pr: document.getElementById('sf-pr').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
     pk: document.getElementById('sf-pk').value.trim(),
     p: editingKey&&SPECS[editingKey] ? SPECS[editingKey].p : '',
-    dl_name: sfPdfFile ? sfPdfFile.name : (editingKey&&SPECS[editingKey] ? SPECS[editingKey].dl_name : null),
+    dl_files: sfExistingPdfs.slice(),
     cat: catId, group: groupId, _admin: true
   };
-  var doSave = function(savedPdf, savedImg) {
-    if (savedPdf) SPECS[key].dl_name = savedPdf;
+  var doSave = function(newPdfs, savedImg) {
+    SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
     if (savedImg) SPECS[key].p = 'https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-images/' + savedImg;
     saveStoredSpecs();
     renderNav();
@@ -1372,15 +1414,18 @@ function saveSpecForm() {
     if (curSpec === key) openSpec(key);
   };
   var imgFile = sfImgFile;
-  var pdfFile = sfPdfFile;
-  if (imgFile || pdfFile) {
+  var pdfFilesToUpload = sfPdfFiles.slice();
+  if (imgFile || pdfFilesToUpload.length) {
     showToast('Uploading to GitHub…','ok');
-    var savedPdf = null, savedImg = null, pending = 0;
-    var done = function() { if (--pending === 0) doSave(savedPdf, savedImg); };
-    if (pdfFile) { pending++; ghUploadPdf(pdfFile, function(f){ savedPdf=f; done(); }); }
+    var savedImg = null, uploadedPdfs = [], pending = 0;
+    var done = function() { if (--pending === 0) doSave(uploadedPdfs, savedImg); };
+    pdfFilesToUpload.forEach(function(f) {
+      pending++;
+      ghUploadPdf(f, function(fname){ if (fname) uploadedPdfs.push(fname); done(); });
+    });
     if (imgFile) { pending++; ghUploadImage(imgFile, function(f){ savedImg=f; done(); }); }
   } else {
-    doSave(null, null);
+    doSave([], null);
   }
 }
 
@@ -1390,7 +1435,8 @@ function confirmDeleteSpec(key) {
   if (!SPECS[key]._admin) {
     try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1)d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } catch(e){}
   }
-  if (SPECS[key].dl_name) { ghDeletePdf(SPECS[key].dl_name); }
+  var dlFiles = SPECS[key].dl_files || (SPECS[key].dl_name ? [SPECS[key].dl_name] : []);
+  dlFiles.forEach(function(f){ ghDeletePdf(f); });
   if (SPECS[key].p && SPECS[key].p.indexOf('pi-specs-images/') !== -1) {
     ghDeleteImage(SPECS[key].p.split('pi-specs-images/')[1]);
   }
