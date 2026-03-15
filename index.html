@@ -1272,6 +1272,7 @@ function filterAdminSpecs(filter) {
       html += '<div class="adm-cell muted">' + escH(catLabel||'—') + '</div>';
       html += '<div class="adm-cell muted">' + escH(grpLabel||'—') + '</div>';
       html += '<div class="adm-actions"><button class="adm-btn" onclick="openSpecForm(\'' + k + '\')">Edit</button>';
+      html += '<button class="adm-btn" onclick="duplicateSpec(\'' + k + '\')">Duplicate</button>';
       html += '<button class="adm-btn del" onclick="confirmDeleteSpec(\'' + k + '\')">Delete</button></div></div>';
     });
   }
@@ -1427,6 +1428,18 @@ function saveSpecForm() {
   } else {
     doSave([], null);
   }
+}
+
+function duplicateSpec(key) {
+  var s = SPECS[key];
+  var newKey = 'spec-' + Date.now();
+  SPECS[newKey] = JSON.parse(JSON.stringify(s));
+  SPECS[newKey].t = 'Copy of ' + s.t;
+  SPECS[newKey]._admin = true;
+  saveStoredSpecs();
+  renderNav();
+  renderAdminSpecs();
+  showToast('Duplicated: ' + s.t, 'ok');
 }
 
 function confirmDeleteSpec(key) {
