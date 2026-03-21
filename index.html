@@ -905,53 +905,73 @@ var SPEC_CAT_MAP = {
 };
 var CATS = JSON.parse(JSON.stringify(DEFAULT_CATS));
 
-function initData() {
+var GH_REPO = 'Mo-pikcel/PI_Specs';
+var GH_DATA_FILE = 'specs-data.json';
+
+function _applyGhData(data) {
+  if (data.cats && data.cats.length) CATS = data.cats;
+  if (data.specs) Object.keys(data.specs).forEach(function(k){ SPECS[k] = data.specs[k]; });
+  if (data.deleted) data.deleted.forEach(function(k){ delete SPECS[k]; });
+}
+
+function _applyLocalData() {
   try { var sc = localStorage.getItem('pi_cats'); if(sc) CATS = JSON.parse(sc); } catch(e){}
-  // Apply cat/group to ALL base specs
+  try { var ss = localStorage.getItem('pi_specs'); if(ss){ var s=JSON.parse(ss); Object.keys(s).forEach(function(k){ SPECS[k]=s[k]; }); } } catch(e){}
+  try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k]) SPECS[k].p=imgs[k]; }); } } catch(e){}
+  try { var del=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); del.forEach(function(k){ delete SPECS[k]; }); } catch(e){}
+}
+
+function initData() {
+  // Apply cat/group to base specs first
   Object.keys(SPECS).forEach(function(k){
     if (SPEC_CAT_MAP[k]) { SPECS[k].cat = SPEC_CAT_MAP[k].cat; SPECS[k].group = SPEC_CAT_MAP[k].group; }
   });
-  // Load admin-added/edited specs (stored separately from base specs)
-  try {
-    var ss = localStorage.getItem('pi_specs');
-    if (ss) { var stored = JSON.parse(ss); Object.keys(stored).forEach(function(k){ SPECS[k] = stored[k]; }); }
-  } catch(e){}
-  // Restore images stored separately (avoids quota issues)
-  try {
-    var im = localStorage.getItem('pi_images');
-    if (im) { var imgs = JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k]) SPECS[k].p = imgs[k]; }); }
-  } catch(e){}
-  // Apply deletions of base specs
-  try {
-    var del = JSON.parse(localStorage.getItem('pi_deleted') || '[]');
-    del.forEach(function(k){ delete SPECS[k]; });
-  } catch(e){}
-  // Migrate old jsDelivr image URLs to raw.githubusercontent.com
-  var needsMigration = false;
-  Object.keys(SPECS).forEach(function(k){
-    if (SPECS[k].p && SPECS[k].p.indexOf('cdn.jsdelivr.net') !== -1) {
-      SPECS[k].p = SPECS[k].p.replace('https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main', 'https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main');
-      needsMigration = true;
-    }
-  });
-  if (needsMigration) saveStoredSpecs();
+  var ghUrl = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/' + GH_DATA_FILE + '?t=' + Date.now();
+  fetch(ghUrl)
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if (data) _applyGhData(data); else _applyLocalData();
+      renderNav();
+    })
+    .catch(function(){
+      _applyLocalData();
+      renderNav();
+    });
 }
 
-function saveCats() { try { localStorage.setItem('pi_cats', JSON.stringify(CATS)); } catch(e){} }
+function saveCats() {
+  try { localStorage.setItem('pi_cats', JSON.stringify(CATS)); } catch(e){}
+  pushDataToGitHub(null);
+}
 
 function saveStoredSpecs() {
-  // Only persist admin-added specs — base specs live in code, not localStorage
-  var stored = {}, imgs = {};
-  Object.keys(SPECS).forEach(function(k) {
-    if (!SPECS[k]._admin) return;
-    var spec = {};
-    Object.keys(SPECS[k]).forEach(function(f){ spec[f] = SPECS[k][f]; });
-    // Split out base64 images to a separate key to avoid quota issues
-    if (spec.p && spec.p.indexOf('data:') === 0) { imgs[k] = spec.p; delete spec.p; }
-    stored[k] = spec;
-  });
-  try { localStorage.setItem('pi_specs', JSON.stringify(stored)); } catch(e){ console.warn('Spec save failed',e); }
-  try { localStorage.setItem('pi_images', JSON.stringify(imgs)); } catch(e){ console.warn('Image save failed — image may be too large'); }
+  // Keep localStorage as offline backup
+  var stored = {};
+  Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
+  try { localStorage.setItem('pi_specs', JSON.stringify(stored)); } catch(e){}
+  pushDataToGitHub(null);
+}
+
+function pushDataToGitHub(cb) {
+  var pat = getGhPat();
+  if (!pat) { if (cb) cb(false); return; }
+  var stored = {};
+  Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
+  var deleted = [];
+  try { deleted = JSON.parse(localStorage.getItem('pi_deleted')||'[]'); } catch(e){}
+  var payload = JSON.stringify({ specs: stored, deleted: deleted, cats: CATS }, null, 2);
+  var encoded;
+  try { encoded = btoa(unescape(encodeURIComponent(payload))); } catch(e){ if(cb) cb(false); return; }
+  var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE;
+  fetch(apiUrl, { headers: { Authorization: 'token ' + pat } })
+    .then(function(r){ return r.json(); })
+    .then(function(existing){
+      var body = { message: 'Update specs data', content: encoded };
+      if (existing && existing.sha) body.sha = existing.sha;
+      return fetch(apiUrl, { method:'PUT', headers:{ Authorization:'token '+pat, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    })
+    .then(function(r){ if (cb) cb(r.ok); })
+    .catch(function(){ if (cb) cb(false); });
 }
 
 /* ═══ NAV RENDERING ════════════════════════════════════════════════ */
@@ -1483,7 +1503,7 @@ function confirmDeleteSpec(key) {
   if (!confirm('Delete "' + SPECS[key].t + '"? This cannot be undone.')) return;
   // Base specs (not admin-added) need to be tracked in deleted list so they don't reappear on reload
   if (!SPECS[key]._admin) {
-    try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1)d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } catch(e){}
+    try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1){ d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } } catch(e){}
   }
   var dlFiles = SPECS[key].dl_files || (SPECS[key].dl_name ? [SPECS[key].dl_name] : []);
   dlFiles.forEach(function(f){ ghDeletePdf(f); });
@@ -1590,7 +1610,6 @@ function dbDel(key) {
 
 /* ═══ INIT ══════════════════════════════════════════════════════════ */
 initData();
-renderNav();
 </script>
 </body>
 </html>
