@@ -747,14 +747,14 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         </label>
         <div id="sf-pr-single"><textarea id="sf-pr" rows="2" placeholder="HI-Q Titan (Gloss) 200g/m² White, 4 Process full colour."></textarea></div>
         <div id="sf-pr-dual" style="display:none">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div>
-              <input id="sf-p2-lh" type="text" placeholder="Left column heading e.g. FOREX MATERIAL SPEC" style="margin-bottom:6px"/>
-              <textarea id="sf-p2-li" rows="4" placeholder="One item per line&#10;HI-Q Titan (Gloss) 200g/m²&#10;Gloss Laminated one side only"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box">
+            <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+              <input id="sf-p2-lh" type="text" placeholder="Left heading e.g. FOREX MATERIAL SPEC" style="width:100%;box-sizing:border-box"/>
+              <textarea id="sf-p2-li" rows="5" placeholder="One item per line&#10;HI-Q Titan (Gloss) 200g/m²&#10;Gloss Laminated one side only" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
             </div>
-            <div>
-              <input id="sf-p2-rh" type="text" placeholder="Right column heading e.g. POP-OUT MATERIAL SPEC" style="margin-bottom:6px"/>
-              <textarea id="sf-p2-ri" rows="4" placeholder="One item per line&#10;300 Gsm Printkote&#10;Gloss laminated — Die cut to shape"></textarea>
+            <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+              <input id="sf-p2-rh" type="text" placeholder="Right heading e.g. POP-OUT MATERIAL SPEC" style="width:100%;box-sizing:border-box"/>
+              <textarea id="sf-p2-ri" rows="5" placeholder="One item per line&#10;300 Gsm Printkote&#10;Gloss laminated — Die cut to shape" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
             </div>
           </div>
         </div>
