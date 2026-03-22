@@ -709,9 +709,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
           <label>GitHub Personal Access Token</label>
           <input id="gh-pat-inp" type="password" placeholder="ghp_xxxxxxxxxxxx" style="font-family:monospace;font-size:13px"/>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button class="sf-save" style="width:auto;padding:0 20px" onclick="saveGhPat()">Save Token</button>
           <button class="sf-cancel" style="width:auto;padding:0 16px" onclick="clearGhPat()">Clear</button>
+          <button class="sf-cancel" style="width:auto;padding:0 16px" onclick="testGhPat()">Test Token</button>
           <span id="gh-pat-status" style="font-size:12px;color:var(--txt3)"></span>
         </div>
         <p style="margin:20px 0 6px;font-size:12px;color:var(--txt3)">To create a token: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token. Select <strong>repo</strong> scope.</p>
@@ -1151,6 +1152,20 @@ function clearGhPat() {
   localStorage.removeItem('pi_gh_token');
   document.getElementById('gh-pat-inp').value = '';
   document.getElementById('gh-pat-status').textContent = 'Token cleared';
+}
+function testGhPat() {
+  var pat = getGhPat();
+  var status = document.getElementById('gh-pat-status');
+  if (!pat) { status.textContent = 'No token saved'; status.style.color='var(--red)'; return; }
+  status.textContent = 'Testing...'; status.style.color='var(--txt3)';
+  fetch('https://api.github.com/repos/' + GH_REPO, { headers: { Authorization: 'token ' + pat } })
+    .then(function(r){
+      if (r.ok) { status.textContent = '✓ Token works'; status.style.color='var(--acc)'; }
+      else if (r.status === 401) { status.textContent = '✗ Invalid token'; status.style.color='var(--red)'; }
+      else if (r.status === 403) { status.textContent = '✗ Token lacks repo permission'; status.style.color='var(--red)'; }
+      else { status.textContent = '✗ Error ' + r.status; status.style.color='var(--red)'; }
+    })
+    .catch(function(){ status.textContent = '✗ Network error'; status.style.color='var(--red)'; });
 }
 function ghUploadPdf(file, cb) {
   var pat = getGhPat();
