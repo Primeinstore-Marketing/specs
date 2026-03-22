@@ -23,8 +23,9 @@
         "Mounted to both sides of 2mm forex",
         "Custom die made from supplied die trace"
       ],
+      "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium) and quantity supplied..",
-      "p": "https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/a-w-m.jpg",
+      "p": "https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/maw.jpg",
       "dl_files": [
         "Aisle_Wing_Medium.pdf"
       ],
