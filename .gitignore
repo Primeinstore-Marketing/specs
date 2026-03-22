@@ -2,3 +2,8 @@
 *.DS_Store
 node_modules/
 *.log
+PI_Specs/
+bg.png
+logo-100.jpg
+pi_store.jpg
+.DS_Store
