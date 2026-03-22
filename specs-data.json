@@ -31,6 +31,33 @@
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
+    },
+    "aw-med-po": {
+      "t": "Aisle Wing Medium Pop-Out",
+      "d": "An Aisle Wing is placed at a 90 degree angle to the shelf. It allows for highly impactful brand communication in store.",
+      "ds": [
+        "Overall size : Width 180 mm x Height 455 mm",
+        "Portrait (Printed both sides). Mirror images to be supplied.",
+        "Primedia Instore Logo or “PRIMEDIA INSTORE” copy (Arial 6pt) needs to be included on the artwork.",
+        "Bleed: a minimum of 5 mm bleed to be added to overall size",
+        "Pop-Out size: Width 148mm x Height 210mm (Pop-out to be no bigger than A5).",
+        "It can be placed anywhere on the Aisle Wing."
+      ],
+      "ar": [
+        "All images used in design to be high resolution 300 dpi CMYK 100% scale.",
+        "(Adobe Photoshop standard profile - US Web Coated (SWOP) V2",
+        "Material to be supplied in Adobe .pdf format with the page setup to include bleed.",
+        "Fonts to be supplied (embedded in the Adobe .pdf file) or converted to paths.",
+        "Please ensure that mirror images are supplied.",
+        "All die lines to be in spot colour and set to overprint."
+      ],
+      "pr": [],
+      "pk": "All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.",
+      "p": "https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/maw-pop-out.jpg",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
     }
   },
   "deleted": [],
