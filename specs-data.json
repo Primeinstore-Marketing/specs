@@ -79,6 +79,37 @@
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
+    },
+    "aw-spin": {
+      "t": "Aisle Wing with Spinning Core Large",
+      "d": "A premium Aisle Wing featuring a spinning core mechanism for maximum 360° shopper attention on shelf",
+      "ds": [
+        "Overall size : Width 200mm x Height 720mm",
+        "Mirror images to be supplied.",
+        "Primedia Instore Logo or “PRIMEDIA INSTORE” copy (Arial 6pt) needs to be included on the artwork.",
+        "Bleed: a minimum of 5 mm bleed to be added to overall size"
+      ],
+      "ar": [
+        "All images 300 dpi CMYK 100% scale.",
+        "Material supplied in Adobe PDF format including bleed.",
+        "Fonts embedded or converted to paths."
+      ],
+      "pr": [
+        "Print Ready Artwork Supplied. Supply Soft Proof for Approval.",
+        "4 colour process on the face.",
+        "Spinning Mechanism: 4 colour process on both sides.",
+        "J_FOAM PVC WHITE 5 MM (0.5Density),",
+        "Spinning Mechanism: J_PALBOARD W/W/W 5mm.",
+        "Zund Crease & Route To Shape & Size",
+        "Glue & make up With Rotating element."
+      ],
+      "p2": null,
+      "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing With Spinning Core Large) and quantity supplied.",
+      "p": "https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/awsc.jpg",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
     }
   },
   "deleted": [],
