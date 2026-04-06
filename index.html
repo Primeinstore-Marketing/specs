@@ -931,7 +931,12 @@ var GH_DATA_FILE = 'specs-data.json';
 
 function _applyGhData(data) {
   if (data.cats && data.cats.length) CATS = data.cats;
-  if (data.specs) Object.keys(data.specs).forEach(function(k){ SPECS[k] = data.specs[k]; });
+  if (data.specs) Object.keys(data.specs).forEach(function(k){
+    var localP = SPECS[k] && SPECS[k].p;
+    SPECS[k] = data.specs[k];
+    // Preserve local image URL if GitHub has none (upload succeeded but JSON save failed)
+    if (!SPECS[k].p && localP) SPECS[k].p = localP;
+  });
   if (data.deleted) data.deleted.forEach(function(k){ delete SPECS[k]; });
 }
 
@@ -953,8 +958,9 @@ function initData() {
   fetch(ghUrl)
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
-      // Merge: GitHub data wins over localStorage for same keys
       if (data) _applyGhData(data);
+      // Re-apply cached image URLs on top of GitHub data (in case GitHub save had failed)
+      try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
       // If GitHub data is empty but we have local data, push local up to GitHub
       var pat = getGhPat();
@@ -971,11 +977,16 @@ function saveCats() {
 }
 
 function saveStoredSpecs() {
-  // Keep localStorage as offline backup
   var stored = {};
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   try { localStorage.setItem('pi_specs', JSON.stringify(stored)); } catch(e){}
-  pushDataToGitHub(null);
+  // Cache all image URLs separately so they survive a failed GitHub save
+  var imgs = {};
+  Object.keys(SPECS).forEach(function(k){ if (SPECS[k].p) imgs[k] = SPECS[k].p; });
+  try { localStorage.setItem('pi_images', JSON.stringify(imgs)); } catch(e){}
+  pushDataToGitHub(function(ok){
+    if (!ok) showToast('GitHub save failed — check your token in Admin → Settings','err');
+  });
 }
 
 function pushDataToGitHub(cb) {
