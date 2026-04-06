@@ -141,6 +141,28 @@
       "group": "aw",
       "_admin": true
     },
+    "clicks-aw-dome": {
+      "t": "Clicks Dome Aisle Wing",
+      "d": "Dome-topped Clicks Aisle Wing variant with a rounded top profile for premium shelf presence.",
+      "ds": [
+        "Overall size: Width 150mm × Height 420mm (dome top) *[PI112]",
+        "Portrait — Printed both sides. Bleed: minimum 5mm."
+      ],
+      "ar": [
+        "All images 300 dpi CMYK 100% scale. All die lines in spot colour set to overprint."
+      ],
+      "pr": [
+        "HI-Q Titan (Gloss) 200g/m² White, 4 Process full colour front only",
+        "Gloss Laminated one side only — Mounted to both sides of 2mm forex — Die Cutting"
+      ],
+      "p2": null,
+      "pk": "All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
+    },
     "spec-1775504390413": {
       "t": "Pouring Aisle Wing Clicks",
       "d": "A pouring aisle wing features a visual design that simulates liquid pouring over or onto the banner. This effect can create a dynamic and engaging look.",
@@ -295,7 +317,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Dome Aisle Wing Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.jpg",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
       "dl_files": [
         "Dome_Aisle_Wing_Medium.pdf"
       ],
