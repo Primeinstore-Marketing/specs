@@ -26,9 +26,7 @@
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium) and quantity supplied..",
       "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw.jpg",
-      "dl_files": [
-        "Aisle_Wing_Medium.pdf"
-      ],
+      "dl_files": [],
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
@@ -312,9 +310,7 @@
       "_admin": true
     }
   },
-  "deleted": [
-    "clicks-aw-dome"
-  ],
+  "deleted": [],
   "cats": [
     {
       "id": "90-degree",
