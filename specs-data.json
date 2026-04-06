@@ -81,18 +81,20 @@
       "_admin": true
     },
     "aw-spin": {
-      "t": "Aisle Wing with Spinning Core Large",
-      "d": "A premium Aisle Wing featuring a spinning core mechanism for maximum 360° shopper attention on shelf",
+      "t": "Aisle Wing with Spinning Core Medium",
+      "d": "Aisle Wing With Spinning Core Medium",
       "ds": [
-        "Overall size : Width 200mm x Height 720mm",
+        "Overall size : Width 180mm x Height 455mm",
         "Mirror images to be supplied.",
         "Primedia Instore Logo or “PRIMEDIA INSTORE” copy (Arial 6pt) needs to be included on the artwork.",
         "Bleed: a minimum of 5 mm bleed to be added to overall size"
       ],
       "ar": [
-        "All images 300 dpi CMYK 100% scale.",
-        "Material supplied in Adobe PDF format including bleed.",
-        "Fonts embedded or converted to paths."
+        "All images used in design to be high resolution 300 dpi CMYK 100% scale.",
+        "(Adobe Photoshop standard profile - US Web Coated (SWOP) V2",
+        "Material to be supplied in Adobe .pdf format with the page setup to include bleed.",
+        "Fonts to be supplied (embedded in the Adobe .pdf file) or converted to paths.",
+        "Please ensure that mirror images are supplied."
       ],
       "pr": [
         "Print Ready Artwork Supplied. Supply Soft Proof for Approval.",
@@ -104,9 +106,11 @@
         "Glue & make up With Rotating element."
       ],
       "p2": null,
-      "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing With Spinning Core Large) and quantity supplied.",
+      "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing With Spinning Core Medium) and quantity supplied.",
       "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/awsc.webp",
-      "dl_files": [],
+      "dl_files": [
+        "Medium_Aisle_Wing_WIth_Spinning_Core_-_Die_Line.pdf"
+      ],
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
