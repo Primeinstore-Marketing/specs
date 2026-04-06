@@ -25,8 +25,10 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium) and quantity supplied..",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw.jpg",
-      "dl_files": [],
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw.webp",
+      "dl_files": [
+        "Aisle_Wing_Medium.pdf"
+      ],
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
@@ -72,8 +74,10 @@
         }
       },
       "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium Pop out) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw-pop-out.jpg",
-      "dl_files": [],
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw-pop-out.webp",
+      "dl_files": [
+        "Aisle_Wing_Medium_Pop-out.pdf"
+      ],
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
@@ -105,9 +109,67 @@
       ],
       "p2": null,
       "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing With Spinning Core Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/awsc.jpg",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/awsc.webp",
       "dl_files": [
         "Medium_Aisle_Wing_WIth_Spinning_Core_-_Die_Line.pdf"
+      ],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
+    },
+    "clicks-aw": {
+      "t": "Clicks Aisle Wing",
+      "d": "A Clicks-format Aisle Wing at 90° to the shelf, sized for the Clicks retail environment.",
+      "ds": [
+        "Overall size: Width 150mm × Height 400mm *[PI108]",
+        "Portrait — Printed both sides. Bleed: minimum 5mm."
+      ],
+      "ar": [
+        "All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.",
+        "Fonts embedded or converted. All die lines in spot colour set to overprint."
+      ],
+      "pr": [
+        "HI-Q Titan (Gloss) 200g/m² White, 4 Process full colour front only",
+        "Gloss Laminated one side only — Mounted to both sides of 2mm forex",
+        "Custom die from supplied die trace — Die Cutting"
+      ],
+      "p2": null,
+      "pk": "All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.",
+      "p": "",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
+    },
+    "clicks-aw-dome": {
+      "t": "Clicks Dome Aisle Wing",
+      "d": "The dome aisle wing has a large, rounded dome that stands tall above the area, making it feel outstanding and open.",
+      "ds": [
+        "Overall size : Width 150 mm x Height 400 mm",
+        "Portrait (Printed on both sides). Mirror images are to be supplied.",
+        "Primedia Instore Logo or “PRIMEDIA INSTORE” copy (Arial 6pt) needs to be included on the artwork.",
+        "Bleed: a minimum of 5 mm bleed to be added to overall size"
+      ],
+      "ar": [
+        "All images used in design to be high resolution 300 dpi CMYK 100% scale.",
+        "(Adobe Photoshop standard profile - US Web Coated (SWOP) V2",
+        "Material to be supplied in Adobe .pdf format with the page setup to include bleed.",
+        "Fonts to be supplied (embedded in the Adobe .pdf file) or converted to paths.",
+        "Please ensure that mirror images are supplied.",
+        "All die lines to be in spot colour and set to overprint."
+      ],
+      "pr": [
+        "Printed CMYK (full colour) front only on HI-Q Titan (Gloss) on E-Flute Cardboard",
+        "Trimmed to size",
+        "2 X Vacuum Form Bubble",
+        "Attach double sided tape",
+        "Other Material: 1mm PST"
+      ],
+      "p2": null,
+      "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Clicks Dome Aisle Wing) and quantity supplied.",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
+      "dl_files": [
+        "Clicks_Dome_Aisle_Wing.pdf"
       ],
       "cat": "90-degree",
       "group": "aw",
@@ -267,7 +329,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Dome Aisle Wing Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.jpg",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
       "dl_files": [
         "Dome_Aisle_Wing_Medium.pdf"
       ],
@@ -301,7 +363,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Clicks Dome Aisle Wing) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Clicks-Dome-Aisle-Wing.jpg",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
       "dl_files": [
         "Clicks_Dome_Aisle_Wing.pdf"
       ],
