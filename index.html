@@ -1000,12 +1000,12 @@ function pushDataToGitHub(cb) {
   var encoded;
   try { encoded = btoa(unescape(encodeURIComponent(payload))); } catch(e){ if(cb) cb(false); return; }
   var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE;
-  fetch(apiUrl, { headers: { Authorization: 'token ' + pat } })
+  fetch(apiUrl, { headers: { Authorization: 'Bearer ' + pat } })
     .then(function(r){ return r.json(); })
     .then(function(existing){
       var body = { message: 'Update specs data', content: encoded };
       if (existing && existing.sha) body.sha = existing.sha;
-      return fetch(apiUrl, { method:'PUT', headers:{ Authorization:'token '+pat, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      return fetch(apiUrl, { method:'PUT', headers:{ Authorization:'Bearer '+pat, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
     })
     .then(function(r){ if (cb) cb(r.ok); })
     .catch(function(){ if (cb) cb(false); });
@@ -1187,7 +1187,7 @@ function testGhPat() {
   var status = document.getElementById('gh-pat-status');
   if (!pat) { status.textContent = 'No token saved'; status.style.color='var(--red)'; return; }
   status.textContent = 'Testing...'; status.style.color='var(--txt3)';
-  fetch('https://api.github.com/repos/' + GH_REPO, { headers: { Authorization: 'token ' + pat } })
+  fetch('https://api.github.com/repos/' + GH_REPO, { headers: { Authorization: 'Bearer ' + pat } })
     .then(function(r){
       if (r.ok) { status.textContent = '✓ Token works'; status.style.color='var(--acc)'; }
       else if (r.status === 401) { status.textContent = '✗ Invalid token'; status.style.color='var(--red)'; }
@@ -1207,14 +1207,14 @@ function ghUploadPdf(file, cb) {
   reader.onload = function() {
     var b64 = reader.result.split(',')[1];
     // Check if file already exists (need SHA for updates)
-    fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+    fetch(apiBase + path, { headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json' } })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(existing) {
         var body = { message: 'Add die line: ' + filename, content: b64 };
         if (existing && existing.sha) body.sha = existing.sha;
         return fetch(apiBase + path, {
           method: 'PUT',
-          headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
       })
@@ -1229,13 +1229,13 @@ function ghDeletePdf(filename) {
   if (!pat || !filename) return;
   var path = 'pi-specs-dielines/' + filename;
   var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
-  fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+  fetch(apiBase + path, { headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json' } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(existing) {
       if (!existing || !existing.sha) return;
       return fetch(apiBase + path, {
         method: 'DELETE',
-        headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: 'Remove die line: ' + filename, sha: existing.sha })
       });
     })
@@ -1252,14 +1252,14 @@ function ghUploadImage(file, cb) {
   var reader = new FileReader();
   reader.onload = function() {
     var b64 = reader.result.split(',')[1];
-    fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+    fetch(apiBase + path, { headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json' } })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(existing) {
         var body = { message: 'Add image: ' + filename, content: b64 };
         if (existing && existing.sha) body.sha = existing.sha;
         return fetch(apiBase + path, {
           method: 'PUT',
-          headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+          headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
       })
@@ -1274,13 +1274,13 @@ function ghDeleteImage(filename) {
   if (!pat || !filename) return;
   var path = 'pi-specs-images/' + filename;
   var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
-  fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
+  fetch(apiBase + path, { headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json' } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(existing) {
       if (!existing || !existing.sha) return;
       return fetch(apiBase + path, {
         method: 'DELETE',
-        headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: 'Remove image: ' + filename, sha: existing.sha })
       });
     })
