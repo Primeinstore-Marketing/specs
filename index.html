@@ -1512,6 +1512,8 @@ function saveSpecForm() {
   var catId = document.getElementById('sf-cat').value;
   var groupId = document.getElementById('sf-group').value;
   var key = editingKey || ('spec-' + Date.now());
+  // Capture old image URL BEFORE overwriting SPECS[key] — key === editingKey when editing
+  var prevImgUrl = editingKey && SPECS[editingKey] ? (SPECS[editingKey].p || '') : '';
   SPECS[key] = {
     t: name,
     d: document.getElementById('sf-desc').value.trim(),
@@ -1523,14 +1525,15 @@ function saveSpecForm() {
       r: { h: document.getElementById('sf-p2-rh').value.trim(), i: document.getElementById('sf-p2-ri').value.split('\n').map(function(x){return x.trim();}).filter(Boolean) }
     } : null,
     pk: document.getElementById('sf-pk').value.trim(),
-    p: sfImgRemoved ? '' : (editingKey&&SPECS[editingKey] ? SPECS[editingKey].p : ''),
+    p: sfImgRemoved ? '' : prevImgUrl,
     dl_files: sfExistingPdfs.slice(),
     cat: catId, group: groupId, _admin: true
   };
   var doSave = function(newPdfs, savedImg) {
     SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
     if (savedImg) SPECS[key].p = 'https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/' + savedImg;
-    var oldImg = editingKey && SPECS[editingKey] && SPECS[editingKey].p && SPECS[editingKey].p.indexOf('pi-specs-images/') !== -1 ? SPECS[editingKey].p.split('pi-specs-images/')[1] : null;
+    // Use prevImgUrl (captured before overwrite) to identify the old file to delete
+    var oldImg = prevImgUrl && prevImgUrl.indexOf('pi-specs-images/') !== -1 ? prevImgUrl.split('pi-specs-images/')[1] : null;
     if (oldImg && (sfImgRemoved || savedImg)) ghDeleteImage(oldImg);
     saveStoredSpecs();
     renderNav();
