@@ -74,8 +74,10 @@
         }
       },
       "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium Pop out) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw-pop-out.jpg",
-      "dl_files": [],
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw-pop-out.webp",
+      "dl_files": [
+        "Aisle_Wing_Medium_Pop-out.pdf"
+      ],
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
