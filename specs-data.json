@@ -310,7 +310,9 @@
       "_admin": true
     }
   },
-  "deleted": [],
+  "deleted": [
+    "clicks-aw-dome"
+  ],
   "cats": [
     {
       "id": "90-degree",
