@@ -926,7 +926,7 @@ var SPEC_CAT_MAP = {
 };
 var CATS = JSON.parse(JSON.stringify(DEFAULT_CATS));
 
-var GH_REPO = 'Mo-pikcel/PI_Specs';
+var GH_REPO = 'Primeinstore-Marketing/specs';
 var GH_DATA_FILE = 'specs-data.json';
 
 function _applyGhData(data) {
@@ -1143,10 +1143,10 @@ function renderDlBar() {
   }).join('');
 }
 function dlView(filename) {
-  window.open('https://docs.google.com/viewer?url=' + encodeURIComponent('https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-dielines/' + filename), '_blank');
+  window.open('https://docs.google.com/viewer?url=' + encodeURIComponent('https://cdn.jsdelivr.net/gh/Primeinstore-Marketing/specs@main/pi-specs-dielines/' + filename), '_blank');
 }
 function dlDownload(filename) {
-  var url = 'https://cdn.jsdelivr.net/gh/Mo-pikcel/PI_Specs@main/pi-specs-dielines/' + encodeURIComponent(filename);
+  var url = 'https://cdn.jsdelivr.net/gh/Primeinstore-Marketing/specs@main/pi-specs-dielines/' + encodeURIComponent(filename);
   fetch(url).then(function(r){ return r.blob(); }).then(function(blob) {
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1191,7 +1191,7 @@ function ghUploadPdf(file, cb) {
   if (file.size > 900000) { showToast(file.name + ' is too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Max 900KB for PDFs.','err'); cb(null); return; }
   var filename = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
   var path = 'pi-specs-dielines/' + filename;
-  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
   var reader = new FileReader();
   reader.onload = function() {
     var b64 = reader.result.split(',')[1];
@@ -1217,7 +1217,7 @@ function ghDeletePdf(filename) {
   var pat = getGhPat();
   if (!pat || !filename) return;
   var path = 'pi-specs-dielines/' + filename;
-  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
   fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(existing) {
@@ -1237,7 +1237,7 @@ function ghUploadImage(file, cb) {
   if (file.size > 900000) { showToast(file.name + ' is too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Resize image to under 900KB.','err'); cb(null); return; }
   var filename = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
   var path = 'pi-specs-images/' + filename;
-  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
   var reader = new FileReader();
   reader.onload = function() {
     var b64 = reader.result.split(',')[1];
@@ -1262,7 +1262,7 @@ function ghDeleteImage(filename) {
   var pat = getGhPat();
   if (!pat || !filename) return;
   var path = 'pi-specs-images/' + filename;
-  var apiBase = 'https://api.github.com/repos/Mo-pikcel/PI_Specs/contents/';
+  var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
   fetch(apiBase + path, { headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github+json' } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(existing) {
@@ -1518,7 +1518,7 @@ function saveSpecForm() {
   };
   var doSave = function(newPdfs, savedImg) {
     SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
-    if (savedImg) SPECS[key].p = 'https://raw.githubusercontent.com/Mo-pikcel/PI_Specs/main/pi-specs-images/' + savedImg;
+    if (savedImg) SPECS[key].p = 'https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/' + savedImg;
     var oldImg = editingKey && SPECS[editingKey] && SPECS[editingKey].p && SPECS[editingKey].p.indexOf('pi-specs-images/') !== -1 ? SPECS[editingKey].p.split('pi-specs-images/')[1] : null;
     if (oldImg && (sfImgRemoved || savedImg)) ghDeleteImage(oldImg);
     saveStoredSpecs();
