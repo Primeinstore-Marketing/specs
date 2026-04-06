@@ -167,7 +167,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Clicks Dome Aisle Wing) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Clicks-Dome-Aisle-Wing.webp",
       "dl_files": [
         "Clicks_Dome_Aisle_Wing.pdf"
       ],
@@ -263,7 +263,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Pouring-Aisle-Wing-medium.jpg",
+      "p": "",
       "dl_files": [
         "Pouring_Aisle_Wing_Medium.pdf"
       ],
@@ -372,7 +372,9 @@
       "_admin": true
     }
   },
-  "deleted": [],
+  "deleted": [
+    "aw-lg-pack"
+  ],
   "cats": [
     {
       "id": "90-degree",
