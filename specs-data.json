@@ -212,7 +212,7 @@
       "_admin": true
     },
     "spec-1775507821643": {
-      "t": "Copy of Pouring Aisle Wing Medium",
+      "t": "Pouring Aisle Wing Pop-out Medium",
       "d": "A pouring aisle wing features a visual design that simulates liquid pouring over or onto the banner. This effect can create a dynamic and engaging look.",
       "ds": [
         "Overall size : Width 180 mm x Height 455 mm",
@@ -234,7 +234,7 @@
         "Other Material. 2mm Acrylic or PET"
       ],
       "p2": null,
-      "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing Medium) and quantity supplied.",
+      "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing Pop-out Medium) and quantity supplied.",
       "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Pouring-Aisle-Wing-medium.jpg",
       "dl_files": [
         "Pouring_Aisle_Wing_Medium.pdf"
