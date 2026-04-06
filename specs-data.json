@@ -113,6 +113,30 @@
       "group": "aw",
       "_admin": true
     },
+    "clicks-aw": {
+      "t": "Clicks Aisle Wing",
+      "d": "A Clicks-format Aisle Wing at 90° to the shelf, sized for the Clicks retail environment.",
+      "ds": [
+        "Overall size: Width 150mm × Height 400mm *[PI108]",
+        "Portrait — Printed both sides. Bleed: minimum 5mm."
+      ],
+      "ar": [
+        "All images 300 dpi CMYK 100% scale. Material in Adobe PDF with bleed.",
+        "Fonts embedded or converted. All die lines in spot colour set to overprint."
+      ],
+      "pr": [
+        "HI-Q Titan (Gloss) 200g/m² White, 4 Process full colour front only",
+        "Gloss Laminated one side only — Mounted to both sides of 2mm forex",
+        "Custom die from supplied die trace — Die Cutting"
+      ],
+      "p2": null,
+      "pk": "All printed material packed flat in corrugated boxes.\nBoxes labelled: Client name, brand name, media service descriptor and quantity supplied.",
+      "p": "",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
+    },
     "spec-1775504390413": {
       "t": "Pouring Aisle Wing Clicks",
       "d": "A pouring aisle wing features a visual design that simulates liquid pouring over or onto the banner. This effect can create a dynamic and engaging look.",
