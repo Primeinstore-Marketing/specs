@@ -1243,31 +1243,20 @@ function ghDeletePdf(filename) {
 }
 
 function ghUploadImage(file, cb) {
-  var pat = getGhPat();
-  if (!pat) { showToast('No GitHub token — add one in Admin → Settings','err'); cb(null); return; }
-  if (file.size > 900000) { showToast(file.name + ' is too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Resize image to under 900KB.','err'); cb(null); return; }
-  var filename = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-  var path = 'pi-specs-images/' + filename;
-  var apiBase = 'https://api.github.com/repos/Primeinstore-Marketing/specs/contents/';
-  var reader = new FileReader();
-  reader.onload = function() {
-    var b64 = reader.result.split(',')[1];
-    fetch(apiBase + path, { headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json' } })
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(existing) {
-        var body = { message: 'Add image: ' + filename, content: b64 };
-        if (existing && existing.sha) body.sha = existing.sha;
-        return fetch(apiBase + path, {
-          method: 'PUT',
-          headers: { Authorization: 'Bearer ' + pat, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-      })
-      .then(function(r){ return r.ok ? r.json() : r.json().then(function(j){ return Promise.reject(j.message||r.status); }); })
-      .then(function(){ cb(filename); })
-      .catch(function(e){ console.error(e); var msg = typeof e === 'string' && e.indexOf('too large') !== -1 ? 'Image too large for GitHub API (max 1MB) — resize and try again' : 'Image upload failed — check your token in Admin → Settings'; showToast(msg,'err'); cb(null); });
-  };
-  reader.readAsDataURL(file);
+  var CLOUD_NAME = 'dyz7v9j2p';
+  var UPLOAD_PRESET = 'media-specs';
+  if (file.size > 5000000) { showToast('Image too large — max 5MB','err'); cb(null); return; }
+  var formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', UPLOAD_PRESET);
+  formData.append('folder', 'pi-specs');
+  fetch('https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload', {
+    method: 'POST',
+    body: formData
+  })
+    .then(function(r){ return r.ok ? r.json() : r.json().then(function(j){ return Promise.reject(j.error&&j.error.message||r.status); }); })
+    .then(function(data){ cb(data.secure_url); })
+    .catch(function(e){ console.error(e); showToast('Image upload failed: ' + e,'err'); cb(null); });
 }
 function ghDeleteImage(filename) {
   var pat = getGhPat();
@@ -1531,10 +1520,8 @@ function saveSpecForm() {
   };
   var doSave = function(newPdfs, savedImg) {
     SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
-    if (savedImg) SPECS[key].p = 'https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/' + savedImg;
-    // Use prevImgUrl (captured before overwrite) to identify the old file to delete
-    var oldImg = prevImgUrl && prevImgUrl.indexOf('pi-specs-images/') !== -1 ? prevImgUrl.split('pi-specs-images/')[1] : null;
-    if (oldImg && (sfImgRemoved || savedImg)) ghDeleteImage(oldImg);
+    // savedImg is now the full Cloudinary URL
+    if (savedImg) SPECS[key].p = savedImg;
     saveStoredSpecs();
     renderNav();
     renderAdminSpecs();
