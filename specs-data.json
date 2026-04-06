@@ -274,6 +274,38 @@
       "cat": "90-degree",
       "group": "aw",
       "_admin": true
+    },
+    "spec-1775509725201": {
+      "t": "Copy of Dome Aisle Wing Medium",
+      "d": "The dome aisle wing has a large, rounded dome that stands tall above the area, making it feel outstanding and open.",
+      "ds": [
+        "Overall size : Width 180 mm x Height 455 mm",
+        "Portrait (Printed on both sides). Mirror images are to be supplied.",
+        "Primedia Instore Logo or “PRIMEDIA INSTORE” copy (Arial 6pt) needs to be included on the artwork.",
+        "Bleed: a minimum of 5 mm bleed to be added to overall size"
+      ],
+      "ar": [
+        "All images used in design to be high resolution 300 dpi CMYK 100% scale.",
+        "(Adobe Photoshop standard profile - US Web Coated (SWOP) V2",
+        "Material to be supplied in Adobe .pdf format with the page setup to include bleed.",
+        "Fonts to be supplied (embedded in the Adobe .pdf file) or converted to paths.",
+        "Please ensure that mirror images are supplied.",
+        "All die lines to be in spot colour and set to overprint."
+      ],
+      "pr": [
+        "Printed CMYK (full colour) front only on HI-Q Titan (Gloss) on E-Flute Cardboard",
+        "Trimmed to size",
+        "2 X Vacuum Form Bubble",
+        "Attach double sided tape",
+        "Other Material: 1mm PST"
+      ],
+      "p2": null,
+      "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Dome Aisle Wing Medium) and quantity supplied.",
+      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.jpg",
+      "dl_files": [],
+      "cat": "90-degree",
+      "group": "aw",
+      "_admin": true
     }
   },
   "deleted": [],
