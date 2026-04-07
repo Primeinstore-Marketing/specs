@@ -948,15 +948,27 @@ function _applyLocalData() {
 }
 
 function initData() {
-  // Apply cat/group to base specs first
+  var WORKER = 'https://polished-moon-7019.mosesm.workers.dev';
   Object.keys(SPECS).forEach(function(k){
     if (SPEC_CAT_MAP[k]) { SPECS[k].cat = SPEC_CAT_MAP[k].cat; SPECS[k].group = SPEC_CAT_MAP[k].group; }
   });
   _applyLocalData();
-  fetch('https://polished-moon-7019.mosesm.workers.dev?t=' + Date.now())
+  fetch(WORKER + '?t=' + Date.now())
     .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(data){
-      if (data) _applyGhData(data);
+    .then(function(kvData){
+      // Count real specs in KV (ignore test entries)
+      var kvSpecs = (kvData && kvData.specs) ? Object.keys(kvData.specs).filter(function(k){ return kvData.specs[k].t && kvData.specs[k].t !== 'Test Spec'; }) : [];
+      // Count local admin specs
+      var localStored = {};
+      try { localStored = JSON.parse(localStorage.getItem('pi_specs') || '{}'); } catch(e){}
+      var localSpecKeys = Object.keys(localStored);
+      if (kvSpecs.length === 0 && localSpecKeys.length > 0) {
+        // KV is empty/stale but we have local data — push local to KV
+        pushDataToGitHub(function(ok){ if(ok) showToast('Data synced to cloud','ok'); });
+      } else if (kvData) {
+        _applyGhData(kvData);
+      }
+      // Re-apply cached image URLs on top
       try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
     })
