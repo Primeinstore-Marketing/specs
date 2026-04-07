@@ -952,21 +952,13 @@ function initData() {
   Object.keys(SPECS).forEach(function(k){
     if (SPEC_CAT_MAP[k]) { SPECS[k].cat = SPEC_CAT_MAP[k].cat; SPECS[k].group = SPEC_CAT_MAP[k].group; }
   });
-  // Always load localStorage first so existing data is never lost
   _applyLocalData();
-  var ghUrl = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/' + GH_DATA_FILE + '?t=' + Date.now();
-  fetch(ghUrl)
+  fetch('https://polished-moon-7019.mosesm.workers.dev?t=' + Date.now())
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
       if (data) _applyGhData(data);
-      // Re-apply cached image URLs on top of GitHub data (in case GitHub save had failed)
       try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
-      // If GitHub data is empty but we have local data, push local up to GitHub
-      var pat = getGhPat();
-      if (pat && data && !Object.keys(data.specs||{}).length && !Object.keys(data.cats||{}).length) {
-        pushDataToGitHub(function(ok){ if(ok) showToast('Local data synced to GitHub','ok'); });
-      }
     })
     .catch(function(){ renderNav(); });
 }
