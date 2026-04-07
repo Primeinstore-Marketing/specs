@@ -982,7 +982,7 @@ function saveStoredSpecs() {
 }
 
 function pushDataToGitHub(cb) {
-  var WORKER_URL = 'https://media-specs.mosesm.workers.dev';
+  var WORKER_URL = 'https://polished-moon-7019.mosesm.workers.dev';
   var stored = {};
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   var deleted = [];
