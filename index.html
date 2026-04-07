@@ -965,10 +965,6 @@ function initData() {
       if (kvSpecs.length === 0 && localSpecKeys.length > 0) {
         // KV is empty/stale but we have local data — push local to KV
         pushDataToGitHub(function(ok){ if(ok) showToast('Data synced to cloud','ok'); });
-      } else if (kvData && kvSpecs.length > 0) {
-        // KV has real data — wipe hardcoded defaults and use KV as sole source of truth
-        Object.keys(SPECS).forEach(function(k){ delete SPECS[k]; });
-        _applyGhData(kvData);
       } else if (kvData) {
         _applyGhData(kvData);
       }
