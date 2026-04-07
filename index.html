@@ -985,29 +985,24 @@ function saveStoredSpecs() {
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k].p) imgs[k] = SPECS[k].p; });
   try { localStorage.setItem('pi_images', JSON.stringify(imgs)); } catch(e){}
   pushDataToGitHub(function(ok){
-    if (!ok) showToast('GitHub save failed — check your token in Admin → Settings','err');
+    if (!ok) showToast('Save failed — data kept locally, will retry on next save','err');
   });
 }
 
 function pushDataToGitHub(cb) {
-  var pat = getGhPat();
-  if (!pat) { if (cb) cb(false); return; }
+  var WORKER_URL = 'https://media-specs.mosesm.workers.dev';
   var stored = {};
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   var deleted = [];
   try { deleted = JSON.parse(localStorage.getItem('pi_deleted')||'[]'); } catch(e){}
-  var payload = JSON.stringify({ specs: stored, deleted: deleted, cats: CATS }, null, 2);
-  var encoded;
-  try { encoded = btoa(unescape(encodeURIComponent(payload))); } catch(e){ if(cb) cb(false); return; }
-  var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE;
-  fetch(apiUrl, { headers: { Authorization: 'Bearer ' + pat } })
+  var payload = { specs: stored, deleted: deleted, cats: CATS };
+  fetch(WORKER_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
     .then(function(r){ return r.json(); })
-    .then(function(existing){
-      var body = { message: 'Update specs data', content: encoded };
-      if (existing && existing.sha) body.sha = existing.sha;
-      return fetch(apiUrl, { method:'PUT', headers:{ Authorization:'Bearer '+pat, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-    })
-    .then(function(r){ if (cb) cb(r.ok); })
+    .then(function(data){ if (cb) cb(data.ok); })
     .catch(function(){ if (cb) cb(false); });
 }
 
