@@ -25,7 +25,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium) and quantity supplied..",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw.webp",
+      "p": "",
       "dl_files": [
         "Aisle_Wing_Medium.pdf"
       ],
@@ -74,7 +74,7 @@
         }
       },
       "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing Medium Pop out) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/maw-pop-out.webp",
+      "p": "",
       "dl_files": [
         "Aisle_Wing_Medium_Pop-out.pdf"
       ],
@@ -109,7 +109,7 @@
       ],
       "p2": null,
       "pk": "All printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Aisle Wing With Spinning Core Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/awsc.webp",
+      "p": "",
       "dl_files": [
         "Medium_Aisle_Wing_WIth_Spinning_Core_-_Die_Line.pdf"
       ],
@@ -167,7 +167,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Clicks Dome Aisle Wing) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Clicks-Dome-Aisle-Wing.webp",
+      "p": "",
       "dl_files": [
         "Clicks_Dome_Aisle_Wing.pdf"
       ],
@@ -199,7 +199,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing - Clicks) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Pouring_Aisle_Wing.jpg",
+      "p": "",
       "dl_files": [
         "Pouring_Aisle_Wing_Clicks.pdf"
       ],
@@ -231,7 +231,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing Pop-out Clicks) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Pouring_Aisle_Wing.jpg",
+      "p": "",
       "dl_files": [
         "Pouring_Aisle_Wing_Clicks.pdf"
       ],
@@ -295,7 +295,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Pouring Aisle Wing Pop-out Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Pouring-Aisle-Wing-medium.jpg",
+      "p": "",
       "dl_files": [
         "Pouring_Aisle_Wing_Pop-out_Medium.pdf"
       ],
@@ -329,7 +329,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Dome Aisle Wing Medium) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
+      "p": "",
       "dl_files": [
         "Dome_Aisle_Wing_Medium.pdf"
       ],
@@ -363,7 +363,7 @@
       ],
       "p2": null,
       "pk": "(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)\nAll printed material must be packed flat in corrugated boxes.\nAll boxes must be clearly labeled with: Client name, brand name, media service descriptor\n(i.e. Clicks Dome Aisle Wing) and quantity supplied.",
-      "p": "https://raw.githubusercontent.com/Primeinstore-Marketing/specs/main/pi-specs-images/Dome-Aisle-Wing-Medium.webp",
+      "p": "",
       "dl_files": [
         "Clicks_Dome_Aisle_Wing.pdf"
       ],
