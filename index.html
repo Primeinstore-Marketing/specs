@@ -1244,7 +1244,7 @@ function renderDlBar() {
   var pdfBtn = document.querySelector('.pdf-dl-btn');
   if (pdfBtn) pdfBtn.style.display = files.length > 1 ? 'none' : '';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
-  list.innerHTML = files.map(function(f) {
+  function fileRow(f) {
     return '<div class="dl-file-row">' +
       '<span class="dl-file-name">📄 ' + escH(f) + '</span>' +
       '<button class="dl-bar-btn ghost" onclick="dlView(\'' + escH(f) + '\')">' +
@@ -1254,7 +1254,29 @@ function renderDlBar() {
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download' +
       '</button>' +
     '</div>';
-  }).join('');
+  }
+  var extra = files.length - 1;
+  var html = fileRow(files[0]);
+  if (extra > 0) {
+    html += '<div id="dl-extra" style="display:none">' + files.slice(1).map(fileRow).join('') + '</div>';
+    html += '<button onclick="toggleDlExtra(this)" style="margin-top:8px;background:none;border:none;color:var(--acc);font:600 11px var(--F);cursor:pointer;padding:2px 0;display:flex;align-items:center;gap:5px">' +
+      '<svg id="dl-extra-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '+ ' + extra + ' more file' + (extra > 1 ? 's' : '') +
+    '</button>';
+  } else {
+    html += files.slice(1).map(fileRow).join('');
+  }
+  list.innerHTML = html;
+}
+function toggleDlExtra(btn) {
+  var el = document.getElementById('dl-extra');
+  var chev = document.getElementById('dl-extra-chev');
+  var open = el.style.display === 'none';
+  el.style.display = open ? '' : 'none';
+  if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+  var extra = el.querySelectorAll('.dl-file-row').length;
+  btn.innerHTML = '<svg id="dl-extra-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;transition:transform .2s;transform:' + (open ? 'rotate(180deg)' : '') + '"><polyline points="6 9 12 15 18 9"/></svg> ' +
+    (open ? '\u2212 hide files' : '+ ' + extra + ' more file' + (extra > 1 ? 's' : ''));
 }
 function dlView(filename) {
   window.open('https://docs.google.com/viewer?url=' + encodeURIComponent('https://cdn.jsdelivr.net/gh/Primeinstore-Marketing/specs@main/pi-specs-dielines/' + filename), '_blank');
