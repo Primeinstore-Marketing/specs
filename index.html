@@ -650,111 +650,6 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .sf-save{height:36px;padding:0 22px;border-radius:8px;border:none;background:var(--acc);color:#fff;font:700 12px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .sf-save:hover{background:var(--acc2);transform:translateY(-1px)}
 
-/* ═══ SHOWCASE ══════════════════════════════════════════════════════════ */
-#showcase{
-  position:absolute;inset:0;
-  display:none;flex-direction:column;overflow:hidden;
-  background:var(--bg);
-}
-#showcase.in{display:flex}
-.sc-topbar{
-  flex-shrink:0;display:flex;align-items:center;gap:12px;
-  padding:0 28px;height:52px;
-  border-bottom:1px solid var(--line);background:var(--bg);
-}
-.sc-back{
-  display:flex;align-items:center;gap:6px;
-  background:none;border:none;cursor:pointer;
-  color:var(--txt2);font:500 12px var(--F);padding:0;
-}
-.sc-back:hover{color:var(--txt)}
-.sc-back svg{width:16px;height:16px}
-.sc-title{font-family:var(--FD);font-size:15px;font-weight:700;color:var(--navy)}
-.sc-body{flex:1;overflow-y:auto;padding:28px 32px 40px}
-
-/* Category overview grid */
-.sc-cats{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;
-  max-width:960px;
-}
-.sc-cat-card{
-  border-radius:14px;overflow:hidden;cursor:pointer;
-  border:1px solid var(--line2);background:var(--bg1);
-  transition:all .2s var(--ease2);
-  display:flex;flex-direction:column;
-}
-.sc-cat-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(27,55,105,.13);border-color:var(--line3)}
-.sc-cat-thumb{
-  height:140px;background:var(--navy);overflow:hidden;position:relative;
-  display:flex;align-items:center;justify-content:center;
-}
-.sc-cat-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
-.sc-cat-card:hover .sc-cat-thumb img{transform:scale(1.06)}
-.sc-cat-num{
-  position:absolute;top:10px;left:10px;
-  width:26px;height:26px;border-radius:50%;
-  background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;
-  font:700 12px var(--FD);color:#fff;
-}
-.sc-cat-info{padding:14px 16px}
-.sc-cat-name{font-family:var(--FD);font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px}
-.sc-cat-desc{font-size:11.5px;color:var(--txt2);line-height:1.5}
-
-/* Media item grid inside a category */
-.sc-media-header{
-  display:flex;align-items:center;gap:10px;margin-bottom:24px;
-}
-.sc-media-back{
-  display:flex;align-items:center;gap:5px;
-  background:none;border:none;cursor:pointer;
-  color:var(--acc);font:600 12px var(--F);padding:0;
-}
-.sc-media-back:hover{color:var(--acc2)}
-.sc-media-title{font-family:var(--FD);font-size:18px;font-weight:800;color:var(--navy)}
-.sc-media-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;
-}
-.sc-media-card{
-  border-radius:12px;overflow:hidden;
-  border:1px solid var(--line2);background:var(--bg);
-  transition:all .2s var(--ease2);
-}
-.sc-media-card:hover{box-shadow:0 6px 24px rgba(27,55,105,.12);border-color:var(--line3)}
-.sc-media-img{
-  height:200px;background:var(--navy);overflow:hidden;position:relative;
-  display:flex;align-items:center;justify-content:center;
-}
-.sc-media-img img{width:100%;height:100%;object-fit:contain;padding:12px;transition:transform .5s var(--ease)}
-.sc-media-card:hover .sc-media-img img{transform:scale(1.04)}
-.sc-media-img-ph{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;color:rgba(255,255,255,.25);font-size:11px;
-}
-.sc-media-body{padding:16px}
-.sc-media-name{font-family:var(--FD);font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
-.sc-media-desc{font-size:12px;color:var(--txt2);line-height:1.6}
-
-/* Nav button for showcase */
-.nav-showcase-btn{
-  display:flex;align-items:center;gap:8px;
-  width:calc(100% - 32px);margin:12px 16px 4px;
-  padding:9px 12px;border-radius:9px;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.07);
-  color:#fff;font:600 12px var(--FD);cursor:pointer;
-  transition:all .15s var(--ease2);text-align:left;
-}
-.nav-showcase-btn:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3)}
-.nav-showcase-btn svg{width:14px;height:14px;flex-shrink:0;opacity:.8}
-
-@media(max-width:1024px){
-  .sc-body{padding:20px 16px 32px}
-  .sc-cats{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  .sc-media-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
-  .sc-media-img{height:160px}
-}
-
 /* ── PDF Download Button ── */
 .pdf-dl-btn{display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--navy);background:var(--navy);color:#fff;font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase}
 .pdf-dl-btn:hover{background:var(--acc);border-color:var(--acc)}
@@ -862,18 +757,6 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         </div>
         <div class="photo-vignette"></div>
       </div>
-    </div>
-
-    <!-- SHOWCASE VIEW -->
-    <div id="showcase">
-      <div class="sc-topbar">
-        <button class="sc-back" onclick="closeShowcase()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
-        </button>
-        <span class="sc-title" id="sc-title">Media Showcase</span>
-      </div>
-      <div class="sc-body" id="sc-body"></div>
     </div>
 
   </div>
@@ -1292,11 +1175,6 @@ function renderNav() {
     catHtml += '</div>';
     if (catHasContent) html += catHtml;
   });
-  // Showcase button at the bottom of nav
-  html += '<div style="padding:16px 0 0">';
-  html += '<button class="nav-showcase-btn" onclick="openShowcase()">';
-  html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
-  html += 'Media Showcase</button></div>';
   nav.innerHTML = html;
   if (prevSearch) { document.getElementById('nav-search-inp').value = prevSearch; filterNav(prevSearch); }
 }
@@ -1376,144 +1254,10 @@ function closeMobNav() {
   document.getElementById('mob-backdrop').style.display = 'none';
 }
 
-/* ═══ SHOWCASE ══════════════════════════════════════════════════════ */
-var SHOWCASE_CATS = [
-  {
-    id:'shopper-facing', num:1, name:'Shopper Facing',
-    desc:'Media formats designed to face and engage shoppers at eye level in the aisle.',
-    thumb:'',
-    items:[
-      {name:'Aisle Wing',desc:'Mounted at 90° to the shelf, aisle wings create high-impact brand communication visible down the aisle.',img:''},
-      {name:'Shelf Talker',desc:'Shelf-level strips and flags that highlight products and promotions directly at point of purchase.',img:''},
-      {name:'Shelf Strip',desc:'Full-length shelf strips that brand entire bays and reinforce product presence.',img:''},
-    ]
-  },
-  {
-    id:'90-degree', num:2, name:'90 Degree Media',
-    desc:'Formats mounted perpendicular to shelving to capture shoppers approaching from multiple directions.',
-    thumb:'',
-    items:[
-      {name:'Blade / Fin',desc:'Suspended from shelf edges, blades intercept shoppers walking along the aisle.',img:''},
-      {name:'Parasol',desc:'Overhead parasol formats visible from a distance, ideal for category navigation.',img:''},
-    ]
-  },
-  {
-    id:'illuminated', num:3, name:'Illuminated Media',
-    desc:'Backlit and LED-powered formats that stand out in any lighting environment.',
-    thumb:'',
-    items:[
-      {name:'Lightbox',desc:'Slim-profile backlit panels delivering vibrant, high-contrast brand imagery.',img:''},
-      {name:'LED Totem',desc:'Floor-standing illuminated totems that anchor brand presence in key locations.',img:''},
-    ]
-  },
-  {
-    id:'fridge', num:4, name:'Fridge Media',
-    desc:'Formats applied to or displayed alongside refrigeration units in chilled sections.',
-    thumb:'',
-    items:[
-      {name:'Fridge Decal',desc:'Full or partial door decals that transform refrigeration units into brand billboards.',img:''},
-      {name:'Fridge Divider',desc:'Internal fridge dividers that segment product categories and reinforce branding.',img:''},
-      {name:'Fridge Door Box',desc:'Hanging or mounted panels on fridge doors for promotional messaging.',img:''},
-    ]
-  },
-  {
-    id:'category-solutions', num:5, name:'Category Solutions',
-    desc:'Custom category management solutions that help shoppers navigate and discover products.',
-    thumb:'',
-    items:[
-      {name:'Category Header',desc:'Overhead header boards that clearly identify product categories for easier navigation.',img:''},
-      {name:'Category Fin',desc:'Vertical fins suspended from category headers to guide shoppers from a distance.',img:''},
-    ]
-  },
-  {
-    id:'secondary-space', num:6, name:'Secondary Space',
-    desc:'Off-shelf display formats that create additional brand presence away from the main fixture.',
-    thumb:'',
-    items:[
-      {name:'Floor Stand',desc:'Freestanding floor displays positioned in high-traffic areas for maximum visibility.',img:''},
-      {name:'Pallet Wrap',desc:'Branded wraps around pallet displays turning bulk stock into promotional fixtures.',img:''},
-      {name:'Gondola End',desc:'High-impact end-of-aisle displays that capture shoppers at category entry points.',img:''},
-    ]
-  },
-  {
-    id:'front-of-store', num:7, name:'Front of Store',
-    desc:'Entrance and checkout-area formats that capture shoppers on arrival and departure.',
-    thumb:'',
-    items:[
-      {name:'Window Graphics',desc:'Full or partial window decals that build brand presence from outside the store.',img:''},
-      {name:'Queue Media',desc:'Formats positioned along checkout queues to engage shoppers during dwell time.',img:''},
-      {name:'Entrance Arch',desc:'Overhead entrance structures that make a bold brand statement as shoppers enter.',img:''},
-    ]
-  }
-];
-
-function openShowcase() {
-  document.getElementById('home').classList.add('out');
-  document.getElementById('specview').classList.remove('in');
-  document.getElementById('showcase').classList.add('in');
-  document.getElementById('sc-title').textContent = 'Media Showcase';
-  closeMobNav();
-  renderShowcaseCats();
-}
-
-function closeShowcase() {
-  document.getElementById('showcase').classList.remove('in');
-  document.getElementById('home').classList.remove('out');
-}
-
-function renderShowcaseCats() {
-  var body = document.getElementById('sc-body');
-  var html = '<div class="sc-cats">';
-  SHOWCASE_CATS.forEach(function(cat, i) {
-    html += '<div class="sc-cat-card" onclick="openShowcaseCat(' + i + ')">';
-    html += '<div class="sc-cat-thumb">';
-    if (cat.thumb) {
-      html += '<img src="' + escH(cat.thumb) + '" alt="' + escH(cat.name) + '" loading="lazy"/>';
-    } else {
-      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.3)">';
-      html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
-      html += '</div>';
-    }
-    html += '<div class="sc-cat-num">' + cat.num + '</div>';
-    html += '</div>';
-    html += '<div class="sc-cat-info"><div class="sc-cat-name">' + escH(cat.name) + '</div>';
-    html += '<div class="sc-cat-desc">' + escH(cat.desc) + '</div></div></div>';
-  });
-  html += '</div>';
-  body.innerHTML = html;
-}
-
-function openShowcaseCat(idx) {
-  var cat = SHOWCASE_CATS[idx];
-  if (!cat) return;
-  document.getElementById('sc-title').textContent = cat.name;
-  var body = document.getElementById('sc-body');
-  var html = '<div class="sc-media-header">';
-  html += '<button class="sc-media-back" onclick="renderShowcaseCats();document.getElementById(\'sc-title\').textContent=\'Media Showcase\'">';
-  html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg> All Categories</button>';
-  html += '<span class="sc-media-title">' + escH(cat.name) + '</span></div>';
-  html += '<div class="sc-media-grid">';
-  cat.items.forEach(function(item) {
-    html += '<div class="sc-media-card">';
-    html += '<div class="sc-media-img">';
-    if (item.img) {
-      html += '<img src="' + escH(item.img) + '" alt="' + escH(item.name) + '" loading="lazy"/>';
-    } else {
-      html += '<div class="sc-media-img-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>No image yet</span></div>';
-    }
-    html += '</div>';
-    html += '<div class="sc-media-body"><div class="sc-media-name">' + escH(item.name) + '</div>';
-    html += '<div class="sc-media-desc">' + escH(item.desc) + '</div></div></div>';
-  });
-  html += '</div>';
-  body.innerHTML = html;
-}
-
 function goHome() {
   curSpec = null;
   document.getElementById('home').classList.remove('out');
   document.getElementById('specview').classList.remove('in');
-  document.getElementById('showcase').classList.remove('in');
   document.getElementById('bc-spec').style.display = 'none';
   document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
 }
