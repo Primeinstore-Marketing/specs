@@ -1332,114 +1332,107 @@ function downloadSpecPdf() {
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     var W = 297, H = 210;
-    var pad = 14;
-    var headerH = 20;
-    var leftW = 158;
+    var headerH = 22;
+    var pad = 14;           // left/right inner padding
+    var leftW = 170;        // ~57% for content
     var rightX = leftW;
-    var rightW = W - leftW;
-    var navy = [27, 55, 105];
-    var lineCol = [208, 216, 232];
-    var textDark = [30, 30, 30];
-    var textMid = [100, 100, 100];
+    var rightW = W - leftW; // ~43% for image
+    var navy = [20, 40, 80];
+    var lineGray = [210, 215, 225];
+    var textBlack = [20, 20, 20];
+    var textGray = [90, 90, 90];
 
-    /* ── White background ── */
+    /* ── White page ── */
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, W, H, 'F');
 
-    /* ── Full-width navy header ── */
+    /* ── Navy header bar ── */
     doc.setFillColor(navy[0], navy[1], navy[2]);
     doc.rect(0, 0, W, headerH, 'F');
 
-    /* Logo — contained, vertically centred in header */
+    /* Logo image left side of header */
     if (logoData && logoW && logoH) {
-      var maxLogoW = 52, maxLogoH = headerH - 6;
-      var ls = Math.min(maxLogoW / logoW, maxLogoH / logoH);
+      var maxLW = 55, maxLH = headerH - 5;
+      var ls = Math.min(maxLW / logoW, maxLH / logoH);
       var lw = logoW * ls, lh = logoH * ls;
       doc.addImage(logoData, 'PNG', pad, (headerH - lh) / 2, lw, lh);
-    } else {
-      doc.setTextColor(255,255,255);
-      doc.setFont('helvetica','bold'); doc.setFontSize(10);
-      doc.text('PRIMEDIA INSTORE', pad, 13);
     }
 
-    /* SPECS text — right of header */
+    /* "SPECS" right side of header */
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(17);
-    doc.setCharSpace(3.5);
-    doc.text('SPECS', W - pad - 36, headerH - 5);
+    doc.setFontSize(16);
+    doc.setCharSpace(3);
+    doc.text('SPECS', W - pad - 30, headerH - 6);
     doc.setCharSpace(0);
 
-    /* ── Vertical divider between panels ── */
-    doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
-    doc.setLineWidth(0.4);
+    /* ── Thin vertical divider line ── */
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.setLineWidth(0.35);
     doc.line(leftW, headerH, leftW, H);
 
-    /* ── Right panel: spec image, scaled to fit with padding, not filling ── */
+    /* ── RIGHT: image top-aligned with padding, contained (no stretch) ── */
     if (specImgData && specImgW && specImgH) {
-      var imgPad = 12;
+      var imgPad = 10;
       var boxX = rightX + imgPad;
       var boxY = headerH + imgPad;
       var boxW = rightW - imgPad * 2;
-      var boxH = H - headerH - imgPad * 2;
+      var boxH = (H - headerH) * 0.65; // image takes ~65% of available height, top-aligned
       var scale = Math.min(boxW / specImgW, boxH / specImgH);
       var dw = specImgW * scale, dh = specImgH * scale;
-      var dx = boxX + (boxW - dw) / 2;
-      var dy = boxY + (boxH - dh) / 2;
-      doc.addImage(specImgData, 'PNG', dx, dy, dw, dh);
-    } else {
-      doc.setFont('helvetica','normal'); doc.setFontSize(8);
-      doc.setTextColor(180,180,180);
-      doc.text('No image', rightX + rightW / 2, (headerH + H) / 2, { align: 'center' });
+      var dx = boxX + (boxW - dw) / 2; // centred horizontally in box
+      doc.addImage(specImgData, 'PNG', dx, boxY, dw, dh);
     }
 
-    /* ── Left panel: spec content ── */
-    var y = headerH + 10;
+    /* ── LEFT: spec content ── */
+    var y = headerH + 11;
     var maxW = leftW - pad * 2;
 
-    /* Spec title */
+    /* Title — bold navy */
     doc.setTextColor(navy[0], navy[1], navy[2]);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     var titleLines = doc.splitTextToSize(s.t, maxW);
     doc.text(titleLines, pad, y);
-    y += titleLines.length * 5.8 + 3;
+    y += titleLines.length * 5.8 + 2;
 
-    /* Description */
+    /* Description — normal gray */
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(textMid[0], textMid[1], textMid[2]);
+    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
     var descLines = doc.splitTextToSize(s.d || '', maxW);
     doc.text(descLines, pad, y);
-    y += descLines.length * 3.8 + 4;
+    y += descLines.length * 3.8 + 5;
 
+    /* Section renderer */
     function drawSection(label, items) {
-      if (!items || !items.length || y > H - 10) return;
-      /* Section heading */
-      doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
-      doc.setLineWidth(0.3);
+      if (!items || !items.length || y > H - 9) return;
+      /* Thin divider line above section */
+      doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+      doc.setLineWidth(0.25);
       doc.line(pad, y, leftW - pad, y);
       y += 4;
+      /* Heading: spaced-out caps, navy, bold */
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.5);
+      doc.setFontSize(6);
       doc.setTextColor(navy[0], navy[1], navy[2]);
-      doc.setCharSpace(1);
+      doc.setCharSpace(2.2);
       doc.text(label.toUpperCase(), pad, y);
       doc.setCharSpace(0);
       y += 4.5;
-      /* Items */
+      /* Bullet items */
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.8);
-      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.setFontSize(8);
+      doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
       items.forEach(function(item) {
-        if (y > H - 8) return;
+        if (y > H - 7) return;
         var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
         var wrapped = doc.splitTextToSize(clean, maxW - 5);
         doc.text('\u2022', pad, y);
         doc.text(wrapped, pad + 4, y);
-        y += wrapped.length * 3.6 + 0.6;
+        y += wrapped.length * 3.7 + 0.5;
       });
-      y += 2;
+      y += 3;
     }
 
     drawSection('Design Specifications', s.ds);
