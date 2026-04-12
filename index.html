@@ -1454,39 +1454,11 @@ function downloadSpecPdf() {
     }
   }
 
-  /* Capture the actual site topbar as an image for the PDF header */
-  function captureBar(cb) {
-    try {
-      var bar = document.getElementById('bar');
-      if (!bar) { cb(null, 0, 0); return; }
-      var bw = bar.offsetWidth, bh = bar.offsetHeight;
-      var cv = document.createElement('canvas');
-      cv.width = bw * 2; cv.height = bh * 2; // 2x for sharpness
-      var ctx = cv.getContext('2d');
-      ctx.scale(2, 2);
-      /* Draw navy background */
-      ctx.fillStyle = '#1b3769';
-      ctx.fillRect(0, 0, bw, bh);
-      /* Draw logo from the img element */
-      var logoEl = bar.querySelector('.logo-img');
-      if (logoEl && logoEl.complete) {
-        try {
-          var logoH2 = bh * 0.55, logoW2 = logoEl.naturalWidth * (logoH2 / logoEl.naturalHeight);
-          ctx.drawImage(logoEl, 14, (bh - logoH2) / 2, logoW2, logoH2);
-        } catch(e) {}
-      }
-      /* Draw "SPECS" text right side */
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold ' + Math.round(bh * 0.38) + 'px Arial';
-      ctx.letterSpacing = '3px';
-      ctx.fillText('SPECS', bw - 90, bh * 0.68);
-      cb(cv.toDataURL('image/png'), cv.width, cv.height);
-    } catch(e) { cb(null, 0, 0); }
-  }
-
-  /* Load logo and spec image, then build */
-  var logoSrc = location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'pi-specs-assets/logo-white.png';
-  captureBar(function(headerData, headerW, headerH2) {
+  /* Load header PNG, logo, spec image — then build */
+  var base = location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'pi-specs-assets/';
+  var logoSrc = base + 'logo-white.png';
+  var headerSrc = base + 'header-bar.png';
+  loadImg(headerSrc, function(headerData, headerW, headerH2) {
     loadImg(logoSrc, function(logoData, logoW, logoH) {
       if (s.p) {
         loadImg(s.p, function(imgData, imgW, imgH) {
