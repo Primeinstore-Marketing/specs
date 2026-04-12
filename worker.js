@@ -8,7 +8,7 @@
  *   OPTIONS *        → CORS preflight
  *
  * KV keys:
- *   specs-data         existing specs JSON
+ *   data         existing specs JSON
  *   auth:password_hash saltHex:hashHex (PBKDF2-SHA256, 100k iterations)
  *   auth:jwt_secret    32-byte hex secret for HMAC-SHA256 JWT
  */
@@ -147,7 +147,7 @@ export default {
 
     /* GET / — return specs (public) */
     if (method === 'GET' && url.pathname === '/') {
-      const data = await KV.get('specs-data');
+      const data = await KV.get('data');
       return new Response(data || '{}', {
         headers: { 'Content-Type': 'application/json', ...CORS },
       });
@@ -158,7 +158,7 @@ export default {
       const payload = await requireAuth(request, KV);
       if (!payload) return json({ error: 'Unauthorized' }, 401);
       const body = await request.text();
-      await KV.put('specs-data', body);
+      await KV.put('data', body);
       return json({ ok: true });
     }
 
