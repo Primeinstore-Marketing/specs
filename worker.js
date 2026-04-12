@@ -136,7 +136,7 @@ async function requireAuth(request, KV) {
 
 export default {
   async fetch(request, env) {
-    const KV = env.SPECS_KV;
+    const KV = env.SPECS_DATA;
     const url = new URL(request.url);
     const method = request.method.toUpperCase();
 
