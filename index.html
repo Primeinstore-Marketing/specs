@@ -1053,7 +1053,7 @@ function _applyLocalData() {
 }
 
 function initData() {
-  var WORKER = 'https://polished-moon-7019.mosesm.workers.dev';
+  var WORKER = WORKER_URL;
   Object.keys(SPECS).forEach(function(k){
     if (SPEC_CAT_MAP[k]) { SPECS[k].cat = SPEC_CAT_MAP[k].cat; SPECS[k].group = SPEC_CAT_MAP[k].group; }
   });
@@ -1099,19 +1099,22 @@ function saveStoredSpecs() {
 }
 
 function pushDataToGitHub(cb) {
-  var WORKER_URL = 'https://polished-moon-7019.mosesm.workers.dev';
   var stored = {};
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   var deleted = [];
   try { deleted = JSON.parse(localStorage.getItem('pi_deleted')||'[]'); } catch(e){}
   var payload = { specs: stored, deleted: deleted, cats: CATS };
+  var tok = getToken();
   fetch(WORKER_URL, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (tok || '') },
     body: JSON.stringify(payload)
   })
-    .then(function(r){ return r.json(); })
-    .then(function(data){ if (cb) cb(data.ok); })
+    .then(function(r){
+      if (r.status === 401) { clearToken(); isAdmin = false; showToast('Session expired — please log in again','err'); if (cb) cb(false); return null; }
+      return r.json();
+    })
+    .then(function(data){ if (data && cb) cb(data.ok); })
     .catch(function(){ if (cb) cb(false); });
 }
 
@@ -1597,9 +1600,12 @@ function ghDeleteImage(filename) {
 }
 
 /* ═══ AUTH ══════════════════════════════════════════════════════════ */
-function getAdminPassword() {
-  return localStorage.getItem('pi_admin_pw') || 'primedia2025';
-}
+var WORKER_URL = 'https://polished-moon-7019.mosesm.workers.dev';
+
+function getToken() { return sessionStorage.getItem('pi_jwt') || ''; }
+function setToken(t) { sessionStorage.setItem('pi_jwt', t); }
+function clearToken() { sessionStorage.removeItem('pi_jwt'); }
+
 function openLogin() {
   if (isAdmin) { openAdminPanel(); return; }
   showLoginForm();
@@ -1625,28 +1631,64 @@ function doReset() {
   var np = document.getElementById('rp-new').value;
   var cp = document.getElementById('rp-confirm').value;
   var re = document.getElementById('re');
-  if (current !== getAdminPassword()) { re.textContent = 'Current password is incorrect.'; return; }
   if (!np || np.length < 6) { re.textContent = 'New password must be at least 6 characters.'; return; }
   if (np !== cp) { re.textContent = 'Passwords do not match.'; return; }
-  localStorage.setItem('pi_admin_pw', np);
-  re.style.color = '#4ade80';
-  re.textContent = 'Password updated successfully!';
-  setTimeout(function(){ showLoginForm(); re.style.color = ''; }, 1500);
+  re.textContent = '';
+  var okBtn = document.querySelector('#reset-card .login-ok');
+  if (okBtn) okBtn.disabled = true;
+  fetch(WORKER_URL + '/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+    body: JSON.stringify({ currentPassword: current, newPassword: np })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (okBtn) okBtn.disabled = false;
+      if (data.ok) {
+        re.style.color = '#4ade80';
+        re.textContent = 'Password updated successfully!';
+        setTimeout(function(){ showLoginForm(); re.style.color = ''; re.textContent = ''; }, 1800);
+      } else {
+        re.textContent = data.error || 'Failed to update password.';
+      }
+    })
+    .catch(function(){
+      if (okBtn) okBtn.disabled = false;
+      re.textContent = 'Network error. Please try again.';
+    });
 }
 function doLogin() {
   var user = document.getElementById('lu').value.trim();
   var pass = document.getElementById('lp').value;
-  if (user === 'admin' && pass === getAdminPassword()) {
-    isAdmin = true;
-    closeLogin();
-    var b = document.getElementById('admin-btn');
-    b.classList.add('admin-on');
-    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
-    if (curSpec) renderDlBar();
-    showToast('Welcome back, Admin!', 'ok');
-  } else {
-    document.getElementById('le').textContent = 'Incorrect username or password.';
-  }
+  var le = document.getElementById('le');
+  le.textContent = '';
+  var okBtn = document.querySelector('.login-card:not(#reset-card) .login-ok');
+  if (okBtn) okBtn.disabled = true;
+  fetch(WORKER_URL + '/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass })
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (okBtn) okBtn.disabled = false;
+      if (data.token) {
+        setToken(data.token);
+        isAdmin = true;
+        closeLogin();
+        var b = document.getElementById('admin-btn');
+        b.classList.add('admin-on');
+        b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
+        if (curSpec) renderDlBar();
+        showToast('Welcome back, Admin!', 'ok');
+      } else {
+        le.textContent = data.error || 'Incorrect username or password.';
+      }
+    })
+    .catch(function(){
+      if (okBtn) okBtn.disabled = false;
+      le.textContent = 'Network error. Please try again.';
+    });
 }
 
 /* ═══ ADMIN PANEL ══════════════════════════════════════════════════ */

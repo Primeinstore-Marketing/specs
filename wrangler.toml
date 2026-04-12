@@ -1,0 +1,7 @@
+name = "polished-moon-7019"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "SPECS_KV"
+id = "8c8b12b2abb24dc8b95dd89f56b60b94"
