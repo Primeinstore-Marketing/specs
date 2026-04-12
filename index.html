@@ -488,14 +488,6 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
   font-size:11px;color:var(--txt3);
 }
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line2)}
-.auth-steps-indicator{
-  display:flex;align-items:center;gap:6px;margin-bottom:20px;
-}
-.auth-step-dot{
-  width:7px;height:7px;border-radius:50%;background:var(--line2);transition:background .2s;
-}
-.auth-step-dot.active{background:var(--navy)}
-.auth-step-dot.done{background:var(--acc)}
 .auth-back{
   display:flex;align-items:center;gap:4px;
   background:none;border:none;cursor:pointer;
@@ -1681,52 +1673,21 @@ function getToken() { return sessionStorage.getItem('pi_jwt') || ''; }
 function setToken(t) { sessionStorage.setItem('pi_jwt', t); }
 function clearToken() { sessionStorage.removeItem('pi_jwt'); }
 
-var _authView = 'login'; // login | forgot-step1 | forgot-step2 | forgot-step3 | change-pw | set-security
-var _fpUsername = '', _fpResetToken = '';
+var _authView = 'login';
 
 function _authBody() { return document.getElementById('auth-modal-body'); }
 
 function _authHtml(view) {
-  var SQ = ['What was the name of your first pet?','What city were you born in?','What is your mother\'s maiden name?','What was the name of your primary school?','What was your childhood nickname?','What is the name of your favourite teacher?'];
-  var sqOpts = SQ.map(function(q){ return '<option value="'+q+'">'+q+'</option>'; }).join('');
   if (view === 'login') return (
     '<div class="auth-step-title">Sign In</div>'+
     '<div class="auth-step-sub">Access the admin panel to manage specs and formats.</div>'+
     '<div class="auth-field"><label>Username</label><input id="au-user" type="text" autocomplete="username" placeholder="admin"/></div>'+
     '<div class="auth-field"><label>Password</label><input id="au-pass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')doLogin()"/></div>'+
     '<div class="auth-err" id="au-err"></div>'+
-    '<button class="auth-ok" id="au-ok" onclick="doLogin()">Sign In</button>'+
-    '<button class="auth-link" onclick="authShowView(\'forgot-step1\')">Forgot password?</button>'
-  );
-  if (view === 'forgot-step1') return (
-    '<button class="auth-back" onclick="authShowView(\'login\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back to sign in</button>'+
-    '<div class="auth-steps-indicator"><div class="auth-step-dot active"></div><div class="auth-step-dot"></div><div class="auth-step-dot"></div></div>'+
-    '<div class="auth-step-title">Forgot Password</div>'+
-    '<div class="auth-step-sub">Enter your username and we\'ll verify your identity.</div>'+
-    '<div class="auth-field"><label>Username</label><input id="fp-user" type="text" placeholder="admin" onkeydown="if(event.key===\'Enter\')fpStep1()"/></div>'+
-    '<div class="auth-err" id="fp-err"></div>'+
-    '<button class="auth-ok" id="fp-ok" onclick="fpStep1()">Continue</button>'
-  );
-  if (view === 'forgot-step2') return (
-    '<button class="auth-back" onclick="authShowView(\'forgot-step1\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back</button>'+
-    '<div class="auth-steps-indicator"><div class="auth-step-dot done"></div><div class="auth-step-dot active"></div><div class="auth-step-dot"></div></div>'+
-    '<div class="auth-step-title">Security Question</div>'+
-    '<div class="auth-step-sub" id="fp-q-text">Answer your security question to continue.</div>'+
-    '<div class="auth-field"><label>Your answer</label><input id="fp-ans" type="text" placeholder="Enter your answer" onkeydown="if(event.key===\'Enter\')fpStep2()"/></div>'+
-    '<div class="auth-err" id="fp-err2"></div>'+
-    '<button class="auth-ok" id="fp-ok2" onclick="fpStep2()">Verify</button>'
-  );
-  if (view === 'forgot-step3') return (
-    '<button class="auth-back" onclick="authShowView(\'login\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back to sign in</button>'+
-    '<div class="auth-steps-indicator"><div class="auth-step-dot done"></div><div class="auth-step-dot done"></div><div class="auth-step-dot active"></div></div>'+
-    '<div class="auth-step-title">Set New Password</div>'+
-    '<div class="auth-step-sub">Choose a strong password for your account.</div>'+
-    '<div class="auth-field"><label>New password</label><input id="fp-np" type="password" placeholder="Min. 6 characters"/></div>'+
-    '<div class="auth-field"><label>Confirm password</label><input id="fp-cp" type="password" placeholder="Repeat password" onkeydown="if(event.key===\'Enter\')fpStep3()"/></div>'+
-    '<div class="auth-err" id="fp-err3"></div>'+
-    '<button class="auth-ok" id="fp-ok3" onclick="fpStep3()">Update Password</button>'
+    '<button class="auth-ok" id="au-ok" onclick="doLogin()">Sign In</button>'
   );
   if (view === 'change-pw') return (
+    '<button class="auth-back" onclick="authShowView(\'login\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back</button>'+
     '<div class="auth-step-title">Change Password</div>'+
     '<div class="auth-step-sub">Update the password for your account.</div>'+
     '<div class="auth-field"><label>Current password</label><input id="cp-cur" type="password" placeholder="••••••••"/></div>'+
@@ -1734,15 +1695,6 @@ function _authHtml(view) {
     '<div class="auth-field"><label>Confirm new password</label><input id="cp-con" type="password" placeholder="Repeat new password" onkeydown="if(event.key===\'Enter\')doChangePw()"/></div>'+
     '<div class="auth-err" id="cp-err"></div>'+
     '<button class="auth-ok" id="cp-ok" onclick="doChangePw()">Update Password</button>'+
-    '<button class="auth-link" onclick="closeLogin()">Cancel</button>'
-  );
-  if (view === 'set-security') return (
-    '<div class="auth-step-title">Security Question</div>'+
-    '<div class="auth-step-sub">Set a security question so you can recover your password if you forget it.</div>'+
-    '<div class="auth-field"><label>Security question</label><select id="ss-q">'+sqOpts+'</select></div>'+
-    '<div class="auth-field"><label>Your answer</label><input id="ss-a" type="text" placeholder="Enter your answer"/></div>'+
-    '<div class="auth-err" id="ss-err"></div>'+
-    '<button class="auth-ok" id="ss-ok" onclick="doSetSecurity()">Save</button>'+
     '<button class="auth-link" onclick="closeLogin()">Cancel</button>'
   );
   return '';
@@ -1791,75 +1743,6 @@ function doLogin() {
   });
 }
 
-/* ── Forgot Password ── */
-function fpStep1() {
-  var user = (document.getElementById('fp-user')||{value:''}).value.trim();
-  var err = document.getElementById('fp-err');
-  var btn = document.getElementById('fp-ok');
-  err.textContent = '';
-  if (!user) { err.textContent = 'Please enter your username.'; return; }
-  btn.disabled = true; btn.textContent = 'Checking…';
-  _fpUsername = user;
-  fetch(WORKER_URL + '/api/forgot-password', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ username: user })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    btn.disabled = false; btn.textContent = 'Continue';
-    if (d.question) {
-      authShowView('forgot-step2');
-      var qt = document.getElementById('fp-q-text');
-      if (qt) qt.textContent = d.question;
-    } else { err.textContent = d.error || 'Account not found or no security question set.'; }
-  })
-  .catch(function(){ btn.disabled=false; btn.textContent='Continue'; err.textContent='Network error.'; });
-}
-
-function fpStep2() {
-  var ans = (document.getElementById('fp-ans')||{value:''}).value.trim();
-  var err = document.getElementById('fp-err2');
-  var btn = document.getElementById('fp-ok2');
-  err.textContent = '';
-  if (!ans) { err.textContent = 'Please enter your answer.'; return; }
-  btn.disabled = true; btn.textContent = 'Verifying…';
-  fetch(WORKER_URL + '/api/verify-security', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ username: _fpUsername, answer: ans })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    btn.disabled = false; btn.textContent = 'Verify';
-    if (d.resetToken) { _fpResetToken = d.resetToken; authShowView('forgot-step3'); }
-    else err.textContent = d.error || 'Incorrect answer.';
-  })
-  .catch(function(){ btn.disabled=false; btn.textContent='Verify'; err.textContent='Network error.'; });
-}
-
-function fpStep3() {
-  var np = (document.getElementById('fp-np')||{value:''}).value;
-  var cp = (document.getElementById('fp-cp')||{value:''}).value;
-  var err = document.getElementById('fp-err3');
-  var btn = document.getElementById('fp-ok3');
-  err.textContent = '';
-  if (np.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
-  if (np !== cp) { err.textContent = 'Passwords do not match.'; return; }
-  btn.disabled = true; btn.textContent = 'Updating…';
-  fetch(WORKER_URL + '/api/reset-password', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ resetToken: _fpResetToken, newPassword: np })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    btn.disabled = false; btn.textContent = 'Update Password';
-    if (d.ok) {
-      showToast('Password updated — please sign in.', 'ok');
-      authShowView('login');
-    } else { err.textContent = d.error || 'Failed to update password.'; }
-  })
-  .catch(function(){ btn.disabled=false; btn.textContent='Update Password'; err.textContent='Network error.'; });
-}
-
 /* ── Change Password (when logged in) ── */
 function doReset() { authShowView('change-pw'); openLogin(); }
 function doChangePw() {
@@ -1883,29 +1766,6 @@ function doChangePw() {
     else err.textContent = d.error || 'Failed to update password.';
   })
   .catch(function(){ btn.disabled=false; btn.textContent='Update Password'; err.textContent='Network error.'; });
-}
-
-/* ── Set Security Question ── */
-function openSetSecurity() { authShowView('set-security'); document.getElementById('login-curtain').classList.add('open'); }
-function doSetSecurity() {
-  var q = (document.getElementById('ss-q')||{value:''}).value;
-  var a = (document.getElementById('ss-a')||{value:''}).value.trim();
-  var err = document.getElementById('ss-err');
-  var btn = document.getElementById('ss-ok');
-  err.textContent = '';
-  if (!a) { err.textContent = 'Please enter your answer.'; return; }
-  btn.disabled = true; btn.textContent = 'Saving…';
-  fetch(WORKER_URL + '/api/set-security', {
-    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
-    body: JSON.stringify({ securityQuestion: q, securityAnswer: a })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    btn.disabled = false; btn.textContent = 'Save';
-    if (d.ok) { showToast('Security question saved!','ok'); closeLogin(); }
-    else err.textContent = d.error || 'Failed to save.';
-  })
-  .catch(function(){ btn.disabled=false; btn.textContent='Save'; err.textContent='Network error.'; });
 }
 
 /* ── Grant / Revoke ── */
@@ -1961,13 +1821,8 @@ function renderAdminUsers() {
   .then(function(r){ return r.json(); })
   .then(function(d){
     var users = d.users || [];
-    var SQ = ['What was the name of your first pet?','What city were you born in?','What is your mother\'s maiden name?','What was the name of your primary school?','What was your childhood nickname?','What is the name of your favourite teacher?'];
-    var sqOpts = SQ.map(function(q){ return '<option value="'+q+'">'+q+'</option>'; }).join('');
     var html = '<div style="padding:24px;max-width:680px">';
-    // User list
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
-    html += '<h3 style="margin:0;font-size:15px;font-weight:700;font-family:var(--FD);color:var(--navy)">User Accounts</h3>';
-    html += '</div>';
+    html += '<h3 style="margin:0 0 16px;font-size:15px;font-weight:700;font-family:var(--FD);color:var(--navy)">User Accounts</h3>';
     html += '<div style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;margin-bottom:28px">';
     users.forEach(function(u, i){
       var isLast = i === users.length - 1;
@@ -1980,7 +1835,6 @@ function renderAdminUsers() {
     });
     if (!users.length) html += '<div style="padding:20px;text-align:center;font-size:13px;color:var(--txt3)">No users yet.</div>';
     html += '</div>';
-    // Create user form
     html += '<h3 style="margin:0 0 14px;font-size:14px;font-weight:700;font-family:var(--FD);color:var(--navy)">Create New Account</h3>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
     html += '<div class="fg"><label>Username</label><input id="nu-user" type="text" placeholder="e.g. jane"/></div>';
@@ -1988,16 +1842,10 @@ function renderAdminUsers() {
     html += '<div class="fg"><label>Password</label><input id="nu-pass" type="password" placeholder="Min. 6 characters"/></div>';
     html += '<div class="fg"><label>Confirm Password</label><input id="nu-pass2" type="password" placeholder="Repeat password"/></div>';
     html += '</div>';
-    html += '<div class="fg" style="margin-bottom:12px"><label>Security Question</label><select id="nu-sq">'+sqOpts+'</select></div>';
-    html += '<div class="fg" style="margin-bottom:16px"><label>Security Answer</label><input id="nu-sa" type="text" placeholder="Answer to security question"/></div>';
     html += '<div id="nu-err" style="min-height:16px;font-size:12px;color:var(--red);margin-bottom:8px"></div>';
     html += '<button id="nu-ok" onclick="createAdminUser()" class="sf-save" style="width:auto;padding:0 24px">Create Account</button>';
-    // Change password section
     html += '<h3 style="margin:28px 0 14px;font-size:14px;font-weight:700;font-family:var(--FD);color:var(--navy)">Change My Password</h3>';
-    html += '<div style="display:flex;gap:8px">';
     html += '<button onclick="openChangePw()" class="sf-cancel" style="width:auto;padding:0 18px">Change Password</button>';
-    html += '<button onclick="openSetSecurity()" class="sf-cancel" style="width:auto;padding:0 18px">Set Security Question</button>';
-    html += '</div>';
     html += '</div>';
     pane.innerHTML = html;
   })
@@ -2011,8 +1859,6 @@ function createAdminUser() {
   var pass = (document.getElementById('nu-pass')||{value:''}).value;
   var pass2 = (document.getElementById('nu-pass2')||{value:''}).value;
   var role = (document.getElementById('nu-role')||{value:'viewer'}).value;
-  var sq = (document.getElementById('nu-sq')||{value:''}).value;
-  var sa = (document.getElementById('nu-sa')||{value:''}).value.trim();
   var err = document.getElementById('nu-err');
   var btn = document.getElementById('nu-ok');
   err.textContent = '';
@@ -2023,7 +1869,7 @@ function createAdminUser() {
   fetch(WORKER_URL + '/api/users', {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
-    body: JSON.stringify({ username:user, password:pass, role:role, securityQuestion:sq, securityAnswer:sa })
+    body: JSON.stringify({ username:user, password:pass, role:role })
   })
   .then(function(r){ return r.json(); })
   .then(function(d){

@@ -2,11 +2,10 @@
  * Primedia Instore Specs — Cloudflare Worker
  *
  * KV keys:
- *   user:{username}      JSON {passwordHash, role, securityQuestion, securityAnswerHash, createdAt}
- *   auth:jwt_secret      32-byte hex
- *   reset:{token}        JSON {username, exp}   (30-min expiry)
- *   data                 existing specs JSON (unchanged)
- *   auth:password_hash   legacy → auto-migrated to user:admin on first use
+ *   user:{username}   JSON {passwordHash, role, createdAt}
+ *   auth:jwt_secret   32-byte hex
+ *   data              existing specs JSON
+ *   auth:password_hash  legacy → auto-migrated to user:admin on first use
  */
 
 const CORS = {
@@ -35,7 +34,6 @@ function bytesToHex(buf) {
 async function randomHex(n) {
   const a = new Uint8Array(n); crypto.getRandomValues(a); return bytesToHex(a);
 }
-
 async function hashPassword(password, saltHex) {
   const enc = new TextEncoder();
   const km = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
@@ -51,10 +49,6 @@ async function verifyPassword(password, stored) {
   let diff = 0;
   for (let i = 0; i < derived.length; i++) diff |= derived.charCodeAt(i) ^ hashHex.charCodeAt(i);
   return diff === 0;
-}
-async function makeHash(value, saltHex) {
-  const h = await hashPassword(value.toLowerCase().trim(), saltHex);
-  return saltHex + ':' + h;
 }
 
 /* ── JWT ────────────────────────────────────────────────────── */
@@ -95,16 +89,13 @@ async function getSecret(KV) {
   if (!s) { s = await randomHex(32); await KV.put('auth:jwt_secret', s); }
   return s;
 }
-
 async function getUser(KV, username) {
   const raw = await KV.get('user:' + username);
   return raw ? JSON.parse(raw) : null;
 }
-
 async function putUser(KV, username, data) {
   await KV.put('user:' + username, JSON.stringify(data));
 }
-
 async function listUsers(KV) {
   const list = await KV.list({ prefix: 'user:' });
   const users = [];
@@ -117,21 +108,19 @@ async function listUsers(KV) {
   }
   return users;
 }
-
-// Migrate legacy auth:password_hash → user:admin on first use
 async function ensureAdminUser(KV) {
   const existing = await getUser(KV, 'admin');
   if (existing) return existing;
   const legacyHash = await KV.get('auth:password_hash');
   let passwordHash;
   if (legacyHash) {
-    passwordHash = legacyHash; // already in salt:hash format
+    passwordHash = legacyHash;
   } else {
     const salt = await randomHex(16);
     const hash = await hashPassword('primedia2025', salt);
     passwordHash = salt + ':' + hash;
   }
-  const adminUser = { passwordHash, role: 'admin', securityQuestion: '', securityAnswerHash: '', createdAt: Date.now() };
+  const adminUser = { passwordHash, role: 'admin', createdAt: Date.now() };
   await putUser(KV, 'admin', adminUser);
   return adminUser;
 }
@@ -181,64 +170,15 @@ export default {
       let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
       const { username, password } = body || {};
       if (!username || !password) return json({ error:'Missing credentials' }, 400);
-
       await ensureAdminUser(KV);
       const user = await getUser(KV, username.toLowerCase().trim());
       if (!user) return json({ error:'Invalid username or password' }, 401);
-
       const valid = await verifyPassword(password, user.passwordHash);
       if (!valid) return json({ error:'Invalid username or password' }, 401);
-
       const secret = await getSecret(KV);
       const exp = Math.floor(Date.now()/1000) + 8*3600;
       const token = await signJwt({ sub: username.toLowerCase().trim(), role: user.role, exp }, secret);
       return json({ token, role: user.role });
-    }
-
-    /* POST /api/forgot-password — step 1: get security question */
-    if (method === 'POST' && path === '/api/forgot-password') {
-      let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { username } = body || {};
-      if (!username) return json({ error:'Username required' }, 400);
-      await ensureAdminUser(KV);
-      const user = await getUser(KV, username.toLowerCase().trim());
-      if (!user || !user.securityQuestion) return json({ error:'No security question set for this account. Contact your administrator.' }, 404);
-      return json({ question: user.securityQuestion });
-    }
-
-    /* POST /api/verify-security — step 2: verify answer, get reset token */
-    if (method === 'POST' && path === '/api/verify-security') {
-      let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { username, answer } = body || {};
-      if (!username || !answer) return json({ error:'Missing fields' }, 400);
-      const user = await getUser(KV, username.toLowerCase().trim());
-      if (!user || !user.securityAnswerHash) return json({ error:'Invalid request' }, 400);
-      const valid = await verifyPassword(answer.toLowerCase().trim(), user.securityAnswerHash);
-      if (!valid) return json({ error:'Incorrect answer' }, 401);
-      const token = await randomHex(24);
-      const exp = Math.floor(Date.now()/1000) + 1800; // 30 min
-      await KV.put('reset:' + token, JSON.stringify({ username: username.toLowerCase().trim(), exp }), { expirationTtl: 1800 });
-      return json({ resetToken: token });
-    }
-
-    /* POST /api/reset-password — step 3: set new password */
-    if (method === 'POST' && path === '/api/reset-password') {
-      let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { resetToken, newPassword } = body || {};
-      if (!resetToken || !newPassword) return json({ error:'Missing fields' }, 400);
-      if (newPassword.length < 6) return json({ error:'Password must be at least 6 characters' }, 400);
-      const raw = await KV.get('reset:' + resetToken);
-      if (!raw) return json({ error:'Reset link expired or invalid' }, 400);
-      const { username, exp } = JSON.parse(raw);
-      if (exp < Math.floor(Date.now()/1000)) { await KV.delete('reset:' + resetToken); return json({ error:'Reset link expired' }, 400); }
-      const user = await getUser(KV, username);
-      if (!user) return json({ error:'User not found' }, 404);
-      const salt = await randomHex(16);
-      const hash = await hashPassword(newPassword, salt);
-      user.passwordHash = salt + ':' + hash;
-      await putUser(KV, username, user);
-      await KV.delete('reset:' + resetToken);
-      return json({ ok: true });
     }
 
     /* POST /api/change-password — JWT required */
@@ -265,7 +205,7 @@ export default {
       const auth = await requireAuth(request, KV, true);
       if (!auth) return json({ error:'Unauthorized' }, 401);
       let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { username, password, role, securityQuestion, securityAnswer } = body || {};
+      const { username, password, role } = body || {};
       if (!username || !password) return json({ error:'Username and password required' }, 400);
       if (password.length < 6) return json({ error:'Password must be at least 6 characters' }, 400);
       const uname = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
@@ -274,12 +214,9 @@ export default {
       if (existing) return json({ error:'Username already exists' }, 409);
       const salt = await randomHex(16);
       const hash = await hashPassword(password, salt);
-      const saHash = securityAnswer ? await makeHash(securityAnswer, await randomHex(16)) : '';
       await putUser(KV, uname, {
         passwordHash: salt + ':' + hash,
         role: role === 'admin' ? 'admin' : 'viewer',
-        securityQuestion: securityQuestion || '',
-        securityAnswerHash: saHash,
         createdAt: Date.now()
       });
       return json({ ok: true, username: uname });
@@ -293,31 +230,16 @@ export default {
       return json({ users });
     }
 
-    /* DELETE /api/users/:username — delete user (admin only, cannot delete self) */
+    /* DELETE /api/users/:username — remove user (admin only) */
     if (method === 'DELETE' && path.startsWith('/api/users/')) {
       const auth = await requireAuth(request, KV, true);
       if (!auth) return json({ error:'Unauthorized' }, 401);
       const target = path.replace('/api/users/', '').toLowerCase();
       if (target === auth.sub) return json({ error:'Cannot delete your own account' }, 400);
-      if (target === 'admin') return json({ error:'Cannot delete the admin account' }, 400);
+      if (target === 'admin') return json({ error:'Cannot delete the primary admin account' }, 400);
       const user = await getUser(KV, target);
       if (!user) return json({ error:'User not found' }, 404);
       await KV.delete('user:' + target);
-      return json({ ok: true });
-    }
-
-    /* POST /api/set-security — set security question (JWT required) */
-    if (method === 'POST' && path === '/api/set-security') {
-      const auth = await requireAuth(request, KV);
-      if (!auth) return json({ error:'Unauthorized' }, 401);
-      let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { securityQuestion, securityAnswer } = body || {};
-      if (!securityQuestion || !securityAnswer) return json({ error:'Question and answer required' }, 400);
-      const user = await getUser(KV, auth.sub);
-      if (!user) return json({ error:'User not found' }, 404);
-      user.securityQuestion = securityQuestion;
-      user.securityAnswerHash = await makeHash(securityAnswer, await randomHex(16));
-      await putUser(KV, auth.sub, user);
       return json({ ok: true });
     }
 
