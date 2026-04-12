@@ -676,6 +676,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     <button class="topbtn" id="mob-nav-toggle" onclick="toggleMobNav()" style="display:none" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
+    <button class="topbtn" id="logout-btn" onclick="doLogout()" style="display:none;color:var(--red);border-color:rgba(255,77,77,.3)" title="Sign out">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
     <button class="topbtn" id="admin-btn" onclick="openLogin()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Admin
@@ -1669,8 +1673,19 @@ function _grantAdmin() {
   var b = document.getElementById('admin-btn');
   b.classList.add('admin-on');
   b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
+  document.getElementById('logout-btn').style.display = 'flex';
   if (curSpec) renderDlBar();
   showToast('Welcome back, Admin!', 'ok');
+}
+function doLogout() {
+  clearToken();
+  isAdmin = false;
+  var b = document.getElementById('admin-btn');
+  b.classList.remove('admin-on');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin';
+  document.getElementById('logout-btn').style.display = 'none';
+  if (curSpec) renderDlBar();
+  showToast('Signed out', 'ok');
 }
 function doLogin() {
   var user = document.getElementById('lu').value.trim();
