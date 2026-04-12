@@ -484,8 +484,13 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 /* Tablet landscape: hide photo pane */
 @media(max-width:1024px){
   :root{--nav:220px}
-  #spec-photo-pane{display:none}
-  #spec-panel{width:100%}
+  /* Stack spec view: photo on top, content below */
+  #specview{flex-direction:column;overflow-y:auto}
+  #spec-photo-pane{
+    flex:none;width:100%;height:220px;min-height:220px;
+  }
+  #spec-photo-pane img{object-position:center 30%}
+  #spec-panel{width:100%;flex:1;overflow-y:visible;height:auto}
   .home-h{font-size:clamp(44px,7vw,80px)}
 }
 
