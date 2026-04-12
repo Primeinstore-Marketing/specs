@@ -1328,11 +1328,13 @@ function downloadSpecPdf() {
     doc.addImage(dataUrl, 'PNG', dx, dy, dw, dh);
   }
 
-  function _build(logoData, logoW, logoH, specImgData, specImgW, specImgH) {
+  function _build(logoData, logoW, logoH, specImgData, specImgW, specImgH, headerData, headerImgW, headerImgH) {
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     var W = 297, H = 210;
-    var headerH = 22;
+    /* If we have the captured header, scale its height proportionally to PDF width */
+    var headerH = (headerData && headerImgW && headerImgH) ? Math.round((headerImgH / 2) / (headerImgW / 2) * W) : 22;
+    headerH = Math.max(16, Math.min(headerH, 28)); // clamp 16-28mm
     var pad = 14;           // left/right inner padding
     var leftW = 170;        // ~57% for content
     var rightX = leftW;
@@ -1346,25 +1348,27 @@ function downloadSpecPdf() {
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, W, H, 'F');
 
-    /* ── Navy header bar ── */
-    doc.setFillColor(navy[0], navy[1], navy[2]);
-    doc.rect(0, 0, W, headerH, 'F');
-
-    /* Logo image left side of header */
-    if (logoData && logoW && logoH) {
-      var maxLW = 55, maxLH = headerH - 5;
-      var ls = Math.min(maxLW / logoW, maxLH / logoH);
-      var lw = logoW * ls, lh = logoH * ls;
-      doc.addImage(logoData, 'PNG', pad, (headerH - lh) / 2, lw, lh);
+    /* ── Header: use captured screenshot of actual site topbar ── */
+    if (headerData && headerImgW && headerImgH) {
+      var hScale = W / headerImgW;
+      doc.addImage(headerData, 'PNG', 0, 0, W, headerImgH * hScale);
+    } else {
+      /* Fallback: draw navy bar with logo and SPECS text */
+      doc.setFillColor(navy[0], navy[1], navy[2]);
+      doc.rect(0, 0, W, headerH, 'F');
+      if (logoData && logoW && logoH) {
+        var maxLW = 55, maxLH = headerH - 5;
+        var ls = Math.min(maxLW / logoW, maxLH / logoH);
+        var lw = logoW * ls, lh = logoH * ls;
+        doc.addImage(logoData, 'PNG', pad, (headerH - lh) / 2, lw, lh);
+      }
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setCharSpace(2);
+      doc.text('SPECS', W - pad - 28, headerH - 6);
+      doc.setCharSpace(0);
     }
-
-    /* "SPECS" right side of header */
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setCharSpace(3);
-    doc.text('SPECS', W - pad - 30, headerH - 6);
-    doc.setCharSpace(0);
 
     /* ── Thin vertical divider line ── */
     doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
@@ -1412,13 +1416,11 @@ function downloadSpecPdf() {
       doc.setLineWidth(0.25);
       doc.line(pad, y, leftW - pad, y);
       y += 4;
-      /* Heading: spaced-out caps, navy, bold */
+      /* Heading: bold navy, normal spacing */
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6);
+      doc.setFontSize(8);
       doc.setTextColor(navy[0], navy[1], navy[2]);
-      doc.setCharSpace(2.2);
-      doc.text(label.toUpperCase(), pad, y);
-      doc.setCharSpace(0);
+      doc.text(label, pad, y);
       y += 4.5;
       /* Bullet items */
       doc.setFont('helvetica', 'normal');
@@ -1452,16 +1454,48 @@ function downloadSpecPdf() {
     }
   }
 
-  /* Load logo then spec image, then build */
+  /* Capture the actual site topbar as an image for the PDF header */
+  function captureBar(cb) {
+    try {
+      var bar = document.getElementById('bar');
+      if (!bar) { cb(null, 0, 0); return; }
+      var bw = bar.offsetWidth, bh = bar.offsetHeight;
+      var cv = document.createElement('canvas');
+      cv.width = bw * 2; cv.height = bh * 2; // 2x for sharpness
+      var ctx = cv.getContext('2d');
+      ctx.scale(2, 2);
+      /* Draw navy background */
+      ctx.fillStyle = '#1b3769';
+      ctx.fillRect(0, 0, bw, bh);
+      /* Draw logo from the img element */
+      var logoEl = bar.querySelector('.logo-img');
+      if (logoEl && logoEl.complete) {
+        try {
+          var logoH2 = bh * 0.55, logoW2 = logoEl.naturalWidth * (logoH2 / logoEl.naturalHeight);
+          ctx.drawImage(logoEl, 14, (bh - logoH2) / 2, logoW2, logoH2);
+        } catch(e) {}
+      }
+      /* Draw "SPECS" text right side */
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold ' + Math.round(bh * 0.38) + 'px Arial';
+      ctx.letterSpacing = '3px';
+      ctx.fillText('SPECS', bw - 90, bh * 0.68);
+      cb(cv.toDataURL('image/png'), cv.width, cv.height);
+    } catch(e) { cb(null, 0, 0); }
+  }
+
+  /* Load logo and spec image, then build */
   var logoSrc = location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'pi-specs-assets/logo-white.png';
-  loadImg(logoSrc, function(logoData, logoW, logoH) {
-    if (s.p) {
-      loadImg(s.p, function(imgData, imgW, imgH) {
-        _build(logoData, logoW, logoH, imgData, imgW, imgH);
-      });
-    } else {
-      _build(logoData, logoW, logoH, null, 0, 0);
-    }
+  captureBar(function(headerData, headerW, headerH2) {
+    loadImg(logoSrc, function(logoData, logoW, logoH) {
+      if (s.p) {
+        loadImg(s.p, function(imgData, imgW, imgH) {
+          _build(logoData, logoW, logoH, imgData, imgW, imgH, headerData, headerW, headerH2);
+        });
+      } else {
+        _build(logoData, logoW, logoH, null, 0, 0, headerData, headerW, headerH2);
+      }
+    });
   });
 }
 
