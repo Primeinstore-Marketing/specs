@@ -770,6 +770,22 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
       <button class="login-ok" onclick="doLogin()">Sign In</button>
       <button class="login-cancel" onclick="closeLogin()">Cancel</button>
     </div>
+    <button onclick="showResetForm()" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,.5);font:12px var(--F);cursor:pointer;text-decoration:underline">Forgot password?</button>
+  </div>
+
+  <!-- Reset password form (hidden by default) -->
+  <div class="login-card" id="reset-card" style="display:none">
+    <div class="login-logo"><img src="pi-specs-assets/logo-white.png" alt="Primedia Instore" class="logo-img"/></div>
+    <h2 class="login-h">Reset Password</h2>
+    <p class="login-sub">Enter a new password for the admin account.</p>
+    <input class="login-inp" id="rp-current" type="password" placeholder="Current password"/>
+    <input class="login-inp" id="rp-new" type="password" placeholder="New password"/>
+    <input class="login-inp" id="rp-confirm" type="password" placeholder="Confirm new password" onkeydown="if(event.key==='Enter')doReset()"/>
+    <div class="login-err" id="re"></div>
+    <div class="login-acts">
+      <button class="login-ok" onclick="doReset()">Update Password</button>
+      <button class="login-cancel" onclick="showLoginForm()">Back</button>
+    </div>
   </div>
 </div>
 
@@ -1581,22 +1597,56 @@ function ghDeleteImage(filename) {
 }
 
 /* ═══ AUTH ══════════════════════════════════════════════════════════ */
+function getAdminPassword() {
+  return localStorage.getItem('pi_admin_pw') || 'primedia2025';
+}
 function openLogin() {
   if (isAdmin) { openAdminPanel(); return; }
+  showLoginForm();
   document.getElementById('login-curtain').classList.add('open');
   setTimeout(function(){ document.getElementById('lu').focus(); }, 100);
 }
-function closeLogin() { document.getElementById('login-curtain').classList.remove('open'); document.getElementById('le').textContent=''; }
+function closeLogin() {
+  document.getElementById('login-curtain').classList.remove('open');
+  document.getElementById('le').textContent = '';
+  document.getElementById('re').textContent = '';
+}
+function showLoginForm() {
+  document.getElementById('reset-card').style.display = 'none';
+  document.getElementById('login-curtain').querySelector('.login-card:not(#reset-card)').style.display = '';
+}
+function showResetForm() {
+  document.getElementById('login-curtain').querySelector('.login-card:not(#reset-card)').style.display = 'none';
+  document.getElementById('reset-card').style.display = '';
+  setTimeout(function(){ document.getElementById('rp-current').focus(); }, 100);
+}
+function doReset() {
+  var current = document.getElementById('rp-current').value;
+  var np = document.getElementById('rp-new').value;
+  var cp = document.getElementById('rp-confirm').value;
+  var re = document.getElementById('re');
+  if (current !== getAdminPassword()) { re.textContent = 'Current password is incorrect.'; return; }
+  if (!np || np.length < 6) { re.textContent = 'New password must be at least 6 characters.'; return; }
+  if (np !== cp) { re.textContent = 'Passwords do not match.'; return; }
+  localStorage.setItem('pi_admin_pw', np);
+  re.style.color = '#4ade80';
+  re.textContent = 'Password updated successfully!';
+  setTimeout(function(){ showLoginForm(); re.style.color = ''; }, 1500);
+}
 function doLogin() {
-  if (document.getElementById('lu').value.trim()==='admin' && document.getElementById('lp').value==='primedia2025') {
-    isAdmin=true; closeLogin();
-    var b=document.getElementById('admin-btn');
+  var user = document.getElementById('lu').value.trim();
+  var pass = document.getElementById('lp').value;
+  if (user === 'admin' && pass === getAdminPassword()) {
+    isAdmin = true;
+    closeLogin();
+    var b = document.getElementById('admin-btn');
     b.classList.add('admin-on');
-    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
     if (curSpec) renderDlBar();
-    openAdminPanel();
-    showToast('Admin access granted','ok');
-  } else { document.getElementById('le').textContent='Incorrect credentials.'; }
+    showToast('Welcome back, Admin!', 'ok');
+  } else {
+    document.getElementById('le').textContent = 'Incorrect username or password.';
+  }
 }
 
 /* ═══ ADMIN PANEL ══════════════════════════════════════════════════ */
