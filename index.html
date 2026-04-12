@@ -1332,96 +1332,114 @@ function downloadSpecPdf() {
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     var W = 297, H = 210;
-    var leftW = 160;          // content panel width
-    var rightX = leftW;
-    var rightW = W - leftW;   // photo panel width
-    var navyR = 20, navyG = 36, navyB = 64;  // #142440
     var pad = 14;
-    var headerH = 22;
+    var headerH = 20;
+    var leftW = 158;
+    var rightX = leftW;
+    var rightW = W - leftW;
+    var navy = [27, 55, 105];
+    var lineCol = [208, 216, 232];
+    var textDark = [30, 30, 30];
+    var textMid = [100, 100, 100];
 
-    /* ── Full navy header bar ── */
-    doc.setFillColor(navyR, navyG, navyB);
+    /* ── White background ── */
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, W, H, 'F');
+
+    /* ── Full-width navy header ── */
+    doc.setFillColor(navy[0], navy[1], navy[2]);
     doc.rect(0, 0, W, headerH, 'F');
 
-    /* Logo image (white version) — contained in header left area */
-    if (logoData) {
-      var logoBoxH = headerH - 4;
-      var logoScale = Math.min(50 / logoW, logoBoxH / logoH);
-      var logoDW = logoW * logoScale, logoDH = logoH * logoScale;
-      doc.addImage(logoData, 'PNG', pad, (headerH - logoDH) / 2, logoDW, logoDH);
+    /* Logo — contained, vertically centred in header */
+    if (logoData && logoW && logoH) {
+      var maxLogoW = 52, maxLogoH = headerH - 6;
+      var ls = Math.min(maxLogoW / logoW, maxLogoH / logoH);
+      var lw = logoW * ls, lh = logoH * ls;
+      doc.addImage(logoData, 'PNG', pad, (headerH - lh) / 2, lw, lh);
     } else {
-      /* Fallback text logo */
       doc.setTextColor(255,255,255);
-      doc.setFont('helvetica','bold'); doc.setFontSize(11);
-      doc.text('PRIMEDIA', pad, 10);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7);
-      doc.setCharSpace(2); doc.text('INSTORE', pad, 16); doc.setCharSpace(0);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      doc.text('PRIMEDIA INSTORE', pad, 13);
     }
 
-    /* SPECS label right side */
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(20); doc.setCharSpace(4);
-    doc.text('SPECS', W - pad - 42, headerH - 5);
+    /* SPECS text — right of header */
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.setCharSpace(3.5);
+    doc.text('SPECS', W - pad - 36, headerH - 5);
     doc.setCharSpace(0);
 
-    doc.setLineWidth(0.5);
+    /* ── Vertical divider between panels ── */
+    doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
+    doc.setLineWidth(0.4);
+    doc.line(leftW, headerH, leftW, H);
 
-    /* ── Right photo panel (dark bg + contained image) ── */
-    addContained(doc, specImgData, specImgW, specImgH, rightX, 0, rightW, H, 18, 22, 42);
-
-    /* ── Left content panel ── */
-    doc.setFillColor(255,255,255);
-    doc.rect(0, 0, leftW, H, 'F');
-    /* Re-draw header over left panel */
-    doc.setFillColor(navyR, navyG, navyB);
-    doc.rect(0, 0, leftW, headerH, 'F');
-    if (logoData) {
-      var ls2 = Math.min(50 / logoW, (headerH-4) / logoH);
-      doc.addImage(logoData, 'PNG', pad, (headerH - logoH*ls2) / 2, logoW*ls2, logoH*ls2);
+    /* ── Right panel: spec image, scaled to fit with padding, not filling ── */
+    if (specImgData && specImgW && specImgH) {
+      var imgPad = 12;
+      var boxX = rightX + imgPad;
+      var boxY = headerH + imgPad;
+      var boxW = rightW - imgPad * 2;
+      var boxH = H - headerH - imgPad * 2;
+      var scale = Math.min(boxW / specImgW, boxH / specImgH);
+      var dw = specImgW * scale, dh = specImgH * scale;
+      var dx = boxX + (boxW - dw) / 2;
+      var dy = boxY + (boxH - dh) / 2;
+      doc.addImage(specImgData, 'PNG', dx, dy, dw, dh);
+    } else {
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      doc.setTextColor(180,180,180);
+      doc.text('No image', rightX + rightW / 2, (headerH + H) / 2, { align: 'center' });
     }
 
-    var lineCol = [196, 208, 228];
-    var textDark = [40, 40, 40];
+    /* ── Left panel: spec content ── */
     var y = headerH + 10;
     var maxW = leftW - pad * 2;
 
-    /* Title */
-    doc.setTextColor(navyR, navyG, navyB);
-    doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    /* Spec title */
+    doc.setTextColor(navy[0], navy[1], navy[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
     var titleLines = doc.splitTextToSize(s.t, maxW);
     doc.text(titleLines, pad, y);
-    y += titleLines.length * 6 + 2;
+    y += titleLines.length * 5.8 + 3;
 
-    /* Description italic */
-    doc.setFont('helvetica','bolditalic'); doc.setFontSize(7.5);
-    doc.setTextColor(80, 80, 80);
-    doc.text('Description', pad, y); y += 4;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8);
-    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+    /* Description */
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(textMid[0], textMid[1], textMid[2]);
     var descLines = doc.splitTextToSize(s.d || '', maxW);
     doc.text(descLines, pad, y);
-    y += descLines.length * 3.8 + 5;
+    y += descLines.length * 3.8 + 4;
 
     function drawSection(label, items) {
       if (!items || !items.length || y > H - 10) return;
-      doc.setFont('helvetica','bold'); doc.setFontSize(8);
-      doc.setTextColor(navyR, navyG, navyB);
-      doc.text(label, pad, y); y += 2;
+      /* Section heading */
       doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
-      doc.setLineWidth(0.25);
-      doc.line(pad, y, leftW - pad, y); y += 4;
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+      doc.setLineWidth(0.3);
+      doc.line(pad, y, leftW - pad, y);
+      y += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(navy[0], navy[1], navy[2]);
+      doc.setCharSpace(1);
+      doc.text(label.toUpperCase(), pad, y);
+      doc.setCharSpace(0);
+      y += 4.5;
+      /* Items */
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.8);
       doc.setTextColor(textDark[0], textDark[1], textDark[2]);
       items.forEach(function(item) {
         if (y > H - 8) return;
-        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g,'');
-        var wrapped = doc.splitTextToSize(clean, maxW - 4);
+        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
+        var wrapped = doc.splitTextToSize(clean, maxW - 5);
         doc.text('\u2022', pad, y);
-        doc.text(wrapped, pad + 3.5, y);
-        y += wrapped.length * 3.5 + 0.5;
+        doc.text(wrapped, pad + 4, y);
+        y += wrapped.length * 3.6 + 0.6;
       });
-      y += 3;
+      y += 2;
     }
 
     drawSection('Design Specifications', s.ds);
@@ -1434,7 +1452,7 @@ function downloadSpecPdf() {
     }
     if (s.pk) drawSection('Packaging', s.pk.split('\n').filter(Boolean));
 
-    doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g,'') + ' - Primedia Instore Specs.pdf');
+    doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g, '') + ' - Primedia Instore Specs.pdf');
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF';
