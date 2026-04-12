@@ -584,6 +584,38 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .sf-cancel:hover{background:var(--bg3)}
 .sf-save{height:36px;padding:0 22px;border-radius:8px;border:none;background:var(--acc);color:#fff;font:700 12px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.04em}
 .sf-save:hover{background:var(--acc2);transform:translateY(-1px)}
+
+/* ── PDF Download Button ── */
+.pdf-dl-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--navy);background:var(--navy);color:#fff;font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase}
+.pdf-dl-btn:hover{background:var(--acc);border-color:var(--acc)}
+.pdf-dl-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── Print / PDF layout ── */
+#pdf-print-area{display:none}
+@page{size:A4 landscape;margin:0}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body>*{display:none!important}
+  #pdf-print-area{display:flex!important;width:100%;height:100vh;font-family:Arial,sans-serif}
+  .pdf-left{width:55%;padding:28px 32px;box-sizing:border-box;display:flex;flex-direction:column}
+  .pdf-right{width:45%;position:relative;overflow:hidden;background:#1a1a2e}
+  .pdf-right img{width:100%;height:100%;object-fit:cover;display:block}
+  .pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid #1a2a4a}
+  .pdf-logo-area{display:flex;align-items:center;gap:8px}
+  .pdf-logo-star{width:28px;height:28px}
+  .pdf-logo-text{font-size:13px;font-weight:900;color:#1a2a4a;line-height:1.1;letter-spacing:-.02em}
+  .pdf-logo-text span{display:block;font-size:9px;font-weight:700;letter-spacing:.12em;color:#1a2a4a}
+  .pdf-specs-badge{font-size:20px;font-weight:900;color:#1a2a4a;letter-spacing:.08em}
+  .pdf-title{font-size:20px;font-weight:900;color:#1a2a4a;margin:0 0 6px;line-height:1.2}
+  .pdf-desc{font-size:10.5px;color:#444;margin:0 0 16px;line-height:1.5}
+  .pdf-section-head{font-size:9px;font-weight:700;color:#1a2a4a;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #d0d8e8;padding-bottom:4px;margin:14px 0 8px}
+  .pdf-row{font-size:10px;color:#333;line-height:1.5;padding-left:12px;position:relative;margin-bottom:3px}
+  .pdf-row::before{content:'•';position:absolute;left:0;color:#1a2a4a;font-size:10px}
+  .pdf-2col{display:flex;gap:12px}
+  .pdf-2col-box{flex:1}
+  .pdf-2col-head{font-size:9px;font-weight:700;color:#555;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase}
+  .pdf-pkg-note{font-size:9px;color:#777;margin-bottom:6px;font-style:italic}
+}
 </style>
 </head>
 <body>
@@ -644,7 +676,13 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
             All Formats
           </button>
-          <div id="pi-chip" style="display:none"></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="pi-chip" style="display:none"></div>
+            <button class="pdf-dl-btn" onclick="downloadSpecPdf()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download PDF
+            </button>
+          </div>
         </div>
         <div class="spec-scroll" id="spec-content"></div>
         <div class="dl-bar" id="dl-bar">
@@ -667,6 +705,9 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 
   </div>
 </div>
+
+<!-- PDF PRINT AREA -->
+<div id="pdf-print-area"></div>
 
 <!-- LOGIN -->
 <div class="curtain" id="login-curtain">
@@ -1164,6 +1205,57 @@ function dlDownload(filename) {
     a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   }).catch(function(){ showToast('Download failed','err'); });
+}
+
+function downloadSpecPdf() {
+  var s = curSpec ? SPECS[curSpec] : null;
+  if (!s) return;
+
+  function row(text) { return '<div class="pdf-row">' + escH(text) + '</div>'; }
+  function section(label, items) {
+    if (!items || !items.length) return '';
+    return '<div class="pdf-section-head">' + label + '</div>' +
+      items.map(function(x){ return row(x.replace ? x.replace(/\s*\*\[[A-Z0-9]+\]/g,'') : x); }).join('');
+  }
+
+  var body = '';
+  body += '<div class="pdf-desc">' + escH(s.d || '') + '</div>';
+  body += section('Design Specifications', s.ds);
+  body += section('Artwork Specifications', s.ar);
+
+  if (s.p2) {
+    body += '<div class="pdf-section-head">Printing Specifications</div><div class="pdf-2col">';
+    body += '<div class="pdf-2col-box"><div class="pdf-2col-head">' + escH(s.p2.l.h) + '</div>' + s.p2.l.i.map(row).join('') + '</div>';
+    body += '<div class="pdf-2col-box"><div class="pdf-2col-head">' + escH(s.p2.r.h) + '</div>' + s.p2.r.i.map(row).join('') + '</div>';
+    body += '</div>';
+  } else {
+    body += section('Printing Specifications', s.pr);
+  }
+
+  if (s.pk) {
+    body += '<div class="pdf-section-head">Packaging</div>';
+    body += '<div class="pdf-pkg-note">(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)</div>';
+    body += s.pk.split('\n').map(row).join('');
+  }
+
+  var imgHtml = s.p ? '<img src="' + escH(s.p) + '" crossorigin="anonymous" alt="' + escH(s.t) + '"/>' :
+    '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:12px;font-family:Arial">No image</div>';
+
+  document.getElementById('pdf-print-area').innerHTML =
+    '<div class="pdf-left">' +
+      '<div class="pdf-header">' +
+        '<div class="pdf-logo-area">' +
+          '<svg class="pdf-logo-star" viewBox="0 0 40 40" fill="none"><polygon points="20,2 25,15 38,15 28,24 32,37 20,29 8,37 12,24 2,15 15,15" fill="#1a2a4a"/></svg>' +
+          '<div class="pdf-logo-text">PRIMEDIA<span>INSTORE</span></div>' +
+        '</div>' +
+        '<div class="pdf-specs-badge">SPECS</div>' +
+      '</div>' +
+      '<div class="pdf-title">' + escH(s.t) + '</div>' +
+      body +
+    '</div>' +
+    '<div class="pdf-right">' + imgHtml + '</div>';
+
+  setTimeout(function(){ window.print(); }, 150);
 }
 
 /* ═══ GITHUB API ════════════════════════════════════════════════════ */
