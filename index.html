@@ -651,7 +651,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .sf-save:hover{background:var(--acc2);transform:translateY(-1px)}
 
 /* ── PDF Download Button ── */
-.pdf-dl-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--navy);background:var(--navy);color:#fff;font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase}
+.pdf-dl-btn{display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--navy);background:var(--navy);color:#fff;font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase}
 .pdf-dl-btn:hover{background:var(--acc);border-color:var(--acc)}
 .pdf-dl-btn svg{width:13px;height:13px;flex-shrink:0}
 
@@ -1240,9 +1240,9 @@ function renderDlBar() {
   var files = s ? (s.dl_files || (s.dl_name ? [s.dl_name] : [])) : [];
   var list = document.getElementById('dl-files-list');
   if (!list) return;
-  /* Hide PDF download button when spec has more than one die line */
+  /* Show PDF download button only for admins with one die line or none */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
-  if (pdfBtn) pdfBtn.style.display = files.length > 1 ? 'none' : '';
+  if (pdfBtn) pdfBtn.style.display = (isAdmin && files.length <= 1) ? '' : 'none';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
   function fileRow(f) {
     return '<div class="dl-file-row">' +
