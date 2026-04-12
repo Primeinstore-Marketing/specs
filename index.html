@@ -430,31 +430,91 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 }
 .form-submit:hover{background:var(--acc2);transform:translateY(-1px)}
 
-/* login */
-.login-card{
-  background:var(--bg2);border:1px solid var(--line2);border-radius:18px;
-  padding:34px;width:min(370px,92vw);
-  transform:translateY(16px) scale(.96);transition:transform .28s var(--ease);
+/* ── Auth Modal ── */
+.auth-modal{
+  background:#fff;border-radius:20px;
+  width:min(420px,94vw);overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.35);
+  transform:translateY(20px) scale(.96);transition:transform .3s var(--ease);
 }
-.curtain.open .login-card{transform:translateY(0) scale(1)}
-.login-logo{margin-bottom:22px}
-.login-logo .logo-img{height:26px}
-.login-h{font-family:var(--FD);font-size:20px;font-weight:700;margin-bottom:5px;letter-spacing:-.02em}
-.login-sub{font-size:12.5px;font-weight:300;color:var(--txt2);margin-bottom:22px}
+.curtain.open .auth-modal{transform:translateY(0) scale(1)}
+.auth-modal-top{
+  background:var(--navy);padding:30px 32px 24px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.auth-modal-logo{height:24px;width:auto}
+.auth-modal-close{
+  background:rgba(255,255,255,.12);border:none;border-radius:50%;
+  width:28px;height:28px;cursor:pointer;color:#fff;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;
+}
+.auth-modal-close:hover{background:rgba(255,255,255,.22)}
+.auth-modal-body{padding:28px 32px 32px}
+.auth-step-title{font-family:var(--FD);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:4px;letter-spacing:-.02em}
+.auth-step-sub{font-size:12.5px;color:var(--txt2);margin-bottom:22px;line-height:1.5}
+.auth-field{margin-bottom:12px}
+.auth-field label{
+  display:block;font-family:var(--FD);font-size:8.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin-bottom:5px;
+}
+.auth-field input,.auth-field select{
+  width:100%;background:var(--bg1);border:1.5px solid var(--line2);border-radius:9px;
+  color:var(--txt);font:13.5px var(--F);padding:10px 13px;outline:none;
+  transition:border-color .15s;box-sizing:border-box;
+}
+.auth-field input:focus,.auth-field select:focus{border-color:var(--acc);background:#fff}
+.auth-field select option{background:#fff}
+.auth-err{
+  min-height:18px;font-size:12px;color:var(--red);
+  margin-bottom:12px;display:flex;align-items:center;gap:5px;
+}
+.auth-err:not(:empty)::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--red);flex-shrink:0}
+.auth-ok{
+  width:100%;height:42px;border-radius:10px;border:none;cursor:pointer;
+  background:var(--navy);color:#fff;
+  font-family:var(--FD);font-size:12px;font-weight:700;letter-spacing:.05em;
+  transition:all .18s;margin-top:4px;
+}
+.auth-ok:hover{background:var(--acc)}
+.auth-ok:disabled{opacity:.55;cursor:not-allowed}
+.auth-link{
+  display:block;text-align:center;margin-top:14px;
+  background:none;border:none;cursor:pointer;
+  color:var(--txt3);font:12px var(--F);transition:color .15s;padding:0;
+}
+.auth-link:hover{color:var(--acc)}
+.auth-divider{
+  display:flex;align-items:center;gap:10px;margin:16px 0;
+  font-size:11px;color:var(--txt3);
+}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line2)}
+.auth-steps-indicator{
+  display:flex;align-items:center;gap:6px;margin-bottom:20px;
+}
+.auth-step-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--line2);transition:background .2s;
+}
+.auth-step-dot.active{background:var(--navy)}
+.auth-step-dot.done{background:var(--acc)}
+.auth-back{
+  display:flex;align-items:center;gap:4px;
+  background:none;border:none;cursor:pointer;
+  color:var(--acc);font:600 11.5px var(--F);padding:0;margin-bottom:16px;
+}
+.auth-back:hover{color:var(--acc2)}
+.auth-back svg{width:14px;height:14px}
+/* legacy aliases */
 .login-inp{
   width:100%;background:var(--bg3);border:1px solid var(--line2);
   border-radius:8px;color:var(--txt);font:13.5px var(--F);
-  padding:10px 13px;outline:none;margin-bottom:9px;
-  transition:border-color .15s;
+  padding:10px 13px;outline:none;margin-bottom:9px;transition:border-color .15s;
 }
 .login-inp:focus{border-color:rgba(40,97,253,.35)}
 .login-err{min-height:16px;font-size:11.5px;color:var(--red);margin-bottom:10px}
 .login-acts{display:flex;gap:9px}
 .login-ok{
   flex:1;height:40px;border-radius:8px;border:none;cursor:pointer;
-  background:var(--acc);color:#ffffff;
-  font-family:var(--FD);font-size:11px;font-weight:700;letter-spacing:.06em;
-  transition:all .18s;
+  background:var(--acc);color:#fff;font-family:var(--FD);font-size:11px;font-weight:700;letter-spacing:.06em;transition:all .18s;
 }
 .login-ok:hover{background:var(--acc2)}
 .login-cancel{
@@ -765,34 +825,15 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 <!-- PDF PRINT AREA -->
 <div id="pdf-print-area"></div>
 
-<!-- LOGIN -->
+<!-- AUTH MODAL -->
 <div class="curtain" id="login-curtain">
-  <div class="login-card">
-    <div class="login-logo"><img src="pi-specs-assets/logo-white.png" alt="Primedia Instore" class="logo-img"/></div>
-    <h2 class="login-h">Admin Access</h2>
-    <p class="login-sub">Sign in to upload spec formats and dieline assets.</p>
-    <input class="login-inp" id="lu" type="text" placeholder="Username" autocomplete="username"/>
-    <input class="login-inp" id="lp" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <div class="login-err" id="le"></div>
-    <div class="login-acts">
-      <button class="login-ok" onclick="doLogin()">Sign In</button>
-      <button class="login-cancel" onclick="closeLogin()">Cancel</button>
+  <div class="auth-modal">
+    <div class="auth-modal-top">
+      <img src="pi-specs-assets/logo-white.png" class="auth-modal-logo" alt="Primedia Instore"/>
+      <button class="auth-modal-close" onclick="closeLogin()">&#x2715;</button>
     </div>
-    <button onclick="showResetForm()" style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,.5);font:12px var(--F);cursor:pointer;text-decoration:underline">Forgot password?</button>
-  </div>
-
-  <!-- Reset password form (hidden by default) -->
-  <div class="login-card" id="reset-card" style="display:none">
-    <div class="login-logo"><img src="pi-specs-assets/logo-white.png" alt="Primedia Instore" class="logo-img"/></div>
-    <h2 class="login-h">Reset Password</h2>
-    <p class="login-sub">Enter a new password for the admin account.</p>
-    <input class="login-inp" id="rp-current" type="password" placeholder="Current password"/>
-    <input class="login-inp" id="rp-new" type="password" placeholder="New password"/>
-    <input class="login-inp" id="rp-confirm" type="password" placeholder="Confirm new password" onkeydown="if(event.key==='Enter')doReset()"/>
-    <div class="login-err" id="re"></div>
-    <div class="login-acts">
-      <button class="login-ok" onclick="doReset()">Update Password</button>
-      <button class="login-cancel" onclick="showLoginForm()">Back</button>
+    <div class="auth-modal-body" id="auth-modal-body">
+      <!-- views injected by JS -->
     </div>
   </div>
 </div>
@@ -807,6 +848,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
         <div class="adm-tabs">
           <button class="adm-tab active" id="tab-specs" onclick="showAdmTab('specs')">Specs</button>
           <button class="adm-tab" id="tab-cats" onclick="showAdmTab('cats')">Categories</button>
+          <button class="adm-tab" id="tab-users" onclick="showAdmTab('users')">Users</button>
           <button class="adm-tab" id="tab-settings" onclick="showAdmTab('settings')">Settings</button>
         </div>
       </div>
@@ -814,6 +856,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     </div>
     <div class="adm-pane" id="adm-specs-pane"></div>
     <div class="adm-pane hidden" id="adm-cats-pane"></div>
+    <div class="adm-pane hidden" id="adm-users-pane"></div>
     <div class="adm-pane hidden" id="adm-settings-pane">
       <div style="padding:24px;max-width:520px">
         <h3 style="margin:0 0 6px;font-size:15px;font-weight:600">GitHub Integration</h3>
@@ -1638,63 +1681,234 @@ function getToken() { return sessionStorage.getItem('pi_jwt') || ''; }
 function setToken(t) { sessionStorage.setItem('pi_jwt', t); }
 function clearToken() { sessionStorage.removeItem('pi_jwt'); }
 
+var _authView = 'login'; // login | forgot-step1 | forgot-step2 | forgot-step3 | change-pw | set-security
+var _fpUsername = '', _fpResetToken = '';
+
+function _authBody() { return document.getElementById('auth-modal-body'); }
+
+function _authHtml(view) {
+  var SQ = ['What was the name of your first pet?','What city were you born in?','What is your mother\'s maiden name?','What was the name of your primary school?','What was your childhood nickname?','What is the name of your favourite teacher?'];
+  var sqOpts = SQ.map(function(q){ return '<option value="'+q+'">'+q+'</option>'; }).join('');
+  if (view === 'login') return (
+    '<div class="auth-step-title">Sign In</div>'+
+    '<div class="auth-step-sub">Access the admin panel to manage specs and formats.</div>'+
+    '<div class="auth-field"><label>Username</label><input id="au-user" type="text" autocomplete="username" placeholder="admin"/></div>'+
+    '<div class="auth-field"><label>Password</label><input id="au-pass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')doLogin()"/></div>'+
+    '<div class="auth-err" id="au-err"></div>'+
+    '<button class="auth-ok" id="au-ok" onclick="doLogin()">Sign In</button>'+
+    '<button class="auth-link" onclick="authShowView(\'forgot-step1\')">Forgot password?</button>'
+  );
+  if (view === 'forgot-step1') return (
+    '<button class="auth-back" onclick="authShowView(\'login\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back to sign in</button>'+
+    '<div class="auth-steps-indicator"><div class="auth-step-dot active"></div><div class="auth-step-dot"></div><div class="auth-step-dot"></div></div>'+
+    '<div class="auth-step-title">Forgot Password</div>'+
+    '<div class="auth-step-sub">Enter your username and we\'ll verify your identity.</div>'+
+    '<div class="auth-field"><label>Username</label><input id="fp-user" type="text" placeholder="admin" onkeydown="if(event.key===\'Enter\')fpStep1()"/></div>'+
+    '<div class="auth-err" id="fp-err"></div>'+
+    '<button class="auth-ok" id="fp-ok" onclick="fpStep1()">Continue</button>'
+  );
+  if (view === 'forgot-step2') return (
+    '<button class="auth-back" onclick="authShowView(\'forgot-step1\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back</button>'+
+    '<div class="auth-steps-indicator"><div class="auth-step-dot done"></div><div class="auth-step-dot active"></div><div class="auth-step-dot"></div></div>'+
+    '<div class="auth-step-title">Security Question</div>'+
+    '<div class="auth-step-sub" id="fp-q-text">Answer your security question to continue.</div>'+
+    '<div class="auth-field"><label>Your answer</label><input id="fp-ans" type="text" placeholder="Enter your answer" onkeydown="if(event.key===\'Enter\')fpStep2()"/></div>'+
+    '<div class="auth-err" id="fp-err2"></div>'+
+    '<button class="auth-ok" id="fp-ok2" onclick="fpStep2()">Verify</button>'
+  );
+  if (view === 'forgot-step3') return (
+    '<button class="auth-back" onclick="authShowView(\'login\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Back to sign in</button>'+
+    '<div class="auth-steps-indicator"><div class="auth-step-dot done"></div><div class="auth-step-dot done"></div><div class="auth-step-dot active"></div></div>'+
+    '<div class="auth-step-title">Set New Password</div>'+
+    '<div class="auth-step-sub">Choose a strong password for your account.</div>'+
+    '<div class="auth-field"><label>New password</label><input id="fp-np" type="password" placeholder="Min. 6 characters"/></div>'+
+    '<div class="auth-field"><label>Confirm password</label><input id="fp-cp" type="password" placeholder="Repeat password" onkeydown="if(event.key===\'Enter\')fpStep3()"/></div>'+
+    '<div class="auth-err" id="fp-err3"></div>'+
+    '<button class="auth-ok" id="fp-ok3" onclick="fpStep3()">Update Password</button>'
+  );
+  if (view === 'change-pw') return (
+    '<div class="auth-step-title">Change Password</div>'+
+    '<div class="auth-step-sub">Update the password for your account.</div>'+
+    '<div class="auth-field"><label>Current password</label><input id="cp-cur" type="password" placeholder="••••••••"/></div>'+
+    '<div class="auth-field"><label>New password</label><input id="cp-new" type="password" placeholder="Min. 6 characters"/></div>'+
+    '<div class="auth-field"><label>Confirm new password</label><input id="cp-con" type="password" placeholder="Repeat new password" onkeydown="if(event.key===\'Enter\')doChangePw()"/></div>'+
+    '<div class="auth-err" id="cp-err"></div>'+
+    '<button class="auth-ok" id="cp-ok" onclick="doChangePw()">Update Password</button>'+
+    '<button class="auth-link" onclick="closeLogin()">Cancel</button>'
+  );
+  if (view === 'set-security') return (
+    '<div class="auth-step-title">Security Question</div>'+
+    '<div class="auth-step-sub">Set a security question so you can recover your password if you forget it.</div>'+
+    '<div class="auth-field"><label>Security question</label><select id="ss-q">'+sqOpts+'</select></div>'+
+    '<div class="auth-field"><label>Your answer</label><input id="ss-a" type="text" placeholder="Enter your answer"/></div>'+
+    '<div class="auth-err" id="ss-err"></div>'+
+    '<button class="auth-ok" id="ss-ok" onclick="doSetSecurity()">Save</button>'+
+    '<button class="auth-link" onclick="closeLogin()">Cancel</button>'
+  );
+  return '';
+}
+
+function authShowView(view) {
+  _authView = view;
+  _authBody().innerHTML = _authHtml(view);
+  var first = _authBody().querySelector('input');
+  if (first) setTimeout(function(){ first.focus(); }, 80);
+}
+
 function openLogin() {
   if (isAdmin) { openAdminPanel(); return; }
-  showLoginForm();
+  authShowView('login');
   document.getElementById('login-curtain').classList.add('open');
-  setTimeout(function(){ document.getElementById('lu').focus(); }, 100);
 }
 function closeLogin() {
   document.getElementById('login-curtain').classList.remove('open');
-  document.getElementById('le').textContent = '';
-  document.getElementById('re').textContent = '';
 }
-function showLoginForm() {
-  document.getElementById('reset-card').style.display = 'none';
-  document.getElementById('login-curtain').querySelector('.login-card:not(#reset-card)').style.display = '';
-}
-function showResetForm() {
-  document.getElementById('login-curtain').querySelector('.login-card:not(#reset-card)').style.display = 'none';
-  document.getElementById('reset-card').style.display = '';
-  setTimeout(function(){ document.getElementById('rp-current').focus(); }, 100);
-}
-function doReset() {
-  var current = document.getElementById('rp-current').value;
-  var np = document.getElementById('rp-new').value;
-  var cp = document.getElementById('rp-confirm').value;
-  var re = document.getElementById('re');
-  if (!np || np.length < 6) { re.textContent = 'New password must be at least 6 characters.'; return; }
-  if (np !== cp) { re.textContent = 'Passwords do not match.'; return; }
-  re.textContent = '';
-  var okBtn = document.querySelector('#reset-card .login-ok');
-  if (okBtn) okBtn.disabled = true;
-  fetch(WORKER_URL + '/api/change-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
-    body: JSON.stringify({ currentPassword: current, newPassword: np })
+function showLoginForm() { authShowView('login'); }
+function showResetForm() { authShowView('change-pw'); }
+
+/* ── Sign In ── */
+function doLogin() {
+  var user = (document.getElementById('au-user')||{value:''}).value.trim();
+  var pass = (document.getElementById('au-pass')||{value:''}).value;
+  var err = document.getElementById('au-err');
+  var btn = document.getElementById('au-ok');
+  err.textContent = '';
+  if (!user || !pass) { err.textContent = 'Please enter your username and password.'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  fetch(WORKER_URL + '/api/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ username: user, password: pass })
   })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (okBtn) okBtn.disabled = false;
-      if (data.ok) {
-        re.style.color = '#4ade80';
-        re.textContent = 'Password updated successfully!';
-        setTimeout(function(){ showLoginForm(); re.style.color = ''; re.textContent = ''; }, 1800);
-      } else {
-        re.textContent = data.error || 'Failed to update password.';
-      }
-    })
-    .catch(function(){
-      // Worker not yet updated — fall back to local storage while deployment is pending
-      if (okBtn) okBtn.disabled = false;
-      var localPw = localStorage.getItem('pi_admin_pw') || 'primedia2025';
-      if (current !== localPw) { re.textContent = 'Current password is incorrect.'; return; }
-      localStorage.setItem('pi_admin_pw', np);
-      re.style.color = '#4ade80';
-      re.textContent = 'Password updated successfully!';
-      setTimeout(function(){ showLoginForm(); re.style.color = ''; re.textContent = ''; }, 1800);
-    });
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Sign In';
+    if (d.token) { setToken(d.token); _grantAdmin(); }
+    else err.textContent = d.error || 'Incorrect username or password.';
+  })
+  .catch(function(){
+    btn.disabled = false; btn.textContent = 'Sign In';
+    err.textContent = 'Network error. Please try again.';
+  });
 }
+
+/* ── Forgot Password ── */
+function fpStep1() {
+  var user = (document.getElementById('fp-user')||{value:''}).value.trim();
+  var err = document.getElementById('fp-err');
+  var btn = document.getElementById('fp-ok');
+  err.textContent = '';
+  if (!user) { err.textContent = 'Please enter your username.'; return; }
+  btn.disabled = true; btn.textContent = 'Checking…';
+  _fpUsername = user;
+  fetch(WORKER_URL + '/api/forgot-password', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ username: user })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Continue';
+    if (d.question) {
+      authShowView('forgot-step2');
+      var qt = document.getElementById('fp-q-text');
+      if (qt) qt.textContent = d.question;
+    } else { err.textContent = d.error || 'Account not found or no security question set.'; }
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Continue'; err.textContent='Network error.'; });
+}
+
+function fpStep2() {
+  var ans = (document.getElementById('fp-ans')||{value:''}).value.trim();
+  var err = document.getElementById('fp-err2');
+  var btn = document.getElementById('fp-ok2');
+  err.textContent = '';
+  if (!ans) { err.textContent = 'Please enter your answer.'; return; }
+  btn.disabled = true; btn.textContent = 'Verifying…';
+  fetch(WORKER_URL + '/api/verify-security', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ username: _fpUsername, answer: ans })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Verify';
+    if (d.resetToken) { _fpResetToken = d.resetToken; authShowView('forgot-step3'); }
+    else err.textContent = d.error || 'Incorrect answer.';
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Verify'; err.textContent='Network error.'; });
+}
+
+function fpStep3() {
+  var np = (document.getElementById('fp-np')||{value:''}).value;
+  var cp = (document.getElementById('fp-cp')||{value:''}).value;
+  var err = document.getElementById('fp-err3');
+  var btn = document.getElementById('fp-ok3');
+  err.textContent = '';
+  if (np.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+  if (np !== cp) { err.textContent = 'Passwords do not match.'; return; }
+  btn.disabled = true; btn.textContent = 'Updating…';
+  fetch(WORKER_URL + '/api/reset-password', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ resetToken: _fpResetToken, newPassword: np })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Update Password';
+    if (d.ok) {
+      showToast('Password updated — please sign in.', 'ok');
+      authShowView('login');
+    } else { err.textContent = d.error || 'Failed to update password.'; }
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Update Password'; err.textContent='Network error.'; });
+}
+
+/* ── Change Password (when logged in) ── */
+function doReset() { authShowView('change-pw'); openLogin(); }
+function doChangePw() {
+  var cur = (document.getElementById('cp-cur')||{value:''}).value;
+  var np = (document.getElementById('cp-new')||{value:''}).value;
+  var cp = (document.getElementById('cp-con')||{value:''}).value;
+  var err = document.getElementById('cp-err');
+  var btn = document.getElementById('cp-ok');
+  err.textContent = '';
+  if (np.length < 6) { err.textContent = 'New password must be at least 6 characters.'; return; }
+  if (np !== cp) { err.textContent = 'Passwords do not match.'; return; }
+  btn.disabled = true; btn.textContent = 'Updating…';
+  fetch(WORKER_URL + '/api/change-password', {
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+    body: JSON.stringify({ currentPassword: cur, newPassword: np })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Update Password';
+    if (d.ok) { showToast('Password updated!','ok'); closeLogin(); }
+    else err.textContent = d.error || 'Failed to update password.';
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Update Password'; err.textContent='Network error.'; });
+}
+
+/* ── Set Security Question ── */
+function openSetSecurity() { authShowView('set-security'); document.getElementById('login-curtain').classList.add('open'); }
+function doSetSecurity() {
+  var q = (document.getElementById('ss-q')||{value:''}).value;
+  var a = (document.getElementById('ss-a')||{value:''}).value.trim();
+  var err = document.getElementById('ss-err');
+  var btn = document.getElementById('ss-ok');
+  err.textContent = '';
+  if (!a) { err.textContent = 'Please enter your answer.'; return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  fetch(WORKER_URL + '/api/set-security', {
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+    body: JSON.stringify({ securityQuestion: q, securityAnswer: a })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Save';
+    if (d.ok) { showToast('Security question saved!','ok'); closeLogin(); }
+    else err.textContent = d.error || 'Failed to save.';
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Save'; err.textContent='Network error.'; });
+}
+
+/* ── Grant / Revoke ── */
 function _grantAdmin() {
   isAdmin = true;
   closeLogin();
@@ -1706,8 +1920,7 @@ function _grantAdmin() {
   showToast('Welcome back, Admin!', 'ok');
 }
 function doLogout() {
-  clearToken();
-  isAdmin = false;
+  clearToken(); isAdmin = false;
   var b = document.getElementById('admin-btn');
   b.classList.remove('admin-on');
   b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin';
@@ -1715,45 +1928,12 @@ function doLogout() {
   if (curSpec) renderDlBar();
   showToast('Signed out', 'ok');
 }
-function doLogin() {
-  var user = document.getElementById('lu').value.trim();
-  var pass = document.getElementById('lp').value;
-  var le = document.getElementById('le');
-  le.textContent = '';
-  var okBtn = document.querySelector('.login-card:not(#reset-card) .login-ok');
-  if (okBtn) okBtn.disabled = true;
-  fetch(WORKER_URL + '/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: user, password: pass })
-  })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (okBtn) okBtn.disabled = false;
-      if (data.token) {
-        setToken(data.token);
-        _grantAdmin();
-      } else {
-        le.textContent = data.error || 'Incorrect username or password.';
-      }
-    })
-    .catch(function(){
-      // Worker not yet updated — fall back to local check while deployment is pending
-      if (okBtn) okBtn.disabled = false;
-      var localPw = localStorage.getItem('pi_admin_pw') || 'primedia2025';
-      if (user === 'admin' && pass === localPw) {
-        _grantAdmin();
-      } else {
-        le.textContent = 'Incorrect username or password.';
-      }
-    });
-}
 
 /* ═══ ADMIN PANEL ══════════════════════════════════════════════════ */
 function openAdminPanel() {
-  // Reset panes so toolbar re-renders fresh on each open
   document.getElementById('adm-specs-pane').innerHTML = '';
   document.getElementById('adm-cats-pane').innerHTML = '';
+  document.getElementById('adm-users-pane').innerHTML = '';
   renderAdminSpecs();
   renderAdminCats();
   showAdmTab(admCurTab);
@@ -1763,16 +1943,114 @@ function closeAdmin() { document.getElementById('admin-curtain').classList.remov
 
 function showAdmTab(tab) {
   admCurTab = tab;
-  document.getElementById('adm-specs-pane').classList.toggle('hidden', tab!=='specs');
-  document.getElementById('adm-cats-pane').classList.toggle('hidden', tab!=='cats');
-  document.getElementById('adm-settings-pane').classList.toggle('hidden', tab!=='settings');
-  document.getElementById('tab-specs').classList.toggle('active', tab==='specs');
-  document.getElementById('tab-cats').classList.toggle('active', tab==='cats');
-  document.getElementById('tab-settings').classList.toggle('active', tab==='settings');
+  ['specs','cats','users','settings'].forEach(function(t){
+    document.getElementById('adm-'+t+'-pane').classList.toggle('hidden', tab!==t);
+    document.getElementById('tab-'+t).classList.toggle('active', tab===t);
+  });
   if (tab === 'settings') {
     var status = document.getElementById('gh-pat-status');
     if (status) status.textContent = getGhPat() ? '✓ Token stored' : 'No token set';
   }
+  if (tab === 'users') renderAdminUsers();
+}
+
+function renderAdminUsers() {
+  var pane = document.getElementById('adm-users-pane');
+  pane.innerHTML = '<div style="padding:24px"><div style="font-size:13px;color:var(--txt3)">Loading users…</div></div>';
+  fetch(WORKER_URL + '/api/users', { headers:{'Authorization':'Bearer '+getToken()} })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var users = d.users || [];
+    var SQ = ['What was the name of your first pet?','What city were you born in?','What is your mother\'s maiden name?','What was the name of your primary school?','What was your childhood nickname?','What is the name of your favourite teacher?'];
+    var sqOpts = SQ.map(function(q){ return '<option value="'+q+'">'+q+'</option>'; }).join('');
+    var html = '<div style="padding:24px;max-width:680px">';
+    // User list
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
+    html += '<h3 style="margin:0;font-size:15px;font-weight:700;font-family:var(--FD);color:var(--navy)">User Accounts</h3>';
+    html += '</div>';
+    html += '<div style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;margin-bottom:28px">';
+    users.forEach(function(u, i){
+      var isLast = i === users.length - 1;
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);'+(isLast?'':'border-bottom:1px solid var(--line)')+'">'+
+        '<div style="width:34px;height:34px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font:700 13px var(--FD);color:#fff;flex-shrink:0">'+u.username[0].toUpperCase()+'</div>'+
+        '<div style="flex:1"><div style="font-weight:600;font-size:13px;color:var(--txt)">'+escH(u.username)+'</div>'+
+        '<div style="font-size:11px;color:var(--txt3);text-transform:capitalize">'+escH(u.role||'viewer')+'</div></div>'+
+        (u.username !== 'admin' ? '<button onclick="deleteAdminUser(\''+escH(u.username)+'\')" style="height:28px;padding:0 12px;border-radius:6px;border:1px solid rgba(255,77,77,.3);background:rgba(255,77,77,.06);color:var(--red);font:600 11px var(--F);cursor:pointer">Remove</button>' : '<span style="font-size:11px;color:var(--txt3);padding:0 12px">Primary</span>')+
+        '</div>';
+    });
+    if (!users.length) html += '<div style="padding:20px;text-align:center;font-size:13px;color:var(--txt3)">No users yet.</div>';
+    html += '</div>';
+    // Create user form
+    html += '<h3 style="margin:0 0 14px;font-size:14px;font-weight:700;font-family:var(--FD);color:var(--navy)">Create New Account</h3>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+    html += '<div class="fg"><label>Username</label><input id="nu-user" type="text" placeholder="e.g. jane"/></div>';
+    html += '<div class="fg"><label>Role</label><select id="nu-role"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>';
+    html += '<div class="fg"><label>Password</label><input id="nu-pass" type="password" placeholder="Min. 6 characters"/></div>';
+    html += '<div class="fg"><label>Confirm Password</label><input id="nu-pass2" type="password" placeholder="Repeat password"/></div>';
+    html += '</div>';
+    html += '<div class="fg" style="margin-bottom:12px"><label>Security Question</label><select id="nu-sq">'+sqOpts+'</select></div>';
+    html += '<div class="fg" style="margin-bottom:16px"><label>Security Answer</label><input id="nu-sa" type="text" placeholder="Answer to security question"/></div>';
+    html += '<div id="nu-err" style="min-height:16px;font-size:12px;color:var(--red);margin-bottom:8px"></div>';
+    html += '<button id="nu-ok" onclick="createAdminUser()" class="sf-save" style="width:auto;padding:0 24px">Create Account</button>';
+    // Change password section
+    html += '<h3 style="margin:28px 0 14px;font-size:14px;font-weight:700;font-family:var(--FD);color:var(--navy)">Change My Password</h3>';
+    html += '<div style="display:flex;gap:8px">';
+    html += '<button onclick="openChangePw()" class="sf-cancel" style="width:auto;padding:0 18px">Change Password</button>';
+    html += '<button onclick="openSetSecurity()" class="sf-cancel" style="width:auto;padding:0 18px">Set Security Question</button>';
+    html += '</div>';
+    html += '</div>';
+    pane.innerHTML = html;
+  })
+  .catch(function(){
+    pane.innerHTML = '<div style="padding:24px;font-size:13px;color:var(--red)">Failed to load users. Make sure the updated worker is deployed.</div>';
+  });
+}
+
+function createAdminUser() {
+  var user = (document.getElementById('nu-user')||{value:''}).value.trim();
+  var pass = (document.getElementById('nu-pass')||{value:''}).value;
+  var pass2 = (document.getElementById('nu-pass2')||{value:''}).value;
+  var role = (document.getElementById('nu-role')||{value:'viewer'}).value;
+  var sq = (document.getElementById('nu-sq')||{value:''}).value;
+  var sa = (document.getElementById('nu-sa')||{value:''}).value.trim();
+  var err = document.getElementById('nu-err');
+  var btn = document.getElementById('nu-ok');
+  err.textContent = '';
+  if (!user) { err.textContent = 'Username is required.'; return; }
+  if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+  if (pass !== pass2) { err.textContent = 'Passwords do not match.'; return; }
+  btn.disabled = true; btn.textContent = 'Creating…';
+  fetch(WORKER_URL + '/api/users', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+    body: JSON.stringify({ username:user, password:pass, role:role, securityQuestion:sq, securityAnswer:sa })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Create Account';
+    if (d.ok) { showToast('Account created: ' + (d.username||user),'ok'); renderAdminUsers(); }
+    else err.textContent = d.error || 'Failed to create account.';
+  })
+  .catch(function(){ btn.disabled=false; btn.textContent='Create Account'; err.textContent='Network error.'; });
+}
+
+function deleteAdminUser(username) {
+  if (!confirm('Remove user "' + username + '"? This cannot be undone.')) return;
+  fetch(WORKER_URL + '/api/users/' + encodeURIComponent(username), {
+    method:'DELETE', headers:{'Authorization':'Bearer '+getToken()}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.ok) { showToast('User removed.','ok'); renderAdminUsers(); }
+    else showToast(d.error || 'Failed to remove user.','err');
+  })
+  .catch(function(){ showToast('Network error.','err'); });
+}
+
+function openChangePw() {
+  closeAdmin();
+  authShowView('change-pw');
+  document.getElementById('login-curtain').classList.add('open');
 }
 
 function renderAdminSpecs() {
