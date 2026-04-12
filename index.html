@@ -1242,7 +1242,7 @@ function renderDlBar() {
   if (!list) return;
   /* Show PDF download button only for admins with one die line or none */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
-  if (pdfBtn) pdfBtn.style.display = (isAdmin && files.length <= 1) ? '' : 'none';
+  if (pdfBtn) pdfBtn.style.display = (isAdmin && files.length <= 1) ? 'inline-flex' : 'none';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
   function fileRow(f) {
     return '<div class="dl-file-row">' +
