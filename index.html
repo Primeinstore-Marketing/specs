@@ -590,33 +590,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 .pdf-dl-btn:hover{background:var(--acc);border-color:var(--acc)}
 .pdf-dl-btn svg{width:13px;height:13px;flex-shrink:0}
 
-/* ── Print / PDF layout ── */
-#pdf-print-area{display:none}
-@page{size:A4 landscape;margin:0}
-@media print{
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  body>*{display:none!important}
-  #pdf-print-area{display:flex!important;width:100%;height:100vh;font-family:Arial,sans-serif}
-  .pdf-left{width:55%;padding:28px 32px;box-sizing:border-box;display:flex;flex-direction:column}
-  .pdf-right{width:45%;position:relative;overflow:hidden;background:#1a1a2e}
-  .pdf-right img{width:100%;height:100%;object-fit:cover;display:block}
-  .pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid #1a2a4a}
-  .pdf-logo-area{display:flex;align-items:center;gap:8px}
-  .pdf-logo-star{width:28px;height:28px}
-  .pdf-logo-text{font-size:13px;font-weight:900;color:#1a2a4a;line-height:1.1;letter-spacing:-.02em}
-  .pdf-logo-text span{display:block;font-size:9px;font-weight:700;letter-spacing:.12em;color:#1a2a4a}
-  .pdf-specs-badge{font-size:20px;font-weight:900;color:#1a2a4a;letter-spacing:.08em}
-  .pdf-title{font-size:20px;font-weight:900;color:#1a2a4a;margin:0 0 6px;line-height:1.2}
-  .pdf-desc{font-size:10.5px;color:#444;margin:0 0 16px;line-height:1.5}
-  .pdf-section-head{font-size:9px;font-weight:700;color:#1a2a4a;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #d0d8e8;padding-bottom:4px;margin:14px 0 8px}
-  .pdf-row{font-size:10px;color:#333;line-height:1.5;padding-left:12px;position:relative;margin-bottom:3px}
-  .pdf-row::before{content:'•';position:absolute;left:0;color:#1a2a4a;font-size:10px}
-  .pdf-2col{display:flex;gap:12px}
-  .pdf-2col-box{flex:1}
-  .pdf-2col-head{font-size:9px;font-weight:700;color:#555;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase}
-  .pdf-pkg-note{font-size:9px;color:#777;margin-bottom:6px;font-style:italic}
-}
+/* ── PDF download (hidden utility) ── */
+#pdf-print-area{display:none!important}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1210,52 +1187,136 @@ function dlDownload(filename) {
 function downloadSpecPdf() {
   var s = curSpec ? SPECS[curSpec] : null;
   if (!s) return;
+  if (!window.jspdf) { showToast('PDF library not loaded yet, try again','err'); return; }
 
-  function row(text) { return '<div class="pdf-row">' + escH(text) + '</div>'; }
-  function section(label, items) {
-    if (!items || !items.length) return '';
-    return '<div class="pdf-section-head">' + label + '</div>' +
-      items.map(function(x){ return row(x.replace ? x.replace(/\s*\*\[[A-Z0-9]+\]/g,'') : x); }).join('');
+  var btn = document.querySelector('.pdf-dl-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+
+  function _build(imgDataUrl) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    var W = 297, H = 210;
+    var leftW = 163; // ~55%
+    var navy = [20, 36, 64];
+    var white = [255, 255, 255];
+    var lineCol = [196, 208, 228];
+    var textDark = [40, 40, 40];
+    var textMid = [100, 100, 100];
+    var pad = 14;
+    var headerH = 20;
+
+    /* ── Header bar (full width, navy) ── */
+    doc.setFillColor(navy[0], navy[1], navy[2]);
+    doc.rect(0, 0, W, headerH, 'F');
+
+    /* Logo: star symbol + PRIMEDIA / INSTORE */
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('PRIMEDIA', pad + 6, 11);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setCharSpace(2);
+    doc.text('INSTORE', pad + 6, 16.5);
+    doc.setCharSpace(0);
+
+    /* SPECS badge (right) */
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setCharSpace(3);
+    doc.text('SPECS', W - pad - 34, 14);
+    doc.setCharSpace(0);
+
+    /* ── Right photo panel (navy bg) ── */
+    doc.setFillColor(20, 26, 46);
+    doc.rect(leftW, 0, W - leftW, H, 'F');
+    if (imgDataUrl) {
+      doc.addImage(imgDataUrl, 'JPEG', leftW, 0, W - leftW, H, '', 'FAST');
+    }
+
+    /* ── Left content ── */
+    var y = headerH + pad;
+    var maxW = leftW - pad * 2;
+
+    /* Title */
+    doc.setTextColor(navy[0], navy[1], navy[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    var titleLines = doc.splitTextToSize(s.t, maxW);
+    doc.text(titleLines, pad, y);
+    y += titleLines.length * 6.5;
+
+    /* Description */
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+    var descLines = doc.splitTextToSize(s.d || '', maxW);
+    doc.text(descLines, pad, y);
+    y += descLines.length * 4.2 + 4;
+
+    function drawSection(label, items) {
+      if (!items || !items.length || y > H - 12) return;
+      /* Section divider line */
+      doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
+      doc.setLineWidth(0.3);
+      doc.line(pad, y, leftW - pad, y);
+      y += 4;
+      /* Section label */
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(navy[0], navy[1], navy[2]);
+      doc.setCharSpace(1.2);
+      doc.text(label.toUpperCase(), pad, y);
+      doc.setCharSpace(0);
+      y += 4.5;
+      /* Items */
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      items.forEach(function(item) {
+        if (y > H - 10) return;
+        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
+        var wrapped = doc.splitTextToSize(clean, maxW - 5);
+        doc.text('\u2022', pad, y);
+        doc.text(wrapped, pad + 4, y);
+        y += wrapped.length * 3.8 + 0.8;
+      });
+      y += 2;
+    }
+
+    drawSection('Design Specifications', s.ds);
+    drawSection('Artwork Specifications', s.ar);
+    if (s.p2 && s.p2.l && s.p2.r) {
+      drawSection(s.p2.l.h || 'Printing Specifications', s.p2.l.i);
+      drawSection(s.p2.r.h || 'Material Specifications', s.p2.r.i);
+    } else {
+      drawSection('Printing Specifications', s.pr);
+    }
+    if (s.pk) {
+      drawSection('Packaging', s.pk.split('\n').filter(Boolean));
+    }
+
+    doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g, '') + ' - Primedia Instore Specs.pdf');
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF'; }
   }
 
-  var body = '';
-  body += '<div class="pdf-desc">' + escH(s.d || '') + '</div>';
-  body += section('Design Specifications', s.ds);
-  body += section('Artwork Specifications', s.ar);
-
-  if (s.p2) {
-    body += '<div class="pdf-section-head">Printing Specifications</div><div class="pdf-2col">';
-    body += '<div class="pdf-2col-box"><div class="pdf-2col-head">' + escH(s.p2.l.h) + '</div>' + s.p2.l.i.map(row).join('') + '</div>';
-    body += '<div class="pdf-2col-box"><div class="pdf-2col-head">' + escH(s.p2.r.h) + '</div>' + s.p2.r.i.map(row).join('') + '</div>';
-    body += '</div>';
+  /* Load product image as data URL (handles cross-origin via canvas) */
+  if (s.p) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      try {
+        var cv = document.createElement('canvas');
+        cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+        cv.getContext('2d').drawImage(img, 0, 0);
+        _build(cv.toDataURL('image/jpeg', 0.88));
+      } catch(e) { _build(null); }
+    };
+    img.onerror = function() { _build(null); };
+    img.src = s.p + (s.p.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
   } else {
-    body += section('Printing Specifications', s.pr);
+    _build(null);
   }
-
-  if (s.pk) {
-    body += '<div class="pdf-section-head">Packaging</div>';
-    body += '<div class="pdf-pkg-note">(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)</div>';
-    body += s.pk.split('\n').map(row).join('');
-  }
-
-  var imgHtml = s.p ? '<img src="' + escH(s.p) + '" crossorigin="anonymous" alt="' + escH(s.t) + '"/>' :
-    '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:12px;font-family:Arial">No image</div>';
-
-  document.getElementById('pdf-print-area').innerHTML =
-    '<div class="pdf-left">' +
-      '<div class="pdf-header">' +
-        '<div class="pdf-logo-area">' +
-          '<svg class="pdf-logo-star" viewBox="0 0 40 40" fill="none"><polygon points="20,2 25,15 38,15 28,24 32,37 20,29 8,37 12,24 2,15 15,15" fill="#1a2a4a"/></svg>' +
-          '<div class="pdf-logo-text">PRIMEDIA<span>INSTORE</span></div>' +
-        '</div>' +
-        '<div class="pdf-specs-badge">SPECS</div>' +
-      '</div>' +
-      '<div class="pdf-title">' + escH(s.t) + '</div>' +
-      body +
-    '</div>' +
-    '<div class="pdf-right">' + imgHtml + '</div>';
-
-  setTimeout(function(){ window.print(); }, 150);
 }
 
 /* ═══ GITHUB API ════════════════════════════════════════════════════ */
