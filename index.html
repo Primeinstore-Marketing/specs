@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Media Specs — Primedia Instore</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Wix+Madefor+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -30,7 +30,7 @@
   --top:52px;
   --ease:cubic-bezier(.16,1,.3,1);
   --ease2:cubic-bezier(.4,0,.2,1);
-  --F:'Montserrat',sans-serif;
+  --F:'Wix Madefor Display',sans-serif;
   --FD:'Wix Madefor Display',sans-serif;
 }
 html,body{height:100%;overflow:hidden}
@@ -140,103 +140,88 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 /* ═══ HOME ════════════════════════════════════════════════════════════ */
 #home{
   position:absolute;inset:0;
-  display:flex;flex-direction:row;align-items:center;
-  padding:0 0 0 8vw;
+  display:flex;flex-direction:row;align-items:flex-end;
+  padding:0 0 8vh 8vw;
   overflow:hidden;
   transition:opacity .35s var(--ease),transform .35s var(--ease);
 }
 #home.out{opacity:0;transform:scale(.98) translateY(-8px);pointer-events:none}
-.home-content{flex:0 0 auto;max-width:480px;position:relative;z-index:1}
+
+/* Hero image: full bleed background */
 .home-visual{
-  flex:1;height:100%;
-  position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:flex-end;
+  position:absolute;inset:0;
+  z-index:0;
 }
 .home-visual img{
   width:100%;height:100%;
   object-fit:cover;object-position:center center;
   display:block;
 }
+/* Dark gradient overlay so text is readable */
 .home-visual::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(to right, var(--bg) 0%, rgba(255,255,255,0) 35%);
-  z-index:1;pointer-events:none;
+  background:linear-gradient(to top, rgba(5,12,30,.85) 0%, rgba(5,12,30,.5) 40%, rgba(5,12,30,.25) 100%);
+  z-index:1;
 }
 .home-visual::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(255,255,255,.15) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, var(--bg) 100%);
-  z-index:1;pointer-events:none;
+  background:linear-gradient(to right, rgba(5,12,30,.65) 0%, rgba(5,12,30,0) 60%);
+  z-index:1;
 }
 
-/* Noise texture overlay */
-#home::before{
-  content:'';position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;
-}
-/* Accent glow */
-#home::after{
-  content:'';position:absolute;
-  top:-20%;right:-10%;width:50vw;height:70vh;
-  background:radial-gradient(ellipse at center, rgba(40,97,253,.08) 0%, transparent 60%);
-  pointer-events:none;z-index:0;
+/* No pseudo overlays on #home itself */
+#home::before,#home::after{display:none}
+
+/* Text content floats above */
+.home-content{
+  position:relative;z-index:2;
+  max-width:520px;
 }
 .home-kicker{
   display:inline-flex;align-items:center;gap:8px;
-  padding:5px 12px 5px 6px;border-radius:100px;
-  border:1px solid rgba(40,97,253,.25);background:var(--acc-dim);
-  margin-bottom:28px;
+  padding:5px 14px 5px 8px;border-radius:100px;
+  border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);
+  backdrop-filter:blur(6px);
+  margin-bottom:22px;
   font-family:var(--FD);font-size:8.5px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--acc);
+  letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);
 }
-.kicker-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+.kicker-dot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .home-h{
   font-family:var(--FD);
-  font-size:clamp(52px,8vw,100px);
-  font-weight:900;line-height:.92;
-  letter-spacing:-.04em;
-  color:var(--txt);
-  margin-bottom:20px;
+  font-size:clamp(44px,7vw,90px);
+  font-weight:900;line-height:.93;
+  letter-spacing:-.03em;
+  color:#fff;
+  margin-bottom:18px;
+  text-shadow:0 2px 24px rgba(0,0,0,.35);
 }
 .home-h span{
-  color:transparent;
-  -webkit-text-stroke:2px rgba(27,55,105,.15);
+  color:rgba(255,255,255,.35);
 }
 .home-sub{
-  font-size:14px;font-weight:400;color:var(--txt2);
-  max-width:400px;line-height:1.7;margin-bottom:44px;
+  font-size:14px;font-weight:400;
+  color:rgba(255,255,255,.7);
+  max-width:400px;line-height:1.7;margin-bottom:40px;
 }
 .home-meta{
   display:flex;gap:0;
-  border:1px solid var(--line2);border-radius:10px;overflow:hidden;
-  width:fit-content;
+  border:1px solid rgba(255,255,255,.2);border-radius:10px;overflow:hidden;
+  width:fit-content;backdrop-filter:blur(8px);background:rgba(255,255,255,.08);
 }
 .hm-item{
-  padding:14px 24px;border-right:1px solid var(--line2);
+  padding:14px 24px;border-right:1px solid rgba(255,255,255,.15);
 }
 .hm-item:last-child{border-right:none}
 .hm-n{
-  font-family:var(--FD);font-size:24px;font-weight:900;
-  color:var(--txt);letter-spacing:-.03em;line-height:1;margin-bottom:5px;
+  font-family:var(--FD);font-size:22px;font-weight:900;
+  color:#fff;letter-spacing:-.02em;line-height:1;margin-bottom:4px;
 }
-.hm-l{font-size:10px;font-weight:400;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em}
+.hm-l{font-size:10px;font-weight:500;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em}
 
-/* Grid decoration */
-.home-grid{
-  position:absolute;right:0;top:0;bottom:0;width:42%;
-  pointer-events:none;z-index:0;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size:40px 40px;
-  -webkit-mask-image:linear-gradient(to right, transparent 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 100%);
-  mask-image:linear-gradient(to right, transparent 0%, rgba(0,0,0,.5) 40%, rgba(0,0,0,.5) 100%);
-}
-.home-grid::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 60% 80% at 70% 50%, transparent 30%, var(--bg) 80%);
-}
+/* Remove grid decoration (replaced by photo bg) */
+.home-grid{display:none}
 
 /* ═══ SPEC VIEW ════════════════════════════════════════════════════════ */
 #specview{
@@ -486,8 +471,8 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 }
 @media(max-width:680px){
   :root{--nav:240px}
-  #home{flex-direction:column;padding:0 6vw;justify-content:center}
-  .home-visual{display:none}
+  #home{flex-direction:column;padding:0 6vw;justify-content:center;align-items:flex-start}
+  .home-visual{display:block}
   .home-h{font-size:clamp(40px,11vw,70px)}
   .sheet-body{grid-template-columns:1fr}
   .frow{grid-template-columns:1fr}
@@ -593,7 +578,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 /* ── PDF download (hidden utility) ── */
 #pdf-print-area{display:none!important}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
