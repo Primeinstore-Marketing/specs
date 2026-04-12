@@ -730,6 +730,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
           </button>
           <div style="display:flex;align-items:center;gap:10px">
             <div id="pi-chip" style="display:none"></div>
+            <button id="img-dl-btn" onclick="downloadSpecImage()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Download Image</span>
+            </button>
             <button class="pdf-dl-btn" onclick="downloadSpecPdf()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download PDF
@@ -1266,6 +1270,9 @@ function renderDlBar() {
   /* Show PDF download button only for admins with one die line or none */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
   if (pdfBtn) pdfBtn.style.display = (isAdmin && files.length <= 1) ? 'inline-flex' : 'none';
+  /* Show image download button only for admins when spec has an image */
+  var imgBtn = document.getElementById('img-dl-btn');
+  if (imgBtn) imgBtn.style.display = (isAdmin && s && s.p) ? 'inline-flex' : 'none';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
   function fileRow(f) {
     return '<div class="dl-file-row">' +
@@ -1313,6 +1320,27 @@ function dlDownload(filename) {
     a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   }).catch(function(){ showToast('Download failed','err'); });
+}
+
+function downloadSpecImage() {
+  var s = curSpec ? SPECS[curSpec] : null;
+  if (!s || !s.p) return;
+  var btn = document.getElementById('img-dl-btn');
+  if (btn) { btn.disabled = true; btn.querySelector('span').textContent = 'Downloading…'; }
+  fetch(s.p)
+    .then(function(r){ return r.blob(); })
+    .then(function(blob){
+      var ext = (s.p.split('?')[0].match(/\.(\w+)$/) || ['','.jpg'])[1];
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (s.t || 'spec-image') + '.' + ext;
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+    })
+    .catch(function(){ showToast('Image download failed','err'); })
+    .finally(function(){
+      if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'Download Image'; }
+    });
 }
 
 function downloadSpecPdf() {
