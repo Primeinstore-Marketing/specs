@@ -1302,9 +1302,9 @@ function renderDlBar() {
   var files = s ? (s.dl_files || (s.dl_name ? [s.dl_name] : [])) : [];
   var list = document.getElementById('dl-files-list');
   if (!list) return;
-  /* Show PDF download button only for admins with one die line or none */
+  /* Show PDF download button for all admins */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
-  if (pdfBtn) pdfBtn.style.display = (isAdmin && files.length <= 1) ? 'inline-flex' : 'none';
+  if (pdfBtn) pdfBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
   /* Show image download button only for admins when spec has an image */
   var imgBtn = document.getElementById('img-dl-btn');
   if (imgBtn) imgBtn.style.display = (isAdmin && s && s.p) ? 'inline-flex' : 'none';
@@ -1478,11 +1478,24 @@ function downloadSpecPdf() {
     var y = headerH + 11;
     var maxW = leftW - pad * 2;
 
+    /* Sanitise text for Helvetica (Latin-1 only) */
+    function pdfSafe(str) {
+      return (str || '')
+        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'") // curly single quotes → '
+        .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"') // curly double quotes → "
+        .replace(/[\u2013\u2014\u2015]/g, '-')                   // en/em dash → -
+        .replace(/\u2026/g, '...')                               // ellipsis → ...
+        .replace(/\u00BC/g, '1/4')                               // ¼ → 1/4
+        .replace(/\u00BD/g, '1/2')                               // ½ → 1/2
+        .replace(/\u00BE/g, '3/4')                               // ¾ → 3/4
+        .replace(/[\u2022\u2023\u2043]/g, '-');                  // bullets → -
+    }
+
     /* Title — bold navy */
     doc.setTextColor(navy[0], navy[1], navy[2]);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
-    var titleLines = doc.splitTextToSize(s.t, maxW);
+    var titleLines = doc.splitTextToSize(pdfSafe(s.t), maxW);
     doc.text(titleLines, pad, y);
     y += titleLines.length * 5.8 + 2;
 
@@ -1490,7 +1503,7 @@ function downloadSpecPdf() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    var descLines = doc.splitTextToSize(s.d || '', maxW);
+    var descLines = doc.splitTextToSize(pdfSafe(s.d || ''), maxW);
     doc.text(descLines, pad, y);
     y += descLines.length * 3.8 + 5;
 
@@ -1506,7 +1519,7 @@ function downloadSpecPdf() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
       doc.setTextColor(navy[0], navy[1], navy[2]);
-      doc.text(label, pad, y);
+      doc.text(pdfSafe(label), pad, y);
       y += 4.5;
       /* Bullet items */
       doc.setFont('helvetica', 'normal');
@@ -1514,7 +1527,7 @@ function downloadSpecPdf() {
       doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
       items.forEach(function(item) {
         if (y > H - 7) return;
-        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
+        var clean = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
         var wrapped = doc.splitTextToSize(clean, maxW - 5);
         doc.text('\u2022', pad, y);
         doc.text(wrapped, pad + 4, y);
