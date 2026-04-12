@@ -593,7 +593,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 /* ── PDF download (hidden utility) ── */
 #pdf-print-area{display:none!important}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -1187,121 +1187,13 @@ function dlDownload(filename) {
 function downloadSpecPdf() {
   var s = curSpec ? SPECS[curSpec] : null;
   if (!s) return;
-  if (!window.jspdf) { showToast('PDF library not loaded yet, try again','err'); return; }
+  if (!window.jspdf) { showToast('PDF library not ready — try again in a moment','err'); return; }
 
   var btn = document.querySelector('.pdf-dl-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating\u2026'; }
 
-  function _build(imgDataUrl) {
-    var jsPDF = window.jspdf.jsPDF;
-    var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    var W = 297, H = 210;
-    var leftW = 163; // ~55%
-    var navy = [20, 36, 64];
-    var white = [255, 255, 255];
-    var lineCol = [196, 208, 228];
-    var textDark = [40, 40, 40];
-    var textMid = [100, 100, 100];
-    var pad = 14;
-    var headerH = 20;
-
-    /* ── Header bar (full width, navy) ── */
-    doc.setFillColor(navy[0], navy[1], navy[2]);
-    doc.rect(0, 0, W, headerH, 'F');
-
-    /* Logo: star symbol + PRIMEDIA / INSTORE */
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('PRIMEDIA', pad + 6, 11);
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setCharSpace(2);
-    doc.text('INSTORE', pad + 6, 16.5);
-    doc.setCharSpace(0);
-
-    /* SPECS badge (right) */
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.setCharSpace(3);
-    doc.text('SPECS', W - pad - 34, 14);
-    doc.setCharSpace(0);
-
-    /* ── Right photo panel (navy bg) ── */
-    doc.setFillColor(20, 26, 46);
-    doc.rect(leftW, 0, W - leftW, H, 'F');
-    if (imgDataUrl) {
-      doc.addImage(imgDataUrl, 'JPEG', leftW, 0, W - leftW, H, '', 'FAST');
-    }
-
-    /* ── Left content ── */
-    var y = headerH + pad;
-    var maxW = leftW - pad * 2;
-
-    /* Title */
-    doc.setTextColor(navy[0], navy[1], navy[2]);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(15);
-    var titleLines = doc.splitTextToSize(s.t, maxW);
-    doc.text(titleLines, pad, y);
-    y += titleLines.length * 6.5;
-
-    /* Description */
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-    var descLines = doc.splitTextToSize(s.d || '', maxW);
-    doc.text(descLines, pad, y);
-    y += descLines.length * 4.2 + 4;
-
-    function drawSection(label, items) {
-      if (!items || !items.length || y > H - 12) return;
-      /* Section divider line */
-      doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
-      doc.setLineWidth(0.3);
-      doc.line(pad, y, leftW - pad, y);
-      y += 4;
-      /* Section label */
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.5);
-      doc.setTextColor(navy[0], navy[1], navy[2]);
-      doc.setCharSpace(1.2);
-      doc.text(label.toUpperCase(), pad, y);
-      doc.setCharSpace(0);
-      y += 4.5;
-      /* Items */
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-      items.forEach(function(item) {
-        if (y > H - 10) return;
-        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
-        var wrapped = doc.splitTextToSize(clean, maxW - 5);
-        doc.text('\u2022', pad, y);
-        doc.text(wrapped, pad + 4, y);
-        y += wrapped.length * 3.8 + 0.8;
-      });
-      y += 2;
-    }
-
-    drawSection('Design Specifications', s.ds);
-    drawSection('Artwork Specifications', s.ar);
-    if (s.p2 && s.p2.l && s.p2.r) {
-      drawSection(s.p2.l.h || 'Printing Specifications', s.p2.l.i);
-      drawSection(s.p2.r.h || 'Material Specifications', s.p2.r.i);
-    } else {
-      drawSection('Printing Specifications', s.pr);
-    }
-    if (s.pk) {
-      drawSection('Packaging', s.pk.split('\n').filter(Boolean));
-    }
-
-    doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g, '') + ' - Primedia Instore Specs.pdf');
-    if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF'; }
-  }
-
-  /* Load product image as data URL (handles cross-origin via canvas) */
-  if (s.p) {
+  /* Load an image URL -> PNG data URL, preserving dimensions (no stretch) */
+  function loadImg(src, cb) {
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function() {
@@ -1309,14 +1201,149 @@ function downloadSpecPdf() {
         var cv = document.createElement('canvas');
         cv.width = img.naturalWidth; cv.height = img.naturalHeight;
         cv.getContext('2d').drawImage(img, 0, 0);
-        _build(cv.toDataURL('image/jpeg', 0.88));
-      } catch(e) { _build(null); }
+        cb(cv.toDataURL('image/png'), img.naturalWidth, img.naturalHeight);
+      } catch(e) { cb(null, 0, 0); }
     };
-    img.onerror = function() { _build(null); };
-    img.src = s.p + (s.p.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
-  } else {
-    _build(null);
+    img.onerror = function() { cb(null, 0, 0); };
+    img.src = src;
   }
+
+  /* Add image to jsPDF, contained (no stretch) inside a box, centred on dark bg */
+  function addContained(doc, dataUrl, imgW, imgH, boxX, boxY, boxW, boxH, bgR, bgG, bgB) {
+    doc.setFillColor(bgR, bgG, bgB);
+    doc.rect(boxX, boxY, boxW, boxH, 'F');
+    if (!dataUrl) return;
+    var scale = Math.min(boxW / imgW, boxH / imgH);
+    var dw = imgW * scale, dh = imgH * scale;
+    var dx = boxX + (boxW - dw) / 2;
+    var dy = boxY + (boxH - dh) / 2;
+    doc.addImage(dataUrl, 'PNG', dx, dy, dw, dh);
+  }
+
+  function _build(logoData, logoW, logoH, specImgData, specImgW, specImgH) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    var W = 297, H = 210;
+    var leftW = 160;          // content panel width
+    var rightX = leftW;
+    var rightW = W - leftW;   // photo panel width
+    var navyR = 20, navyG = 36, navyB = 64;  // #142440
+    var pad = 14;
+    var headerH = 22;
+
+    /* ── Full navy header bar ── */
+    doc.setFillColor(navyR, navyG, navyB);
+    doc.rect(0, 0, W, headerH, 'F');
+
+    /* Logo image (white version) — contained in header left area */
+    if (logoData) {
+      var logoBoxH = headerH - 4;
+      var logoScale = Math.min(50 / logoW, logoBoxH / logoH);
+      var logoDW = logoW * logoScale, logoDH = logoH * logoScale;
+      doc.addImage(logoData, 'PNG', pad, (headerH - logoDH) / 2, logoDW, logoDH);
+    } else {
+      /* Fallback text logo */
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold'); doc.setFontSize(11);
+      doc.text('PRIMEDIA', pad, 10);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      doc.setCharSpace(2); doc.text('INSTORE', pad, 16); doc.setCharSpace(0);
+    }
+
+    /* SPECS label right side */
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(20); doc.setCharSpace(4);
+    doc.text('SPECS', W - pad - 42, headerH - 5);
+    doc.setCharSpace(0);
+
+    doc.setLineWidth(0.5);
+
+    /* ── Right photo panel (dark bg + contained image) ── */
+    addContained(doc, specImgData, specImgW, specImgH, rightX, 0, rightW, H, 18, 22, 42);
+
+    /* ── Left content panel ── */
+    doc.setFillColor(255,255,255);
+    doc.rect(0, 0, leftW, H, 'F');
+    /* Re-draw header over left panel */
+    doc.setFillColor(navyR, navyG, navyB);
+    doc.rect(0, 0, leftW, headerH, 'F');
+    if (logoData) {
+      var ls2 = Math.min(50 / logoW, (headerH-4) / logoH);
+      doc.addImage(logoData, 'PNG', pad, (headerH - logoH*ls2) / 2, logoW*ls2, logoH*ls2);
+    }
+
+    var lineCol = [196, 208, 228];
+    var textDark = [40, 40, 40];
+    var y = headerH + 10;
+    var maxW = leftW - pad * 2;
+
+    /* Title */
+    doc.setTextColor(navyR, navyG, navyB);
+    doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    var titleLines = doc.splitTextToSize(s.t, maxW);
+    doc.text(titleLines, pad, y);
+    y += titleLines.length * 6 + 2;
+
+    /* Description italic */
+    doc.setFont('helvetica','bolditalic'); doc.setFontSize(7.5);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Description', pad, y); y += 4;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+    var descLines = doc.splitTextToSize(s.d || '', maxW);
+    doc.text(descLines, pad, y);
+    y += descLines.length * 3.8 + 5;
+
+    function drawSection(label, items) {
+      if (!items || !items.length || y > H - 10) return;
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      doc.setTextColor(navyR, navyG, navyB);
+      doc.text(label, pad, y); y += 2;
+      doc.setDrawColor(lineCol[0], lineCol[1], lineCol[2]);
+      doc.setLineWidth(0.25);
+      doc.line(pad, y, leftW - pad, y); y += 4;
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      items.forEach(function(item) {
+        if (y > H - 8) return;
+        var clean = (item || '').replace(/\s*\*\[[A-Z0-9]+\]/g,'');
+        var wrapped = doc.splitTextToSize(clean, maxW - 4);
+        doc.text('\u2022', pad, y);
+        doc.text(wrapped, pad + 3.5, y);
+        y += wrapped.length * 3.5 + 0.5;
+      });
+      y += 3;
+    }
+
+    drawSection('Design Specifications', s.ds);
+    drawSection('Artwork Specifications', s.ar);
+    if (s.p2 && s.p2.l && s.p2.r) {
+      drawSection(s.p2.l.h || 'Printing Specifications', s.p2.l.i);
+      drawSection(s.p2.r.h, s.p2.r.i);
+    } else {
+      drawSection('Printing Specifications', s.pr);
+    }
+    if (s.pk) drawSection('Packaging', s.pk.split('\n').filter(Boolean));
+
+    doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g,'') + ' - Primedia Instore Specs.pdf');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF';
+    }
+  }
+
+  /* Load logo then spec image, then build */
+  var logoSrc = location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'pi-specs-assets/logo-white.png';
+  loadImg(logoSrc, function(logoData, logoW, logoH) {
+    if (s.p) {
+      loadImg(s.p, function(imgData, imgW, imgH) {
+        _build(logoData, logoW, logoH, imgData, imgW, imgH);
+      });
+    } else {
+      _build(logoData, logoW, logoH, null, 0, 0);
+    }
+  });
 }
 
 /* ═══ GITHUB API ════════════════════════════════════════════════════ */
