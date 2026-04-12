@@ -479,19 +479,79 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 #toast.err{border-color:rgba(255,77,77,.3);color:var(--red)}
 .t-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 
-/* Responsive */
-@media(max-width:880px){
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+/* Tablet landscape: hide photo pane */
+@media(max-width:1024px){
+  :root{--nav:220px}
   #spec-photo-pane{display:none}
   #spec-panel{width:100%}
+  .home-h{font-size:clamp(44px,7vw,80px)}
 }
-@media(max-width:680px){
-  :root{--nav:240px}
-  #home{flex-direction:column;padding:0 6vw;justify-content:center}
-  .home-visual{display:none}
-  .home-h{font-size:clamp(40px,11vw,70px)}
+
+/* Tablet portrait: collapse nav, overlay it */
+@media(max-width:768px){
+  :root{--nav:260px;--top:48px}
+  #nav{
+    position:fixed;top:var(--top);left:0;bottom:0;z-index:150;
+    transform:translateX(-100%);transition:transform .28s cubic-bezier(.16,1,.3,1);
+    box-shadow:4px 0 24px rgba(0,0,0,.18);
+    width:260px!important;flex:0 0 0!important;overflow:visible;
+  }
+  #nav.mob-open{transform:translateX(0)}
+  #shell{overflow:hidden}
+  #main{width:100vw;flex:1;min-width:0}
+  /* Hamburger button */
+  #mob-nav-toggle{display:flex!important}
+  /* Nav overlay backdrop */
+  #mob-backdrop{display:block}
+  /* Spec topbar: stack on small screens */
+  .spec-topbar{flex-wrap:wrap;gap:8px;padding:10px 14px}
+  /* Home */
+  #home{padding:0 5vw;align-items:flex-end;padding-bottom:6vh}
+  .home-visual{left:30%}
+  .home-h{font-size:clamp(38px,9vw,70px)}
+  .home-meta{flex-wrap:wrap}
+  .home-kicker{margin-bottom:16px}
+  /* Spec panel */
+  #spec-panel{padding-bottom:80px}
+  .dl-bar{margin:0 16px 16px}
+  /* Admin */
+  .admin-sheet{width:100% !important;border-radius:0 !important;height:100vh !important;margin:0 !important}
+}
+
+/* Mobile: full width layout */
+@media(max-width:480px){
+  :root{--top:44px}
+  .bar-brand{width:auto;padding:0 14px}
+  .bar-center{padding:0 10px}
+  #bc-spec{display:none!important}
+  /* Home content */
+  .home-content{max-width:100%}
+  .home-h{font-size:clamp(34px,11vw,56px)}
+  .home-sub{font-size:12px}
+  .home-meta{width:100%}
+  .hm-item{flex:1;padding:10px 12px;text-align:center}
+  .hm-n{font-size:18px}
+  /* Spec view */
+  .spec-topbar{padding:8px 12px}
+  .back-btn{font-size:11px}
+  .spec-h{font-size:20px}
+  .spec-block-label{font-size:7.5px}
+  /* Die line bar */
+  .dl-bar{margin:0 12px 12px;padding:14px}
+  .dl-file-row{flex-direction:column;align-items:flex-start;gap:6px}
+  /* Sheet form */
   .sheet-body{grid-template-columns:1fr}
   .frow{grid-template-columns:1fr}
-  .hm-item{padding:12px 16px}
+  /* PDF button — hide label on tiny screens */
+  .pdf-dl-btn span{display:none}
+}
+
+/* Very small screens */
+@media(max-width:360px){
+  .home-h{font-size:30px}
+  .hm-item{padding:8px 10px}
 }
 /* ═══ NAV SEARCH ═════════════════════════════════════════════════════ */
 .nav-search-wrap{padding:14px 16px 6px;position:relative}
@@ -608,12 +668,18 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     </div>
   </div>
   <div class="bar-right">
+    <button class="topbtn" id="mob-nav-toggle" onclick="toggleMobNav()" style="display:none" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <button class="topbtn" id="admin-btn" onclick="openLogin()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Admin
     </button>
   </div>
 </div>
+
+<!-- Mobile nav backdrop -->
+<div id="mob-backdrop" onclick="toggleMobNav()" style="display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.45)"></div>
 
 <!-- SHELL -->
 <div id="shell">
@@ -1141,7 +1207,19 @@ function openSpec(key) {
   document.getElementById('bc-spec').style.display = '';
   document.getElementById('home').classList.add('out');
   document.getElementById('specview').classList.add('in');
+  closeMobNav();
   renderDlBar();
+}
+
+function toggleMobNav() {
+  var nav = document.getElementById('nav');
+  var bd = document.getElementById('mob-backdrop');
+  var open = nav.classList.toggle('mob-open');
+  bd.style.display = open ? 'block' : 'none';
+}
+function closeMobNav() {
+  document.getElementById('nav').classList.remove('mob-open');
+  document.getElementById('mob-backdrop').style.display = 'none';
 }
 
 function goHome() {
@@ -1157,6 +1235,9 @@ function renderDlBar() {
   var files = s ? (s.dl_files || (s.dl_name ? [s.dl_name] : [])) : [];
   var list = document.getElementById('dl-files-list');
   if (!list) return;
+  /* Hide PDF download button when spec has more than one die line */
+  var pdfBtn = document.querySelector('.pdf-dl-btn');
+  if (pdfBtn) pdfBtn.style.display = files.length > 1 ? 'none' : '';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
   list.innerHTML = files.map(function(f) {
     return '<div class="dl-file-row">' +
