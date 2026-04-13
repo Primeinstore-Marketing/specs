@@ -89,7 +89,7 @@ async function getSecret(KV) {
   if (!s) { s = await randomHex(32); await KV.put('auth:jwt_secret', s); }
   return s;
 }
-const ADMIN_EMAIL = 'admin@primedia.co.za';
+const ADMIN_EMAIL = 'mosesm@primeinstore.co.za';
 
 function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
