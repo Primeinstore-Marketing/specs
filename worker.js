@@ -1,13 +1,17 @@
 /**
  * Primedia Instore Specs — Cloudflare Worker
+ * Routes:
+ *   GET  /           → return specs from KV (public)
+ *   PUT  /           → update specs in KV (JWT required)
+ *   POST /api/login  → authenticate, return JWT
+ *   POST /api/change-password → change password (JWT required)
+ *   OPTIONS *        → CORS preflight
  *
  * KV keys:
- *   user:{username}   JSON {passwordHash, role, createdAt}
- *   auth:jwt_secret   32-byte hex
- *   data              existing specs JSON
- *   auth:password_hash  legacy → auto-migrated to user:admin on first use
+ *   data               existing specs JSON
+ *   auth:password_hash saltHex:hashHex (PBKDF2-SHA256, 100k iterations)
+ *   auth:jwt_secret    32-byte hex secret for HMAC-SHA256 JWT
  */
-
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
@@ -20,8 +24,6 @@ function json(body, status = 200) {
     headers: { 'Content-Type': 'application/json', ...CORS },
   });
 }
-
-/* ── Crypto ─────────────────────────────────────────────────── */
 
 function hexToBytes(hex) {
   const a = new Uint8Array(hex.length / 2);
@@ -50,8 +52,6 @@ async function verifyPassword(password, stored) {
   for (let i = 0; i < derived.length; i++) diff |= derived.charCodeAt(i) ^ hashHex.charCodeAt(i);
   return diff === 0;
 }
-
-/* ── JWT ────────────────────────────────────────────────────── */
 
 function b64url(buf) {
   return btoa(String.fromCharCode(...new Uint8Array(buf)))
@@ -82,23 +82,17 @@ async function verifyJwt(token, secretHex) {
   return payload;
 }
 
-/* ── KV helpers ─────────────────────────────────────────────── */
-
 async function getSecret(KV) {
   let s = await KV.get('auth:jwt_secret');
   if (!s) { s = await randomHex(32); await KV.put('auth:jwt_secret', s); }
   return s;
 }
-const ADMIN_EMAIL = 'mosesm@primeinstore.co.za';
-
-function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
-async function getUser(KV, email) {
-  const raw = await KV.get('user:' + email);
+async function getUser(KV, username) {
+  const raw = await KV.get('user:' + username);
   return raw ? JSON.parse(raw) : null;
 }
-async function putUser(KV, email, data) {
-  await KV.put('user:' + email, JSON.stringify(data));
+async function putUser(KV, username, data) {
+  await KV.put('user:' + username, JSON.stringify(data));
 }
 async function listUsers(KV) {
   const list = await KV.list({ prefix: 'user:' });
@@ -107,35 +101,27 @@ async function listUsers(KV) {
     const raw = await KV.get(key.name);
     if (raw) {
       const u = JSON.parse(raw);
-      users.push({ email: key.name.replace('user:', ''), role: u.role, createdAt: u.createdAt });
+      users.push({ username: key.name.replace('user:', ''), role: u.role, createdAt: u.createdAt });
     }
   }
   return users;
 }
 async function ensureAdminUser(KV) {
-  const existing = await getUser(KV, ADMIN_EMAIL);
+  const existing = await getUser(KV, 'admin');
   if (existing) return existing;
-  /* Migrate legacy user:admin → user:{ADMIN_EMAIL} */
+  const legacyHash = await KV.get('auth:password_hash');
   let passwordHash;
-  const legacyUser = await KV.get('user:admin');
-  if (legacyUser) {
-    passwordHash = JSON.parse(legacyUser).passwordHash;
+  if (legacyHash) {
+    passwordHash = legacyHash;
   } else {
-    const legacyHash = await KV.get('auth:password_hash');
-    if (legacyHash) {
-      passwordHash = legacyHash;
-    } else {
-      const salt = await randomHex(16);
-      const hash = await hashPassword('primedia2025', salt);
-      passwordHash = salt + ':' + hash;
-    }
+    const salt = await randomHex(16);
+    const hash = await hashPassword('primedia2025', salt);
+    passwordHash = salt + ':' + hash;
   }
-  const adminUser = { passwordHash, role: 'admin', email: ADMIN_EMAIL, createdAt: Date.now() };
-  await putUser(KV, ADMIN_EMAIL, adminUser);
+  const adminUser = { passwordHash, role: 'admin', createdAt: Date.now() };
+  await putUser(KV, 'admin', adminUser);
   return adminUser;
 }
-
-/* ── Auth middleware ────────────────────────────────────────── */
 
 async function requireAuth(request, KV, requireAdmin = false) {
   const auth = request.headers.get('Authorization') || '';
@@ -149,8 +135,6 @@ async function requireAuth(request, KV, requireAdmin = false) {
   return payload;
 }
 
-/* ── Main handler ───────────────────────────────────────────── */
-
 export default {
   async fetch(request, env) {
     const KV = env.SPECS_DATA;
@@ -160,13 +144,11 @@ export default {
 
     if (method === 'OPTIONS') return new Response(null, { status:204, headers:CORS });
 
-    /* GET / — public spec data */
     if (method === 'GET' && path === '/') {
       const data = await KV.get('data');
       return new Response(data || '{}', { headers: {'Content-Type':'application/json',...CORS} });
     }
 
-    /* PUT / — save spec data (any authenticated user) */
     if (method === 'PUT' && path === '/') {
       const auth = await requireAuth(request, KV);
       if (!auth) return json({ error: 'Unauthorized' }, 401);
@@ -175,24 +157,21 @@ export default {
       return json({ ok: true });
     }
 
-    /* POST /api/login */
     if (method === 'POST' && path === '/api/login') {
       let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { email, password } = body || {};
-      if (!email || !password) return json({ error:'Missing credentials' }, 400);
-      const emailKey = email.toLowerCase().trim();
+      const { username, password } = body || {};
+      if (!username || !password) return json({ error:'Missing credentials' }, 400);
       await ensureAdminUser(KV);
-      const user = await getUser(KV, emailKey);
-      if (!user) return json({ error:'Invalid email or password' }, 401);
+      const user = await getUser(KV, username.toLowerCase().trim());
+      if (!user) return json({ error:'Invalid username or password' }, 401);
       const valid = await verifyPassword(password, user.passwordHash);
-      if (!valid) return json({ error:'Invalid email or password' }, 401);
+      if (!valid) return json({ error:'Invalid username or password' }, 401);
       const secret = await getSecret(KV);
       const exp = Math.floor(Date.now()/1000) + 8*3600;
-      const token = await signJwt({ sub: emailKey, role: user.role, exp }, secret);
+      const token = await signJwt({ sub: username.toLowerCase().trim(), role: user.role, exp }, secret);
       return json({ token, role: user.role });
     }
 
-    /* POST /api/change-password — JWT required */
     if (method === 'POST' && path === '/api/change-password') {
       const auth = await requireAuth(request, KV);
       if (!auth) return json({ error:'Unauthorized' }, 401);
@@ -211,30 +190,27 @@ export default {
       return json({ ok: true });
     }
 
-    /* POST /api/users — create user (admin only) */
     if (method === 'POST' && path === '/api/users') {
       const auth = await requireAuth(request, KV, true);
       if (!auth) return json({ error:'Unauthorized' }, 401);
       let body; try { body = await request.json(); } catch { return json({ error:'Invalid JSON' }, 400); }
-      const { email, password, role } = body || {};
-      if (!email || !password) return json({ error:'Email and password required' }, 400);
-      if (!isValidEmail(email)) return json({ error:'Invalid email address' }, 400);
+      const { username, password, role } = body || {};
+      if (!username || !password) return json({ error:'Username and password required' }, 400);
       if (password.length < 6) return json({ error:'Password must be at least 6 characters' }, 400);
-      const emailKey = email.toLowerCase().trim();
-      const existing = await getUser(KV, emailKey);
-      if (existing) return json({ error:'Email already registered' }, 409);
+      const uname = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
+      if (!uname) return json({ error:'Invalid username' }, 400);
+      const existing = await getUser(KV, uname);
+      if (existing) return json({ error:'Username already exists' }, 409);
       const salt = await randomHex(16);
       const hash = await hashPassword(password, salt);
-      await putUser(KV, emailKey, {
+      await putUser(KV, uname, {
         passwordHash: salt + ':' + hash,
         role: role === 'admin' ? 'admin' : 'viewer',
-        email: emailKey,
         createdAt: Date.now()
       });
-      return json({ ok: true, email: emailKey });
+      return json({ ok: true, username: uname });
     }
 
-    /* GET /api/users — list users (admin only) */
     if (method === 'GET' && path === '/api/users') {
       const auth = await requireAuth(request, KV, true);
       if (!auth) return json({ error:'Unauthorized' }, 401);
@@ -242,13 +218,12 @@ export default {
       return json({ users });
     }
 
-    /* DELETE /api/users/:email — remove user (admin only) */
     if (method === 'DELETE' && path.startsWith('/api/users/')) {
       const auth = await requireAuth(request, KV, true);
       if (!auth) return json({ error:'Unauthorized' }, 401);
-      const target = decodeURIComponent(path.replace('/api/users/', '')).toLowerCase().trim();
+      const target = path.replace('/api/users/', '').toLowerCase();
       if (target === auth.sub) return json({ error:'Cannot delete your own account' }, 400);
-      if (target === ADMIN_EMAIL) return json({ error:'Cannot delete the primary admin account' }, 400);
+      if (target === 'admin') return json({ error:'Cannot delete the primary admin account' }, 400);
       const user = await getUser(KV, target);
       if (!user) return json({ error:'User not found' }, 404);
       await KV.delete('user:' + target);

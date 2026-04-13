@@ -1694,7 +1694,7 @@ function _authHtml(view) {
   if (view === 'login') return (
     '<div class="auth-step-title">Sign In</div>'+
     '<div class="auth-step-sub">Access the admin panel to manage specs and formats.</div>'+
-    '<div class="auth-field"><label>Email</label><input id="au-user" type="email" autocomplete="email" placeholder="you@primeinstore.co.za"/></div>'+
+    '<div class="auth-field"><label>Username</label><input id="au-user" type="text" autocomplete="username" placeholder="admin"/></div>'+
     '<div class="auth-field"><label>Password</label><input id="au-pass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')doLogin()"/></div>'+
     '<div class="auth-err" id="au-err"></div>'+
     '<button class="auth-ok" id="au-ok" onclick="doLogin()">Sign In</button>'
@@ -1738,11 +1738,11 @@ function doLogin() {
   var err = document.getElementById('au-err');
   var btn = document.getElementById('au-ok');
   err.textContent = '';
-  if (!user || !pass) { err.textContent = 'Please enter your email and password.'; return; }
+  if (!user || !pass) { err.textContent = 'Please enter your username and password.'; return; }
   btn.disabled = true; btn.textContent = 'Signing in…';
   fetch(WORKER_URL + '/api/login', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ email: user, password: pass })
+    body: JSON.stringify({ username: user, password: pass })
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
@@ -1839,21 +1839,18 @@ function renderAdminUsers() {
     html += '<div style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;margin-bottom:28px">';
     users.forEach(function(u, i){
       var isLast = i === users.length - 1;
-      var emailDisplay = u.email || u.username || '';
-      var initial = emailDisplay[0] ? emailDisplay[0].toUpperCase() : '?';
-      var isPrimary = emailDisplay === 'admin@primedia.co.za' || emailDisplay === 'admin';
       html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);'+(isLast?'':'border-bottom:1px solid var(--line)')+'">'+
-        '<div style="width:34px;height:34px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font:700 13px var(--FD);color:#fff;flex-shrink:0">'+initial+'</div>'+
-        '<div style="flex:1"><div style="font-weight:600;font-size:13px;color:var(--txt)">'+escH(emailDisplay)+'</div>'+
+        '<div style="width:34px;height:34px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font:700 13px var(--FD);color:#fff;flex-shrink:0">'+(u.username[0]||'?').toUpperCase()+'</div>'+
+        '<div style="flex:1"><div style="font-weight:600;font-size:13px;color:var(--txt)">'+escH(u.username)+'</div>'+
         '<div style="font-size:11px;color:var(--txt3);text-transform:capitalize">'+escH(u.role||'viewer')+'</div></div>'+
-        (!isPrimary ? '<button onclick="deleteAdminUser(\''+escH(emailDisplay)+'\')" style="height:28px;padding:0 12px;border-radius:6px;border:1px solid rgba(255,77,77,.3);background:rgba(255,77,77,.06);color:var(--red);font:600 11px var(--F);cursor:pointer">Remove</button>' : '<span style="font-size:11px;color:var(--txt3);padding:0 12px">Primary</span>')+
+        (u.username !== 'admin' ? '<button onclick="deleteAdminUser(\''+escH(u.username)+'\')" style="height:28px;padding:0 12px;border-radius:6px;border:1px solid rgba(255,77,77,.3);background:rgba(255,77,77,.06);color:var(--red);font:600 11px var(--F);cursor:pointer">Remove</button>' : '<span style="font-size:11px;color:var(--txt3);padding:0 12px">Primary</span>')+
         '</div>';
     });
     if (!users.length) html += '<div style="padding:20px;text-align:center;font-size:13px;color:var(--txt3)">No users yet.</div>';
     html += '</div>';
     html += '<h3 style="margin:0 0 14px;font-size:14px;font-weight:700;font-family:var(--FD);color:var(--navy)">Create New Account</h3>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
-    html += '<div class="fg"><label>Email</label><input id="nu-user" type="email" placeholder="user@primedia.co.za"/></div>';
+    html += '<div class="fg"><label>Username</label><input id="nu-user" type="text" placeholder="e.g. jane"/></div>';
     html += '<div class="fg"><label>Role</label><select id="nu-role"><option value="viewer">Viewer</option><option value="admin">Admin</option></select></div>';
     html += '<div class="fg"><label>Password</label><input id="nu-pass" type="password" placeholder="Min. 6 characters"/></div>';
     html += '<div class="fg"><label>Confirm Password</label><input id="nu-pass2" type="password" placeholder="Repeat password"/></div>';
@@ -1878,28 +1875,27 @@ function createAdminUser() {
   var err = document.getElementById('nu-err');
   var btn = document.getElementById('nu-ok');
   err.textContent = '';
-  if (!user) { err.textContent = 'Email is required.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user)) { err.textContent = 'Please enter a valid email address.'; return; }
+  if (!user) { err.textContent = 'Username is required.'; return; }
   if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
   if (pass !== pass2) { err.textContent = 'Passwords do not match.'; return; }
   btn.disabled = true; btn.textContent = 'Creating…';
   fetch(WORKER_URL + '/api/users', {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
-    body: JSON.stringify({ email:user, password:pass, role:role })
+    body: JSON.stringify({ username:user, password:pass, role:role })
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
     btn.disabled = false; btn.textContent = 'Create Account';
-    if (d.ok) { showToast('Account created: ' + (d.email||user),'ok'); renderAdminUsers(); }
+    if (d.ok) { showToast('Account created: ' + (d.username||user),'ok'); renderAdminUsers(); }
     else err.textContent = d.error || 'Failed to create account.';
   })
   .catch(function(){ btn.disabled=false; btn.textContent='Create Account'; err.textContent='Network error.'; });
 }
 
-function deleteAdminUser(email) {
-  if (!confirm('Remove user "' + email + '"? This cannot be undone.')) return;
-  fetch(WORKER_URL + '/api/users/' + encodeURIComponent(email), {
+function deleteAdminUser(username) {
+  if (!confirm('Remove user "' + username + '"? This cannot be undone.')) return;
+  fetch(WORKER_URL + '/api/users/' + encodeURIComponent(username), {
     method:'DELETE', headers:{'Authorization':'Bearer '+getToken()}
   })
   .then(function(r){ return r.json(); })
