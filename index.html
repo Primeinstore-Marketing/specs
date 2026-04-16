@@ -1530,16 +1530,26 @@ function downloadSpecPdf() {
       doc.text(pdfSafe(label), pad, y);
       y += 4.5;
       /* Bullet items */
-      doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
-      doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
       items.forEach(function(item) {
         if (y > H - 7) return;
-        var clean = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
-        var wrapped = doc.splitTextToSize(clean, maxW - 5);
-        doc.text('\u2022', pad, y);
-        doc.text(wrapped, pad + 4, y);
-        y += wrapped.length * 3.7 + 0.5;
+        var raw = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
+        if (raw.startsWith('**')) {
+          /* Subheading */
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(navy[0], navy[1], navy[2]);
+          doc.text(raw.slice(2).trim(), pad, y);
+          y += 4.5;
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
+        } else {
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
+          var wrapped = doc.splitTextToSize(raw, maxW - 5);
+          doc.text('\u2022', pad, y);
+          doc.text(wrapped, pad + 4, y);
+          y += wrapped.length * 3.7 + 0.5;
+        }
       });
       y += 3;
     }
