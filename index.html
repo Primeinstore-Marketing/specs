@@ -307,6 +307,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
   background:var(--acc);opacity:.5;margin-top:6px;
 }
 .spec-row .ref{color:var(--acc);font-weight:700}
+.spec-subhead{font-size:11px;font-weight:700;color:var(--navy);letter-spacing:.03em;padding:7px 0 2px;margin-top:4px}
 .spec-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .spec-col-box{background:var(--bg1);border-radius:8px;padding:12px 14px;border:1px solid var(--line)}
 .spec-col-box-label{font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
@@ -884,8 +885,8 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
       <div class="fg"><label>Category *</label><select id="sf-cat" onchange="sfUpdateGroups(null)"></select></div>
       <div class="fg"><label>Sub-Group</label><select id="sf-group"></select></div>
       <div class="fg sf-full"><label>Description</label><textarea id="sf-desc" rows="2" placeholder="Brief description of this format..."></textarea></div>
-      <div class="fg sf-full"><label>Design Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span></label><textarea id="sf-ds" rows="3" placeholder="Overall size: Width 180mm × Height 455mm *[PI130]&#10;Portrait — Printed both sides."></textarea></div>
-      <div class="fg sf-full"><label>Artwork Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span></label><textarea id="sf-ar" rows="2" placeholder="All images 300 dpi CMYK 100% scale.&#10;Material supplied in Adobe PDF format."></textarea></div>
+      <div class="fg sf-full"><label>Design Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line — start a line with ** for a subheading)</span></label><textarea id="sf-ds" rows="3" placeholder="**Info Direct/Coupon Direct Leaflet:&#10;Overall size: Width 180mm × Height 455mm *[PI130]&#10;Portrait — Printed both sides."></textarea></div>
+      <div class="fg sf-full"><label>Artwork Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line — start a line with ** for a subheading)</span></label><textarea id="sf-ar" rows="2" placeholder="All images 300 dpi CMYK 100% scale.&#10;Material supplied in Adobe PDF format."></textarea></div>
       <div class="fg sf-full">
         <label>Printing Specifications
           <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line)</span>
@@ -1237,31 +1238,38 @@ function openSpec(key) {
   document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
   var nb = document.querySelector('[data-key="' + key + '"]');
   if (nb) nb.classList.add('selected');
+  /* Render a single spec item — lines starting with ** become subheadings */
+  function specRow(x) {
+    var clean = (x || '').replace(/\s*\*\[[A-Z0-9]+\]/g, '');
+    if (clean.startsWith('**')) return '<div class="spec-subhead">' + escH(clean.slice(2).trim()) + '</div>';
+    return '<div class="spec-row">' + escH(clean) + '</div>';
+  }
+
   var h = '<h1 class="spec-h">' + escH(s.t) + '</h1><p class="spec-desc">' + escH(s.d) + '</p>';
   if (s.ds && s.ds.length) {
     h += '<div class="spec-block"><div class="spec-block-label">Design Specifications</div><div class="spec-rows">';
-    s.ds.forEach(function(x){ h += '<div class="spec-row">' + escH(x.replace(/\s*\*\[[A-Z0-9]+\]/g,'')) + '</div>'; });
+    s.ds.forEach(function(x){ h += specRow(x); });
     h += '</div></div>';
   }
   if (s.ar && s.ar.length) {
     h += '<div class="spec-block"><div class="spec-block-label">Artwork Specifications</div><div class="spec-rows">';
-    s.ar.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    s.ar.forEach(function(x){ h += specRow(x); });
     h += '</div></div>';
   }
   if (s.p2) {
     h += '<div class="spec-block"><div class="spec-block-label">Printing Specifications</div><div class="spec-2col">';
     h += '<div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.p2.l.h) + '</div><div class="spec-rows">';
-    s.p2.l.i.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    s.p2.l.i.forEach(function(x){ h += specRow(x); });
     h += '</div></div><div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.p2.r.h) + '</div><div class="spec-rows">';
-    s.p2.r.i.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    s.p2.r.i.forEach(function(x){ h += specRow(x); });
     h += '</div></div></div></div>';
   } else if (s.pr && s.pr.length) {
     h += '<div class="spec-block"><div class="spec-block-label">Printing Specifications</div><div class="spec-rows">';
-    s.pr.forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+    s.pr.forEach(function(x){ h += specRow(x); });
     h += '</div></div>';
   }
   h += '<div class="spec-block"><div class="spec-block-label">Packaging</div><div style="font-size:12px;color:var(--txt3);margin-bottom:8px">(WHEN SUPPLYING PRINTED MATERIAL TO PRIMEDIA INSTORE)</div><div class="spec-rows">';
-  if (s.pk) s.pk.split('\n').forEach(function(x){ h += '<div class="spec-row">' + escH(x) + '</div>'; });
+  if (s.pk) s.pk.split('\n').forEach(function(x){ h += specRow(x); });
   h += '</div></div>';
   document.getElementById('spec-content').innerHTML = h;
   document.getElementById('spec-panel').scrollTop = 0;
