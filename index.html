@@ -1121,6 +1121,8 @@ function initData() {
       } else if (kvData) {
         _applyGhData(kvData);
       }
+      // Re-apply local deleted list after KV merge — ensures deletions survive even if KV push failed
+      try { var dl=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); dl.forEach(function(k){ delete SPECS[k]; }); } catch(e){}
       // Re-apply cached image URLs on top
       try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
@@ -1383,9 +1385,11 @@ function deleteCurrentSpec() {
   try { deleted = JSON.parse(localStorage.getItem('pi_deleted') || '[]'); } catch(e) {}
   if (deleted.indexOf(key) === -1) deleted.push(key);
   try { localStorage.setItem('pi_deleted', JSON.stringify(deleted)); } catch(e) {}
-  saveStoredSpecs();
-  showToast('Spec deleted', 'ok');
   goHome();
+  pushDataToGitHub(function(ok) {
+    if (ok) showToast('Spec deleted', 'ok');
+    else showToast('Deleted locally — cloud sync failed. Stay logged in and save again to sync.', 'err');
+  });
 }
 
 function downloadSpecImage() {
