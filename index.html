@@ -791,6 +791,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download PDF
             </button>
+            <button id="spec-delete-btn" onclick="deleteCurrentSpec()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.06);color:var(--red);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              Delete
+            </button>
           </div>
         </div>
         <div class="spec-scroll" id="spec-content"></div>
@@ -1313,6 +1317,9 @@ function renderDlBar() {
   /* Show PDF download button for all admins */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
   if (pdfBtn) pdfBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
+  /* Show delete button for admin-created specs only */
+  var delBtn = document.getElementById('spec-delete-btn');
+  if (delBtn) delBtn.style.display = (isAdmin && s && s._admin) ? 'inline-flex' : 'none';
   /* Show image download button only for admins when spec has an image */
   var imgBtn = document.getElementById('img-dl-btn');
   if (imgBtn) imgBtn.style.display = (isAdmin && s && s.p) ? 'inline-flex' : 'none';
@@ -1363,6 +1370,22 @@ function dlDownload(filename) {
     a.click();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   }).catch(function(){ showToast('Download failed','err'); });
+}
+
+function deleteCurrentSpec() {
+  if (!curSpec || !isAdmin) return;
+  var s = SPECS[curSpec];
+  if (!s || !s._admin) return;
+  if (!confirm('Delete "' + (s.t || curSpec) + '"? This cannot be undone.')) return;
+  var key = curSpec;
+  delete SPECS[key];
+  var deleted = [];
+  try { deleted = JSON.parse(localStorage.getItem('pi_deleted') || '[]'); } catch(e) {}
+  if (deleted.indexOf(key) === -1) deleted.push(key);
+  try { localStorage.setItem('pi_deleted', JSON.stringify(deleted)); } catch(e) {}
+  saveStoredSpecs();
+  showToast('Spec deleted', 'ok');
+  goHome();
 }
 
 function downloadSpecImage() {
