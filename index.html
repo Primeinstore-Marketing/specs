@@ -1317,9 +1317,9 @@ function renderDlBar() {
   /* Show PDF download button for all admins */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
   if (pdfBtn) pdfBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
-  /* Show delete button for admin-created specs only */
+  /* Show delete button for any spec when admin is logged in */
   var delBtn = document.getElementById('spec-delete-btn');
-  if (delBtn) delBtn.style.display = (isAdmin && s && s._admin) ? 'inline-flex' : 'none';
+  if (delBtn) delBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
   /* Show image download button only for admins when spec has an image */
   var imgBtn = document.getElementById('img-dl-btn');
   if (imgBtn) imgBtn.style.display = (isAdmin && s && s.p) ? 'inline-flex' : 'none';
@@ -1375,7 +1375,7 @@ function dlDownload(filename) {
 function deleteCurrentSpec() {
   if (!curSpec || !isAdmin) return;
   var s = SPECS[curSpec];
-  if (!s || !s._admin) return;
+  if (!s) return;
   if (!confirm('Delete "' + (s.t || curSpec) + '"? This cannot be undone.')) return;
   var key = curSpec;
   delete SPECS[key];
