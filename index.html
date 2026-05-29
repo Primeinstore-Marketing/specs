@@ -1349,7 +1349,7 @@ function renderDlBar() {
   if (!list) return;
   /* Show PDF download button for all admins */
   var pdfBtn = document.querySelector('.pdf-dl-btn');
-  if (pdfBtn) pdfBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
+  if (pdfBtn) pdfBtn.style.display = s ? 'inline-flex' : 'none';
   /* Show edit/delete buttons for any spec when admin is logged in */
   var editBtn = document.getElementById('spec-edit-btn');
   if (editBtn) editBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
@@ -1357,7 +1357,7 @@ function renderDlBar() {
   if (delBtn) delBtn.style.display = (isAdmin && s) ? 'inline-flex' : 'none';
   /* Show image download button only for admins when spec has an image */
   var imgBtn = document.getElementById('img-dl-btn');
-  if (imgBtn) imgBtn.style.display = (isAdmin && s && s.p) ? 'inline-flex' : 'none';
+  if (imgBtn) imgBtn.style.display = (s && s.p) ? 'inline-flex' : 'none';
   if (!files.length) { list.innerHTML = '<div style="font-size:12px;color:var(--txt3)">No die line uploaded yet.</div>'; return; }
   function fileRow(f) {
     return '<div class="dl-file-row">' +
