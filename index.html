@@ -893,7 +893,27 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
       <div class="fg"><label>Category *</label><select id="sf-cat" onchange="sfUpdateGroups(null)"></select></div>
       <div class="fg"><label>Sub-Group</label><select id="sf-group"></select></div>
       <div class="fg sf-full"><label>Description</label><textarea id="sf-desc" rows="2" placeholder="Brief description of this format..."></textarea></div>
-      <div class="fg sf-full"><label>Design Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line — start a line with ** for a subheading)</span></label><textarea id="sf-ds" rows="3" placeholder="**Info Direct/Coupon Direct Leaflet:&#10;Overall size: Width 180mm × Height 455mm *[PI130]&#10;Portrait — Printed both sides."></textarea></div>
+      <div class="fg sf-full">
+        <label>Design Specifications
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line — start a line with ** for a subheading)</span>
+          <label style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:11px;margin-left:12px;cursor:pointer">
+            <input type="checkbox" id="sf-ds-2col" onchange="sfToggleDsCol()" style="margin-right:4px"/>Two columns
+          </label>
+        </label>
+        <div id="sf-ds-single" style="width:100%"><textarea id="sf-ds" rows="3" placeholder="**Info Direct/Coupon Direct Leaflet:&#10;Overall size: Width 180mm × Height 455mm *[PI130]&#10;Portrait — Printed both sides." style="width:100%;box-sizing:border-box"></textarea></div>
+        <div id="sf-ds-dual" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;box-sizing:border-box">
+            <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+              <input id="sf-d2-lh" type="text" placeholder="Left heading e.g. SHELF FRONT" style="width:100%;box-sizing:border-box"/>
+              <textarea id="sf-d2-li" rows="5" placeholder="One item per line&#10;Overall Size: Width 900mm, Height 58mm" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
+            </div>
+            <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+              <input id="sf-d2-rh" type="text" placeholder="Right heading e.g. WING" style="width:100%;box-sizing:border-box"/>
+              <textarea id="sf-d2-ri" rows="5" placeholder="One item per line&#10;Overall size not to exceed: Width 175mm x Height 110mm" style="width:100%;box-sizing:border-box;resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="fg sf-full"><label>Artwork Specifications <span style="font-weight:400;text-transform:none;letter-spacing:0;font-family:var(--F);font-size:10px">(one per line — start a line with ** for a subheading)</span></label><textarea id="sf-ar" rows="2" placeholder="All images 300 dpi CMYK 100% scale.&#10;Material supplied in Adobe PDF format."></textarea></div>
       <div class="fg sf-full">
         <label>Printing Specifications
@@ -1256,7 +1276,14 @@ function openSpec(key) {
   }
 
   var h = '<h1 class="spec-h">' + escH(s.t) + '</h1><p class="spec-desc">' + escH(s.d) + '</p>';
-  if (s.ds && s.ds.length) {
+  if (s.ds2) {
+    h += '<div class="spec-block"><div class="spec-block-label">Design Specifications</div><div class="spec-2col">';
+    h += '<div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.ds2.l.h) + '</div><div class="spec-rows">';
+    s.ds2.l.i.forEach(function(x){ h += specRow(x); });
+    h += '</div></div><div class="spec-col-box"><div class="spec-col-box-label">' + escH(s.ds2.r.h) + '</div><div class="spec-rows">';
+    s.ds2.r.i.forEach(function(x){ h += specRow(x); });
+    h += '</div></div></div></div>';
+  } else if (s.ds && s.ds.length) {
     h += '<div class="spec-block"><div class="spec-block-label">Design Specifications</div><div class="spec-rows">';
     s.ds.forEach(function(x){ h += specRow(x); });
     h += '</div></div>';
@@ -2051,7 +2078,15 @@ function openSpecForm(key) {
   document.getElementById('sf-name').value = s ? s.t : '';
   renderSfPdfList();
   document.getElementById('sf-desc').value = s ? (s.d||'') : '';
+  var hasDs2col = s && s.ds2;
+  document.getElementById('sf-ds-2col').checked = !!hasDs2col;
+  document.getElementById('sf-ds-single').style.display = hasDs2col ? 'none' : '';
+  document.getElementById('sf-ds-dual').style.display = hasDs2col ? '' : 'none';
   document.getElementById('sf-ds').value = sfJoinLines(s&&s.ds);
+  document.getElementById('sf-d2-lh').value = hasDs2col ? (s.ds2.l.h||'') : '';
+  document.getElementById('sf-d2-li').value = hasDs2col ? sfJoinLines(s.ds2.l.i) : '';
+  document.getElementById('sf-d2-rh').value = hasDs2col ? (s.ds2.r.h||'') : '';
+  document.getElementById('sf-d2-ri').value = hasDs2col ? sfJoinLines(s.ds2.r.i) : '';
   document.getElementById('sf-ar').value = sfJoinLines(s&&s.ar);
   var has2col = s && s.p2;
   document.getElementById('sf-pr-2col').checked = !!has2col;
@@ -2143,6 +2178,11 @@ function sfToggle2Col() {
   document.getElementById('sf-pr-single').style.display = on ? 'none' : '';
   document.getElementById('sf-pr-dual').style.display = on ? '' : 'none';
 }
+function sfToggleDsCol() {
+  var on = document.getElementById('sf-ds-2col').checked;
+  document.getElementById('sf-ds-single').style.display = on ? 'none' : '';
+  document.getElementById('sf-ds-dual').style.display = on ? '' : 'none';
+}
 function closeSpecForm() { document.getElementById('spec-form-curtain').classList.remove('open'); }
 
 function saveSpecForm() {
@@ -2156,7 +2196,11 @@ function saveSpecForm() {
   SPECS[key] = {
     t: name,
     d: document.getElementById('sf-desc').value.trim(),
-    ds: document.getElementById('sf-ds').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
+    ds: document.getElementById('sf-ds-2col').checked ? [] : document.getElementById('sf-ds').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
+    ds2: document.getElementById('sf-ds-2col').checked ? {
+      l: { h: document.getElementById('sf-d2-lh').value.trim(), i: document.getElementById('sf-d2-li').value.split('\n').map(function(x){return x.trim();}).filter(Boolean) },
+      r: { h: document.getElementById('sf-d2-rh').value.trim(), i: document.getElementById('sf-d2-ri').value.split('\n').map(function(x){return x.trim();}).filter(Boolean) }
+    } : null,
     ar: document.getElementById('sf-ar').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
     pr: document.getElementById('sf-pr-2col').checked ? [] : document.getElementById('sf-pr').value.split('\n').map(function(x){return x.trim();}).filter(Boolean),
     p2: document.getElementById('sf-pr-2col').checked ? {
