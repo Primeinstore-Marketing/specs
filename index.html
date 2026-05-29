@@ -2221,7 +2221,7 @@ function saveSpecForm() {
     renderAdminSpecs();
     closeSpecForm();
     showToast((editingKey ? 'Updated: ' : 'Added: ') + name,'ok');
-    if (curSpec === key) openSpec(key);
+    openSpec(key);
   };
   var imgFile = sfImgFile;
   var pdfFilesToUpload = sfPdfFiles.slice();
