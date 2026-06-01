@@ -1490,12 +1490,12 @@ function downloadSpecPdf() {
     headerH = Math.max(16, Math.min(headerH, 28));
     var pad = 14;
     var leftW1 = 170;
+    var cW = leftW1 - pad * 2;       // 142mm text column
+    var availH = H - headerH - 11 - 8; // usable vertical space for content
     var navy = [20, 40, 80];
     var lineGray = [210, 215, 225];
     var textBlack = [20, 20, 20];
     var textGray = [90, 90, 90];
-    var pageNum = 1;
-    var y;
 
     function pdfSafe(str) {
       return (str || '')
@@ -1507,115 +1507,133 @@ function downloadSpecPdf() {
         .replace(/[•‣⁃]/g, '-');
     }
 
-    function cW() { return (pageNum === 1 ? leftW1 : W) - pad * 2; }
-    function rEdge() { return pageNum === 1 ? leftW1 : W; }
+    /* Collect all sections to render */
+    var sections = [];
+    if (s.ds2) {
+      sections.push({label: s.ds2.l.h || 'Design Specifications', items: s.ds2.l.i || []});
+      if (s.ds2.r.i && s.ds2.r.i.length) sections.push({label: s.ds2.r.h || '', items: s.ds2.r.i});
+    } else if (s.ds && s.ds.length) {
+      sections.push({label: 'Design Specifications', items: s.ds});
+    }
+    if (s.ar && s.ar.length) sections.push({label: 'Artwork Specifications', items: s.ar});
+    if (s.p2 && s.p2.l && s.p2.r) {
+      sections.push({label: s.p2.l.h || 'Printing Specifications', items: s.p2.l.i || []});
+      if (s.p2.r.i && s.p2.r.i.length) sections.push({label: s.p2.r.h || '', items: s.p2.r.i});
+    } else if (s.pr && s.pr.length) {
+      sections.push({label: 'Printing Specifications', items: s.pr});
+    }
+    if (s.pk) { var pkItems = s.pk.split('\n').filter(Boolean); if (pkItems.length) sections.push({label: 'Packaging', items: pkItems}); }
 
-    function drawHeader() {
-      doc.setFillColor(255, 255, 255);
-      doc.rect(0, 0, W, H, 'F');
-      if (headerData && headerImgW && headerImgH) {
-        doc.addImage(headerData, 'PNG', 0, 0, W, headerImgH * (W / headerImgW));
-      } else {
-        doc.setFillColor(navy[0], navy[1], navy[2]);
-        doc.rect(0, 0, W, headerH, 'F');
-        if (logoData && logoW && logoH) {
-          var ls = Math.min(55 / logoW, (headerH - 5) / logoH);
-          doc.addImage(logoData, 'PNG', pad, (headerH - logoH * ls) / 2, logoW * ls, logoH * ls);
-        }
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.setCharSpace(2);
-        doc.text('SPECS', W - pad - 28, headerH - 6);
-        doc.setCharSpace(0);
+    /* ── Pass 1: measure total height at base font sizes ── */
+    var baseTitle = 13, baseBody = 8;
+    doc.setFontSize(baseTitle);
+    var titleLinesBase = doc.splitTextToSize(pdfSafe(s.t), cW);
+    var totalH = titleLinesBase.length * 5.8 + 2;
+    doc.setFontSize(baseBody);
+    var descLinesBase = doc.splitTextToSize(pdfSafe(s.d || ''), cW);
+    totalH += descLinesBase.length * 3.8 + 5;
+    sections.forEach(function(sec) {
+      if (!sec.items.length) return;
+      totalH += 4 + 4.5; // divider line + heading
+      sec.items.forEach(function(item) {
+        var raw = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
+        if (raw.startsWith('**')) { totalH += 4.5; }
+        else { totalH += doc.splitTextToSize(raw, cW - 5).length * 3.7 + 0.5; }
+      });
+      totalH += 3;
+    });
+
+    /* ── Scale factor: shrink to fit, minimum 55% ── */
+    var sc = totalH > availH ? Math.max(availH / totalH, 0.55) : 1;
+    var titleSz  = baseTitle * sc;
+    var bodySz   = baseBody  * sc;
+    var titleLH  = 5.8 * sc;
+    var bodyLH   = 3.7 * sc;
+    var descLH   = 3.8 * sc;
+
+    /* ── Draw header ── */
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, W, H, 'F');
+    if (headerData && headerImgW && headerImgH) {
+      doc.addImage(headerData, 'PNG', 0, 0, W, headerImgH * (W / headerImgW));
+    } else {
+      doc.setFillColor(navy[0], navy[1], navy[2]);
+      doc.rect(0, 0, W, headerH, 'F');
+      if (logoData && logoW && logoH) {
+        var ls = Math.min(55 / logoW, (headerH - 5) / logoH);
+        doc.addImage(logoData, 'PNG', pad, (headerH - logoH * ls) / 2, logoW * ls, logoH * ls);
       }
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setCharSpace(2);
+      doc.text('SPECS', W - pad - 28, headerH - 6);
+      doc.setCharSpace(0);
     }
 
-    function newPage() {
-      doc.addPage([297, 210]); // explicit landscape A4
-      pageNum++;
-      drawHeader();
-      y = headerH + 11;
-    }
-
-    /* Page 1 */
-    drawHeader();
+    /* Vertical divider */
     doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
     doc.setLineWidth(0.35);
     doc.line(leftW1, headerH, leftW1, H);
 
+    /* Spec image in right panel */
     if (specImgData && specImgW && specImgH) {
       var imgPad = 10;
       var bx = leftW1 + imgPad, by = headerH + imgPad;
       var bw = (W - leftW1) - imgPad * 2, bh = (H - headerH) * 0.72;
-      var sc = Math.min(bw / specImgW, bh / specImgH);
-      doc.addImage(specImgData, 'PNG', bx + (bw - specImgW * sc) / 2, by, specImgW * sc, specImgH * sc);
+      var isc = Math.min(bw / specImgW, bh / specImgH);
+      doc.addImage(specImgData, 'PNG', bx + (bw - specImgW * isc) / 2, by, specImgW * isc, specImgH * isc);
     }
 
-    y = headerH + 11;
+    /* ── Pass 2: render content with scaled sizes ── */
+    var y = headerH + 11;
+
     doc.setTextColor(navy[0], navy[1], navy[2]);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    var titleLines = doc.splitTextToSize(pdfSafe(s.t), cW());
+    doc.setFontSize(titleSz);
+    var titleLines = doc.splitTextToSize(pdfSafe(s.t), cW);
     doc.text(titleLines, pad, y);
-    y += titleLines.length * 5.8 + 2;
+    y += titleLines.length * titleLH + 2 * sc;
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(bodySz);
     doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    var descLines = doc.splitTextToSize(pdfSafe(s.d || ''), cW());
+    var descLines = doc.splitTextToSize(pdfSafe(s.d || ''), cW);
     doc.text(descLines, pad, y);
-    y += descLines.length * 3.8 + 5;
+    y += descLines.length * descLH + 5 * sc;
 
-    function drawSection(label, items) {
-      if (!items || !items.length) return;
-      if (y > H - 30) newPage();
+    sections.forEach(function(sec) {
+      if (!sec.items.length) return;
       doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
       doc.setLineWidth(0.25);
-      doc.line(pad, y, rEdge() - pad, y);
-      y += 4;
+      doc.line(pad, y, leftW1 - pad, y);
+      y += 4 * sc;
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
+      doc.setFontSize(bodySz);
       doc.setTextColor(navy[0], navy[1], navy[2]);
-      doc.text(pdfSafe(label), pad, y);
-      y += 4.5;
-      doc.setFontSize(8);
-      items.forEach(function(item) {
-        if (y > H - 14) newPage();
+      doc.text(pdfSafe(sec.label), pad, y);
+      y += 4.5 * sc;
+      sec.items.forEach(function(item) {
         var raw = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
         if (raw.startsWith('**')) {
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(navy[0], navy[1], navy[2]);
           doc.text(raw.slice(2).trim(), pad, y);
-          y += 4.5;
+          y += 4.5 * sc;
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
         } else {
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
-          var wrapped = doc.splitTextToSize(raw, cW() - 5);
+          doc.setFontSize(bodySz);
+          var wrapped = doc.splitTextToSize(raw, cW - 5);
           doc.text('•', pad, y);
           doc.text(wrapped, pad + 4, y);
-          y += wrapped.length * 3.7 + 0.5;
+          y += wrapped.length * bodyLH + 0.5 * sc;
         }
       });
-      y += 3;
-    }
-
-    if (s.ds2) {
-      drawSection(s.ds2.l.h || 'Design Specifications', s.ds2.l.i);
-      drawSection(s.ds2.r.h, s.ds2.r.i);
-    } else {
-      drawSection('Design Specifications', s.ds);
-    }
-    drawSection('Artwork Specifications', s.ar);
-    if (s.p2 && s.p2.l && s.p2.r) {
-      drawSection(s.p2.l.h || 'Printing Specifications', s.p2.l.i);
-      drawSection(s.p2.r.h, s.p2.r.i);
-    } else {
-      drawSection('Printing Specifications', s.pr);
-    }
-    if (s.pk) drawSection('Packaging', s.pk.split('\n').filter(Boolean));
+      y += 3 * sc;
+    });
 
     doc.save(s.t.replace(/[^a-zA-Z0-9 ]/g, '') + ' - Primedia Instore Specs.pdf');
     if (btn) {
