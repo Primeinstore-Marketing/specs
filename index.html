@@ -1532,7 +1532,7 @@ function downloadSpecPdf() {
     }
 
     function newPage() {
-      doc.addPage();
+      doc.addPage([297, 210]); // explicit landscape A4
       pageNum++;
       drawHeader();
       y = headerH + 11;
@@ -1569,7 +1569,7 @@ function downloadSpecPdf() {
 
     function drawSection(label, items) {
       if (!items || !items.length) return;
-      if (y > H - 20) newPage();
+      if (y > H - 30) newPage();
       doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
       doc.setLineWidth(0.25);
       doc.line(pad, y, rEdge() - pad, y);
@@ -1581,7 +1581,7 @@ function downloadSpecPdf() {
       y += 4.5;
       doc.setFontSize(8);
       items.forEach(function(item) {
-        if (y > H - 9) newPage();
+        if (y > H - 14) newPage();
         var raw = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
         if (raw.startsWith('**')) {
           doc.setFont('helvetica', 'bold');
