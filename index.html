@@ -1486,116 +1486,104 @@ function downloadSpecPdf() {
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     var W = 297, H = 210;
-    /* If we have the captured header, scale its height proportionally to PDF width */
     var headerH = (headerData && headerImgW && headerImgH) ? Math.round((headerImgH / 2) / (headerImgW / 2) * W) : 22;
-    headerH = Math.max(16, Math.min(headerH, 28)); // clamp 16-28mm
-    var pad = 14;           // left/right inner padding
-    var leftW = 170;        // ~57% for content
-    var rightX = leftW;
-    var rightW = W - leftW; // ~43% for image
+    headerH = Math.max(16, Math.min(headerH, 28));
+    var pad = 14;
+    var leftW1 = 170;
     var navy = [20, 40, 80];
     var lineGray = [210, 215, 225];
     var textBlack = [20, 20, 20];
     var textGray = [90, 90, 90];
+    var pageNum = 1;
+    var y;
 
-    /* ── White page ── */
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, W, H, 'F');
-
-    /* ── Header: use captured screenshot of actual site topbar ── */
-    if (headerData && headerImgW && headerImgH) {
-      var hScale = W / headerImgW;
-      doc.addImage(headerData, 'PNG', 0, 0, W, headerImgH * hScale);
-    } else {
-      /* Fallback: draw navy bar with logo and SPECS text */
-      doc.setFillColor(navy[0], navy[1], navy[2]);
-      doc.rect(0, 0, W, headerH, 'F');
-      if (logoData && logoW && logoH) {
-        var maxLW = 55, maxLH = headerH - 5;
-        var ls = Math.min(maxLW / logoW, maxLH / logoH);
-        var lw = logoW * ls, lh = logoH * ls;
-        doc.addImage(logoData, 'PNG', pad, (headerH - lh) / 2, lw, lh);
-      }
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.setCharSpace(2);
-      doc.text('SPECS', W - pad - 28, headerH - 6);
-      doc.setCharSpace(0);
-    }
-
-    /* ── Thin vertical divider line ── */
-    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
-    doc.setLineWidth(0.35);
-    doc.line(leftW, headerH, leftW, H);
-
-    /* ── RIGHT: image top-aligned with padding, contained (no stretch) ── */
-    if (specImgData && specImgW && specImgH) {
-      var imgPad = 10;
-      var boxX = rightX + imgPad;
-      var boxY = headerH + imgPad;
-      var boxW = rightW - imgPad * 2;
-      var boxH = (H - headerH) * 0.65; // image takes ~65% of available height, top-aligned
-      var scale = Math.min(boxW / specImgW, boxH / specImgH);
-      var dw = specImgW * scale, dh = specImgH * scale;
-      var dx = boxX + (boxW - dw) / 2; // centred horizontally in box
-      doc.addImage(specImgData, 'PNG', dx, boxY, dw, dh);
-    }
-
-    /* ── LEFT: spec content ── */
-    var y = headerH + 11;
-    var maxW = leftW - pad * 2;
-
-    /* Sanitise text for Helvetica (Latin-1 only) */
     function pdfSafe(str) {
       return (str || '')
-        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'") // curly single quotes → '
-        .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"') // curly double quotes → "
-        .replace(/[\u2013\u2014\u2015]/g, '-')                   // en/em dash → -
-        .replace(/\u2026/g, '...')                               // ellipsis → ...
-        .replace(/\u00BC/g, '1/4')                               // ¼ → 1/4
-        .replace(/\u00BD/g, '1/2')                               // ½ → 1/2
-        .replace(/\u00BE/g, '3/4')                               // ¾ → 3/4
-        .replace(/[\u2022\u2023\u2043]/g, '-');                  // bullets → -
+        .replace(/[‘’‚‛′‵]/g, "'")
+        .replace(/[“”„‟″‶]/g, '"')
+        .replace(/[–—―]/g, '-')
+        .replace(/…/g, '...')
+        .replace(/¼/g, '1/4').replace(/½/g, '1/2').replace(/¾/g, '3/4')
+        .replace(/[•‣⁃]/g, '-');
     }
 
-    /* Title — bold navy */
+    function cW() { return (pageNum === 1 ? leftW1 : W) - pad * 2; }
+    function rEdge() { return pageNum === 1 ? leftW1 : W; }
+
+    function drawHeader() {
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 0, W, H, 'F');
+      if (headerData && headerImgW && headerImgH) {
+        doc.addImage(headerData, 'PNG', 0, 0, W, headerImgH * (W / headerImgW));
+      } else {
+        doc.setFillColor(navy[0], navy[1], navy[2]);
+        doc.rect(0, 0, W, headerH, 'F');
+        if (logoData && logoW && logoH) {
+          var ls = Math.min(55 / logoW, (headerH - 5) / logoH);
+          doc.addImage(logoData, 'PNG', pad, (headerH - logoH * ls) / 2, logoW * ls, logoH * ls);
+        }
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setCharSpace(2);
+        doc.text('SPECS', W - pad - 28, headerH - 6);
+        doc.setCharSpace(0);
+      }
+    }
+
+    function newPage() {
+      doc.addPage();
+      pageNum++;
+      drawHeader();
+      y = headerH + 11;
+    }
+
+    /* Page 1 */
+    drawHeader();
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.setLineWidth(0.35);
+    doc.line(leftW1, headerH, leftW1, H);
+
+    if (specImgData && specImgW && specImgH) {
+      var imgPad = 10;
+      var bx = leftW1 + imgPad, by = headerH + imgPad;
+      var bw = (W - leftW1) - imgPad * 2, bh = (H - headerH) * 0.72;
+      var sc = Math.min(bw / specImgW, bh / specImgH);
+      doc.addImage(specImgData, 'PNG', bx + (bw - specImgW * sc) / 2, by, specImgW * sc, specImgH * sc);
+    }
+
+    y = headerH + 11;
     doc.setTextColor(navy[0], navy[1], navy[2]);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
-    var titleLines = doc.splitTextToSize(pdfSafe(s.t), maxW);
+    var titleLines = doc.splitTextToSize(pdfSafe(s.t), cW());
     doc.text(titleLines, pad, y);
     y += titleLines.length * 5.8 + 2;
 
-    /* Description — normal gray */
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    var descLines = doc.splitTextToSize(pdfSafe(s.d || ''), maxW);
+    var descLines = doc.splitTextToSize(pdfSafe(s.d || ''), cW());
     doc.text(descLines, pad, y);
     y += descLines.length * 3.8 + 5;
 
-    /* Section renderer */
     function drawSection(label, items) {
-      if (!items || !items.length || y > H - 9) return;
-      /* Thin divider line above section */
+      if (!items || !items.length) return;
+      if (y > H - 20) newPage();
       doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
       doc.setLineWidth(0.25);
-      doc.line(pad, y, leftW - pad, y);
+      doc.line(pad, y, rEdge() - pad, y);
       y += 4;
-      /* Heading: bold navy, normal spacing */
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
       doc.setTextColor(navy[0], navy[1], navy[2]);
       doc.text(pdfSafe(label), pad, y);
       y += 4.5;
-      /* Bullet items */
       doc.setFontSize(8);
       items.forEach(function(item) {
-        if (y > H - 7) return;
+        if (y > H - 9) newPage();
         var raw = pdfSafe((item || '').replace(/\s*\*\[[A-Z0-9]+\]/g, ''));
         if (raw.startsWith('**')) {
-          /* Subheading */
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(navy[0], navy[1], navy[2]);
           doc.text(raw.slice(2).trim(), pad, y);
@@ -1605,8 +1593,8 @@ function downloadSpecPdf() {
         } else {
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(textBlack[0], textBlack[1], textBlack[2]);
-          var wrapped = doc.splitTextToSize(raw, maxW - 5);
-          doc.text('\u2022', pad, y);
+          var wrapped = doc.splitTextToSize(raw, cW() - 5);
+          doc.text('•', pad, y);
           doc.text(wrapped, pad + 4, y);
           y += wrapped.length * 3.7 + 0.5;
         }
@@ -1614,7 +1602,12 @@ function downloadSpecPdf() {
       y += 3;
     }
 
-    drawSection('Design Specifications', s.ds);
+    if (s.ds2) {
+      drawSection(s.ds2.l.h || 'Design Specifications', s.ds2.l.i);
+      drawSection(s.ds2.r.h, s.ds2.r.i);
+    } else {
+      drawSection('Design Specifications', s.ds);
+    }
     drawSection('Artwork Specifications', s.ar);
     if (s.p2 && s.p2.l && s.p2.r) {
       drawSection(s.p2.l.h || 'Printing Specifications', s.p2.l.i);
@@ -1630,7 +1623,6 @@ function downloadSpecPdf() {
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PDF';
     }
   }
-
   /* Load header PNG, logo, spec image — then build */
   var base = location.origin + location.pathname.replace(/\/[^/]*$/, '/') + 'pi-specs-assets/';
   var logoSrc = base + 'logo-white.png';
