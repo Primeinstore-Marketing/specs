@@ -255,7 +255,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 }
 /* Spec top bar */
 .spec-topbar{
-  height:48px;display:flex;align-items:center;
+  min-height:48px;display:flex;align-items:center;
   padding:0 24px;gap:10px;flex-shrink:0;
   border-bottom:1px solid var(--line);
   background:var(--bg);
@@ -534,20 +534,19 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 
-/* Tablet landscape: hide photo pane */
+/* Tablet landscape */
 @media(max-width:1024px){
   :root{--nav:220px}
-  /* Stack spec view: photo on top, content below */
   #specview{flex-direction:column;overflow-y:auto}
-  #spec-photo-pane{
-    order:-1;flex:none;width:100%;height:220px;min-height:220px;
-  }
+  #spec-photo-pane{order:-1;flex:none;width:100%;height:220px;min-height:220px}
   #spec-photo-pane img{object-position:center 30%}
   #spec-panel{width:100%;flex:1;overflow-y:visible;height:auto}
+  .spec-scroll{padding:22px 24px}
+  .dl-bar{padding:14px 24px}
   .home-h{font-size:clamp(44px,7vw,80px)}
 }
 
-/* Tablet portrait: collapse nav, overlay it */
+/* Tablet portrait: nav becomes overlay */
 @media(max-width:768px){
   :root{--nav:260px;--top:48px}
   #nav{
@@ -559,57 +558,70 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
   #nav.mob-open{transform:translateX(0)}
   #shell{overflow:hidden}
   #main{width:100vw;flex:1;min-width:0}
-  /* Hamburger button */
   #mob-nav-toggle{display:flex!important}
-  /* Nav overlay backdrop */
   #mob-backdrop{display:block}
-  /* Spec topbar: stack on small screens */
-  .spec-topbar{flex-wrap:wrap;gap:8px;padding:10px 14px}
+  /* Spec topbar wraps to two rows */
+  .spec-topbar{flex-wrap:wrap;gap:8px;padding:10px 14px;min-height:48px;height:auto}
+  .spec-scroll{padding:20px}
+  .dl-bar{margin:0 16px 16px;padding:14px 18px}
   /* Home */
   #home{padding:0 5vw;align-items:flex-end;padding-bottom:6vh}
   .home-visual{left:30%}
   .home-h{font-size:clamp(38px,9vw,70px)}
   .home-meta{flex-wrap:wrap}
   .home-kicker{margin-bottom:16px}
-  /* Spec panel */
-  #spec-panel{padding-bottom:80px}
-  .dl-bar{margin:0 16px 16px}
-  /* Admin */
-  .admin-sheet{width:100% !important;border-radius:0 !important;height:100vh !important;margin:0 !important}
+  #spec-panel{padding-bottom:0}
+  /* Modals full-screen on tablet */
+  .admin-sheet{width:100%!important;border-radius:0!important;height:100vh!important;margin:0!important}
+  .spec-form-sheet{width:100%!important;border-radius:14px 14px 0 0!important;max-height:96vh!important}
+  .curtain{padding:0;align-items:flex-end}
+  .sheet{border-radius:14px 14px 0 0;max-height:96vh}
+  .sf-grid{grid-template-columns:1fr;padding:16px 18px 24px}
 }
 
-/* Mobile: full width layout */
+/* Mobile */
 @media(max-width:480px){
   :root{--top:44px}
-  .bar-brand{width:auto;padding:0 14px}
-  .bar-center{padding:0 10px}
+  .bar-brand{width:auto;padding:0 12px}
+  .bar-center{padding:0 8px}
   #bc-spec{display:none!important}
-  /* Home content */
+  /* Topbar: icon-only for Admin/Sign Out */
+  .btn-label{display:none}
+  /* Home */
   .home-content{max-width:100%}
-  .home-h{font-size:clamp(34px,11vw,56px)}
-  .home-sub{font-size:12px}
+  .home-h{font-size:clamp(32px,10vw,54px)}
+  .home-sub{font-size:12px;max-width:100%}
   .home-meta{width:100%}
   .hm-item{flex:1;padding:10px 12px;text-align:center}
   .hm-n{font-size:18px}
-  /* Spec view */
-  .spec-topbar{padding:8px 12px}
-  .back-btn{font-size:11px}
+  /* Spec view: shorter photo, tighter layout */
+  #spec-photo-pane{height:180px;min-height:180px}
+  .spec-topbar{padding:8px 10px;gap:6px}
+  .spec-scroll{padding:16px}
+  .back-btn{font-size:11px;padding:0 8px}
   .spec-h{font-size:20px}
   .spec-block-label{font-size:9.5px}
+  .spec-2col{grid-template-columns:1fr}
+  /* Spec action buttons: icon-only */
+  #img-dl-btn,#spec-edit-btn,#spec-delete-btn{padding:0 10px}
+  .pdf-dl-btn{padding:0 10px}
   /* Die line bar */
-  .dl-bar{margin:0 12px 12px;padding:14px}
+  .dl-bar{margin:0;padding:12px 16px}
   .dl-file-row{flex-direction:column;align-items:flex-start;gap:6px}
   /* Sheet form */
   .sheet-body{grid-template-columns:1fr}
   .frow{grid-template-columns:1fr}
-  /* PDF button — hide label on tiny screens */
-  .pdf-dl-btn span{display:none}
+  .sheet-head{padding:16px 18px 14px}
+  .adm-tabs{flex-wrap:wrap;gap:2px}
 }
 
 /* Very small screens */
 @media(max-width:360px){
-  .home-h{font-size:30px}
+  :root{--top:42px}
+  .home-h{font-size:28px}
   .hm-item{padding:8px 10px}
+  .spec-topbar{gap:4px}
+  #img-dl-btn{display:none!important}
 }
 /* ═══ NAV SEARCH ═════════════════════════════════════════════════════ */
 .nav-search-wrap{padding:14px 16px 6px;position:relative}
@@ -731,11 +743,11 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     </button>
     <button class="topbtn" id="logout-btn" onclick="doLogout()" style="display:none;color:var(--red);border-color:rgba(255,77,77,.3)" title="Sign out">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign Out
+      <span class="btn-label">Sign Out</span>
     </button>
     <button class="topbtn" id="admin-btn" onclick="openLogin()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Admin
+      <span class="btn-label">Admin</span>
     </button>
   </div>
 </div>
@@ -789,15 +801,15 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
             </button>
             <button class="pdf-dl-btn" onclick="downloadSpecPdf()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download PDF
+              <span class="btn-label">Download PDF</span>
             </button>
             <button id="spec-edit-btn" onclick="openSpecForm(curSpec)" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(40,97,253,.35);background:rgba(40,97,253,.06);color:var(--acc);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Edit
+              <span class="btn-label">Edit</span>
             </button>
             <button id="spec-delete-btn" onclick="deleteCurrentSpec()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.06);color:var(--red);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              Delete
+              <span class="btn-label">Delete</span>
             </button>
           </div>
         </div>
