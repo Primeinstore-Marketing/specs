@@ -880,9 +880,9 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               <span class="btn-label">Edit</span>
             </button>
-            <button id="spec-delete-btn" onclick="deleteCurrentSpec()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.06);color:var(--red);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              <span class="btn-label">Delete</span>
+            <button id="spec-delete-btn" onclick="archiveCurrentSpec()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid rgba(180,83,9,.3);background:rgba(245,158,11,.06);color:#b45309;font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              <span class="btn-label">Archive</span>
             </button>
           </div>
         </div>
@@ -935,6 +935,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
           <button class="adm-tab active" id="tab-specs" onclick="showAdmTab('specs')">Specs</button>
           <button class="adm-tab" id="tab-cats" onclick="showAdmTab('cats')">Categories</button>
           <button class="adm-tab" id="tab-users" onclick="showAdmTab('users')">Users</button>
+          <button class="adm-tab" id="tab-archive" onclick="showAdmTab('archive')">Archive</button>
           <button class="adm-tab" id="tab-settings" onclick="showAdmTab('settings')">Settings</button>
         </div>
       </div>
@@ -943,6 +944,7 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     <div class="adm-pane" id="adm-specs-pane"></div>
     <div class="adm-pane hidden" id="adm-cats-pane"></div>
     <div class="adm-pane hidden" id="adm-users-pane"></div>
+    <div class="adm-pane hidden" id="adm-archive-pane"></div>
     <div class="adm-pane hidden" id="adm-settings-pane">
       <div style="padding:24px;max-width:520px">
         <h3 style="margin:0 0 6px;font-size:15px;font-weight:600">GitHub Integration</h3>
@@ -1201,6 +1203,7 @@ function _applyGhData(data) {
   });
   if (data.deleted) data.deleted.forEach(function(k){ delete SPECS[k]; });
   if (data.notifications) NOTIFICATIONS = data.notifications;
+  if (data.archived) ARCHIVED = data.archived;
 }
 
 function _applyLocalData() {
@@ -1208,6 +1211,7 @@ function _applyLocalData() {
   try { var ss = localStorage.getItem('pi_specs'); if(ss){ var s=JSON.parse(ss); Object.keys(s).forEach(function(k){ SPECS[k]=s[k]; }); } } catch(e){}
   try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k]) SPECS[k].p=imgs[k]; }); } } catch(e){}
   try { var del=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); del.forEach(function(k){ delete SPECS[k]; }); } catch(e){}
+  try { var arc=localStorage.getItem('pi_archived'); if(arc) ARCHIVED=JSON.parse(arc); } catch(e){}
 }
 
 function initData() {
@@ -1254,6 +1258,7 @@ function saveStoredSpecs() {
   var imgs = {};
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k].p) imgs[k] = SPECS[k].p; });
   try { localStorage.setItem('pi_images', JSON.stringify(imgs)); } catch(e){}
+  try { localStorage.setItem('pi_archived', JSON.stringify(ARCHIVED)); } catch(e){}
   pushDataToGitHub(function(ok){
     if (!ok) showToast('Save failed — data kept locally, will retry on next save','err');
   });
@@ -1264,7 +1269,7 @@ function pushDataToGitHub(cb) {
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   var deleted = [];
   try { deleted = JSON.parse(localStorage.getItem('pi_deleted')||'[]'); } catch(e){}
-  var payload = { specs: stored, deleted: deleted, cats: CATS, notifications: NOTIFICATIONS.slice(0, 60) };
+  var payload = { specs: stored, deleted: deleted, cats: CATS, notifications: NOTIFICATIONS.slice(0, 60), archived: ARCHIVED };
   var tok = getToken();
   fetch(WORKER_URL, {
     method: 'PUT',
@@ -1335,6 +1340,7 @@ function renderNav() {
 /* ═══ STATE ════════════════════════════════════════════════════════ */
 var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfImgRemoved = false, sfPdfFiles = [], sfExistingPdfs = [], admCurTab = 'specs';
 var NOTIFICATIONS = [];
+var ARCHIVED = {};
 
 function toggleSec(id, btn) {
   var list = document.getElementById('sl-' + id);
@@ -1495,22 +1501,65 @@ function dlDownload(filename) {
   }).catch(function(){ showToast('Download failed','err'); });
 }
 
-function deleteCurrentSpec() {
+function archiveCurrentSpec() {
   if (!curSpec || !isAdmin) return;
-  var s = SPECS[curSpec];
-  if (!s) return;
-  if (!confirm('Delete "' + (s.t || curSpec) + '"? This cannot be undone.')) return;
-  var key = curSpec;
-  delete SPECS[key];
-  var deleted = [];
-  try { deleted = JSON.parse(localStorage.getItem('pi_deleted') || '[]'); } catch(e) {}
-  if (deleted.indexOf(key) === -1) deleted.push(key);
-  try { localStorage.setItem('pi_deleted', JSON.stringify(deleted)); } catch(e) {}
+  archiveSpec(curSpec);
   goHome();
-  pushDataToGitHub(function(ok) {
-    if (ok) showToast('Spec deleted', 'ok');
-    else showToast('Deleted locally — cloud sync failed. Stay logged in and save again to sync.', 'err');
+}
+
+function archiveSpec(key) {
+  var s = SPECS[key];
+  if (!s) return;
+  // Save full spec data to archive with timestamp
+  ARCHIVED[key] = Object.assign({}, s, { _archivedAt: Date.now() });
+  delete SPECS[key];
+  // Add to deleted list so hardcoded specs don't re-appear on reload
+  try {
+    var del = JSON.parse(localStorage.getItem('pi_deleted') || '[]');
+    if (del.indexOf(key) === -1) { del.push(key); localStorage.setItem('pi_deleted', JSON.stringify(del)); }
+  } catch(e){}
+  try { localStorage.setItem('pi_archived', JSON.stringify(ARCHIVED)); } catch(e){}
+  renderNav();
+  renderAdminSpecs();
+  renderAdminArchive();
+  if (curSpec === key) goHome();
+  pushDataToGitHub(function(ok){
+    if (ok) showToast('Spec archived','ok');
+    else showToast('Archived locally — sync failed','err');
   });
+}
+
+function restoreSpec(key) {
+  var s = ARCHIVED[key];
+  if (!s) return;
+  var restored = Object.assign({}, s);
+  delete restored._archivedAt;
+  restored._admin = true;
+  SPECS[key] = restored;
+  delete ARCHIVED[key];
+  // Remove from deleted list
+  try {
+    var del = JSON.parse(localStorage.getItem('pi_deleted') || '[]');
+    del = del.filter(function(k){ return k !== key; });
+    localStorage.setItem('pi_deleted', JSON.stringify(del));
+  } catch(e){}
+  try { localStorage.setItem('pi_archived', JSON.stringify(ARCHIVED)); } catch(e){}
+  saveStoredSpecs();
+  renderNav();
+  renderAdminSpecs();
+  renderAdminArchive();
+  showToast('Spec restored: ' + (s.t || key), 'ok');
+}
+
+function permanentlyDeleteSpec(key) {
+  var s = ARCHIVED[key];
+  if (!s) return;
+  if (!confirm('Permanently delete "' + (s.t || key) + '"?\nThis cannot be undone.')) return;
+  delete ARCHIVED[key];
+  try { localStorage.setItem('pi_archived', JSON.stringify(ARCHIVED)); } catch(e){}
+  saveStoredSpecs();
+  renderAdminArchive();
+  showToast('Permanently deleted','ok');
 }
 
 function downloadSpecImage() {
@@ -1985,6 +2034,7 @@ function openAdminPanel() {
   document.getElementById('adm-specs-pane').innerHTML = '';
   document.getElementById('adm-cats-pane').innerHTML = '';
   document.getElementById('adm-users-pane').innerHTML = '';
+  document.getElementById('adm-archive-pane').innerHTML = '';
   renderAdminSpecs();
   renderAdminCats();
   showAdmTab(admCurTab);
@@ -1994,7 +2044,7 @@ function closeAdmin() { document.getElementById('admin-curtain').classList.remov
 
 function showAdmTab(tab) {
   admCurTab = tab;
-  ['specs','cats','users','settings'].forEach(function(t){
+  ['specs','cats','users','archive','settings'].forEach(function(t){
     document.getElementById('adm-'+t+'-pane').classList.toggle('hidden', tab!==t);
     document.getElementById('tab-'+t).classList.toggle('active', tab===t);
   });
@@ -2003,6 +2053,7 @@ function showAdmTab(tab) {
     if (status) status.textContent = getGhPat() ? '✓ Token stored' : 'No token set';
   }
   if (tab === 'users') renderAdminUsers();
+  if (tab === 'archive') renderAdminArchive();
 }
 
 function renderAdminUsers() {
@@ -2130,11 +2181,42 @@ function filterAdminSpecs(filter) {
       html += '<div class="adm-cell muted">' + escH(grpLabel||'—') + '</div>';
       html += '<div class="adm-actions"><button class="adm-btn" onclick="openSpecForm(\'' + k + '\')">Edit</button>';
       html += '<button class="adm-btn" onclick="duplicateSpec(\'' + k + '\')">Duplicate</button>';
-      html += '<button class="adm-btn del icon" onclick="confirmDeleteSpec(\'' + k + '\')" title="Delete">&#x2715;</button></div></div>';
+      html += '<button class="adm-btn" style="border-color:rgba(180,83,9,.3);color:#b45309" onclick="archiveSpec(\'' + k + '\')" title="Archive">&#x2610;</button></div></div>';
     });
   }
   html += '</div>';
   listWrap.innerHTML = html;
+}
+
+function renderAdminArchive() {
+  var pane = document.getElementById('adm-archive-pane');
+  if (!pane) return;
+  var keys = Object.keys(ARCHIVED);
+  if (!keys.length) {
+    pane.innerHTML = '<div style="padding:32px 24px;text-align:center;color:var(--txt3);font-size:13px">No archived specs yet. Archived specs appear here and can be restored or permanently removed.</div>';
+    return;
+  }
+  // Sort by most recently archived
+  keys.sort(function(a,b){ return (ARCHIVED[b]._archivedAt||0) - (ARCHIVED[a]._archivedAt||0); });
+  var html = '<div class="adm-toolbar"><span class="adm-count">' + keys.length + ' archived spec' + (keys.length !== 1 ? 's' : '') + '</span></div>';
+  html += '<div class="adm-list">';
+  html += '<div class="adm-row adm-row-head"><div class="adm-cell">Name</div><div class="adm-cell">Category</div><div class="adm-cell">Archived</div><div class="adm-cell"></div></div>';
+  keys.forEach(function(k) {
+    var s = ARCHIVED[k];
+    var catLabel = '';
+    CATS.forEach(function(c){ if (c.id === s.cat) catLabel = c.label; });
+    var ago = s._archivedAt ? _timeAgo(s._archivedAt) : '—';
+    html += '<div class="adm-row">';
+    html += '<div class="adm-cell">' + escH(s.t || k) + '</div>';
+    html += '<div class="adm-cell muted">' + escH(catLabel || '—') + '</div>';
+    html += '<div class="adm-cell muted">' + ago + '</div>';
+    html += '<div class="adm-actions">';
+    html += '<button class="adm-btn" style="color:#15803d;border-color:rgba(21,128,61,.3)" onclick="restoreSpec(\'' + k + '\')">Restore</button>';
+    html += '<button class="adm-btn del" onclick="permanentlyDeleteSpec(\'' + k + '\')">Delete Forever</button>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  pane.innerHTML = html;
 }
 
 function renderAdminCats() {
@@ -2352,23 +2434,6 @@ function duplicateSpec(key) {
   showToast('Duplicated: ' + s.t, 'ok');
 }
 
-function confirmDeleteSpec(key) {
-  if (!confirm('Delete "' + SPECS[key].t + '"? This cannot be undone.')) return;
-  // Base specs (not admin-added) need to be tracked in deleted list so they don't reappear on reload
-  if (!SPECS[key]._admin) {
-    try { var d=JSON.parse(localStorage.getItem('pi_deleted')||'[]'); if(d.indexOf(key)===-1){ d.push(key); localStorage.setItem('pi_deleted',JSON.stringify(d)); } } catch(e){}
-  }
-  var dlFiles = SPECS[key].dl_files || (SPECS[key].dl_name ? [SPECS[key].dl_name] : []);
-  dlFiles.forEach(function(f){ ghDeletePdf(f); });
-  if (SPECS[key].p && SPECS[key].p.indexOf('pi-specs-images/') !== -1) {
-    ghDeleteImage(SPECS[key].p.split('pi-specs-images/')[1]);
-  }
-  delete SPECS[key];
-  saveStoredSpecs();
-  renderNav();
-  renderAdminSpecs();
-  showToast('Spec deleted','ok');
-}
 
 /* ═══ CATEGORY CRUD ════════════════════════════════════════════════ */
 function addCategory() {
