@@ -722,6 +722,66 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
 
 /* ── PDF download (hidden utility) ── */
 #pdf-print-area{display:none!important}
+
+/* ═══ NOTIFICATIONS ════════════════════════════════════════════════ */
+.notif-btn{position:relative}
+.notif-badge{
+  position:absolute;top:-5px;right:-6px;
+  min-width:16px;height:16px;border-radius:8px;
+  background:var(--red);color:#fff;
+  font:700 9px var(--F);line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;pointer-events:none;
+  border:2px solid var(--bg);
+}
+#notif-panel{
+  position:fixed;top:calc(var(--top) + 8px);right:16px;
+  width:340px;max-height:500px;
+  background:var(--bg);border:1px solid var(--line2);
+  border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.18);
+  z-index:300;overflow:hidden;
+  display:none;flex-direction:column;
+  animation:notifIn .18s var(--ease);
+}
+@keyframes notifIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+#notif-panel.open{display:flex}
+.notif-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 12px;border-bottom:1px solid var(--line);flex-shrink:0;
+}
+.notif-head-title{font-family:var(--FD);font-size:13px;font-weight:700;color:var(--navy)}
+.notif-mark-btn{
+  background:none;border:none;cursor:pointer;
+  font:600 11px var(--F);color:var(--acc);padding:0;transition:color .15s;
+}
+.notif-mark-btn:hover{color:var(--acc2)}
+.notif-scroll{overflow-y:auto;flex:1}
+.notif-scroll::-webkit-scrollbar{width:3px}
+.notif-empty{padding:36px 16px;text-align:center;font-size:12px;color:var(--txt3)}
+.notif-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:11px 16px;border-bottom:1px solid var(--line);
+  cursor:pointer;transition:background .12s;
+}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:rgba(40,97,253,.04)}
+.notif-item:hover{background:var(--bg1)}
+.notif-item.unread:hover{background:rgba(40,97,253,.08)}
+.ni-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:var(--acc)}
+.ni-dot.read{background:var(--line3)}
+.ni-body{flex:1;min-width:0}
+.ni-name{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ni-meta{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt3)}
+.ni-tag{
+  display:inline-flex;align-items:center;
+  padding:1px 7px;border-radius:100px;
+  font-size:9px;font-weight:700;letter-spacing:.06em;flex-shrink:0;
+}
+.ni-tag.added{background:rgba(74,222,128,.15);color:#15803d}
+.ni-tag.edited{background:var(--acc-dim);color:var(--acc)}
+@media(max-width:480px){
+  #notif-panel{width:calc(100vw - 24px);right:12px}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
@@ -738,6 +798,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     </div>
   </div>
   <div class="bar-right">
+    <button class="topbtn notif-btn" id="notif-btn" onclick="toggleNotifPanel()" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span id="notif-badge" class="notif-badge" style="display:none">0</span>
+    </button>
     <button class="topbtn" id="mob-nav-toggle" onclick="toggleMobNav()" style="display:none" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
@@ -750,6 +814,15 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
       <span class="btn-label">Admin</span>
     </button>
   </div>
+</div>
+
+<!-- Notification panel -->
+<div id="notif-panel">
+  <div class="notif-head">
+    <span class="notif-head-title">Notifications</span>
+    <button class="notif-mark-btn" id="notif-mark-all" onclick="markAllNotifsRead()" style="display:none">Mark all read</button>
+  </div>
+  <div class="notif-scroll" id="notif-list"></div>
 </div>
 
 <!-- Mobile nav backdrop -->
@@ -1127,6 +1200,7 @@ function _applyGhData(data) {
     if (!SPECS[k].p && localP) SPECS[k].p = localP;
   });
   if (data.deleted) data.deleted.forEach(function(k){ delete SPECS[k]; });
+  if (data.notifications) NOTIFICATIONS = data.notifications;
 }
 
 function _applyLocalData() {
@@ -1162,8 +1236,9 @@ function initData() {
       // Re-apply cached image URLs on top
       try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
+      updateNotifBadge();
     })
-    .catch(function(){ renderNav(); });
+    .catch(function(){ renderNav(); updateNotifBadge(); });
 }
 
 function saveCats() {
@@ -1189,7 +1264,7 @@ function pushDataToGitHub(cb) {
   Object.keys(SPECS).forEach(function(k){ if (SPECS[k]._admin) stored[k] = SPECS[k]; });
   var deleted = [];
   try { deleted = JSON.parse(localStorage.getItem('pi_deleted')||'[]'); } catch(e){}
-  var payload = { specs: stored, deleted: deleted, cats: CATS };
+  var payload = { specs: stored, deleted: deleted, cats: CATS, notifications: NOTIFICATIONS.slice(0, 60) };
   var tok = getToken();
   fetch(WORKER_URL, {
     method: 'PUT',
@@ -1259,6 +1334,7 @@ function renderNav() {
 
 /* ═══ STATE ════════════════════════════════════════════════════════ */
 var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfImgRemoved = false, sfPdfFiles = [], sfExistingPdfs = [], admCurTab = 'specs';
+var NOTIFICATIONS = [];
 
 function toggleSec(id, btn) {
   var list = document.getElementById('sl-' + id);
@@ -1887,18 +1963,20 @@ function _grantAdmin() {
   closeLogin();
   var b = document.getElementById('admin-btn');
   b.classList.add('admin-on');
-  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin \u2713';
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="btn-label">Admin \u2713</span>';
   document.getElementById('logout-btn').style.display = 'flex';
   if (curSpec) renderDlBar();
+  updateNotifBadge();
   showToast('Welcome back, Admin!', 'ok');
 }
 function doLogout() {
   clearToken(); isAdmin = false;
   var b = document.getElementById('admin-btn');
   b.classList.remove('admin-on');
-  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin';
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="btn-label">Admin</span>';
   document.getElementById('logout-btn').style.display = 'none';
   if (curSpec) renderDlBar();
+  updateNotifBadge();
   showToast('Signed out', 'ok');
 }
 
@@ -2238,6 +2316,7 @@ function saveSpecForm() {
     SPECS[key].dl_files = sfExistingPdfs.concat(newPdfs);
     // savedImg is now the full Cloudinary URL
     if (savedImg) SPECS[key].p = savedImg;
+    addNotification(editingKey ? 'edited' : 'added', key, name);
     saveStoredSpecs();
     renderNav();
     renderAdminSpecs();
@@ -2381,6 +2460,85 @@ function dbDel(key) {
     d.transaction('files','readwrite').objectStore('files').delete(key);
   });
 }
+
+/* ═══ NOTIFICATIONS ════════════════════════════════════════════════ */
+function _notifReadIds() {
+  try { return JSON.parse(localStorage.getItem('pi_notif_read') || '[]'); } catch(e){ return []; }
+}
+function _saveReadIds(ids) {
+  try { localStorage.setItem('pi_notif_read', JSON.stringify(ids)); } catch(e){}
+}
+function getVisibleNotifs() {
+  if (isAdmin) return NOTIFICATIONS;
+  return NOTIFICATIONS.filter(function(n){ return n.type === 'added'; });
+}
+function updateNotifBadge() {
+  var read = _notifReadIds();
+  var count = getVisibleNotifs().filter(function(n){ return read.indexOf(n.id) === -1; }).length;
+  var badge = document.getElementById('notif-badge');
+  if (badge) { badge.textContent = count > 9 ? '9+' : String(count); badge.style.display = count > 0 ? 'flex' : 'none'; }
+  var markBtn = document.getElementById('notif-mark-all');
+  if (markBtn) markBtn.style.display = count > 0 ? '' : 'none';
+}
+function addNotification(type, specKey, specName) {
+  NOTIFICATIONS.unshift({ id: 'notif-' + Date.now(), type: type, specKey: specKey, specName: specName, ts: Date.now() });
+  if (NOTIFICATIONS.length > 60) NOTIFICATIONS.length = 60;
+  updateNotifBadge();
+}
+function _timeAgo(ts) {
+  var d = Date.now() - ts, m = Math.floor(d / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  var h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+  var days = Math.floor(h / 24); return days === 1 ? 'yesterday' : days + 'd ago';
+}
+function renderNotifList() {
+  var el = document.getElementById('notif-list');
+  if (!el) return;
+  var notifs = getVisibleNotifs();
+  var read = _notifReadIds();
+  if (!notifs.length) { el.innerHTML = '<div class="notif-empty">No notifications yet</div>'; return; }
+  el.innerHTML = notifs.map(function(n) {
+    var isRead = read.indexOf(n.id) !== -1;
+    return '<div class="notif-item' + (isRead ? '' : ' unread') + '" onclick="notifClick(\'' + n.id + '\',\'' + escH(n.specKey) + '\')">' +
+      '<div class="ni-dot' + (isRead ? ' read' : '') + '"></div>' +
+      '<div class="ni-body">' +
+        '<div class="ni-name">' + escH(n.specName) + '</div>' +
+        '<div class="ni-meta"><span class="ni-tag ' + n.type + '">' + (n.type === 'added' ? 'NEW' : 'UPDATED') + '</span>' + _timeAgo(n.ts) + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+function notifClick(id, specKey) {
+  var read = _notifReadIds();
+  if (read.indexOf(id) === -1) { read.push(id); _saveReadIds(read); }
+  renderNotifList();
+  updateNotifBadge();
+  closeNotifPanel();
+  if (specKey && SPECS[specKey]) openSpec(specKey);
+}
+function markAllNotifsRead() {
+  var read = _notifReadIds();
+  getVisibleNotifs().forEach(function(n){ if (read.indexOf(n.id) === -1) read.push(n.id); });
+  _saveReadIds(read);
+  updateNotifBadge();
+  renderNotifList();
+}
+function toggleNotifPanel() {
+  var panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  var opening = !panel.classList.contains('open');
+  panel.classList.toggle('open');
+  if (opening) { renderNotifList(); updateNotifBadge(); }
+}
+function closeNotifPanel() {
+  var panel = document.getElementById('notif-panel');
+  if (panel) panel.classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('notif-panel');
+  if (!panel || !panel.classList.contains('open')) return;
+  if (!e.target.closest('#notif-panel') && !e.target.closest('#notif-btn')) closeNotifPanel();
+});
 
 /* ═══ INIT ══════════════════════════════════════════════════════════ */
 initData();
