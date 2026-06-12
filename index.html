@@ -1174,10 +1174,10 @@ var SPECS = {
 /* ═══ DEFAULT CATEGORIES ═══════════════════════════════════════════ */
 var DEFAULT_CATS = [
   {id:'90-degree',label:'90 Degree',groups:[{id:'aw',label:'Aisle Wing'},{id:'sw',label:'Shelf Wing'}]},
-  {id:'illuminated',label:'Illuminated',groups:[]},
-  {id:'shopper-facing',label:'Shopper Facing',groups:[{id:'pst',label:'Product Showcase / Tester'},{id:'pg',label:'Price Glorifier'},{id:'sf',label:'Shelf Front'}]},
-  {id:'leaflet',label:'Leaflet',groups:[{id:'baw',label:'Boxed Aisle Wing'}]},
   {id:'fridge',label:'Fridge',groups:[{id:'fridge-grp',label:'Fridge and Freezer'}]},
+  {id:'illuminated',label:'Illuminated',groups:[]},
+  {id:'leaflet',label:'Leaflet',groups:[{id:'baw',label:'Boxed Aisle Wing'}]},
+  {id:'shopper-facing',label:'Shopper Facing',groups:[{id:'pst',label:'Product Showcase / Tester'},{id:'pg',label:'Price Glorifier'},{id:'sf',label:'Shelf Front'}]},
   {id:'till-point',label:'Till Point',groups:[]}
 ];
 var SPEC_CAT_MAP = {
@@ -1327,7 +1327,7 @@ function renderNav() {
   html += '<svg class="nav-search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
   html += '<input class="nav-search-inp" id="nav-search-inp" type="text" placeholder="Search formats..." oninput="filterNav(this.value)"/>';
   html += '</div>';
-  CATS.forEach(function(cat) {
+  CATS.slice().sort(function(a,b){ return a.label.localeCompare(b.label); }).forEach(function(cat) {
     var catHasContent = false;
     var catHtml = '<div class="nav-section"><div class="nav-section-label">' + escH(cat.label) + '</div>';
     cat.groups.forEach(function(grp) {
