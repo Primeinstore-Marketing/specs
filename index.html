@@ -868,6 +868,10 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
           </button>
           <div style="display:flex;align-items:center;gap:10px">
             <div id="pi-chip" style="display:none"></div>
+            <button id="share-btn" onclick="copySpecLink()" title="Copy shareable link" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span class="btn-label">Copy Link</span>
+            </button>
             <button id="img-dl-btn" onclick="downloadSpecImage()" style="display:none;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font:600 11px var(--FD);cursor:pointer;transition:all .15s;letter-spacing:.03em;text-transform:uppercase">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               <span>Download Image</span>
@@ -977,7 +981,17 @@ body{font-family:var(--F);background:var(--bg);color:var(--txt);-webkit-font-smo
     </div>
     <div class="sf-grid">
       <div class="fg sf-full"><label>Format Name *</label><input id="sf-name" type="text" placeholder="e.g. Aisle Wing Medium Pop-Out"/></div>
-      <div class="fg"><label>Category *</label><select id="sf-cat" onchange="sfUpdateGroups(null)"></select></div>
+      <div class="fg">
+        <label>Category *</label>
+        <div style="display:flex;align-items:center;gap:7px">
+          <select id="sf-cat" onchange="sfUpdateGroups(null)" style="flex:1;min-width:0"></select>
+          <button type="button" onclick="sfToggleNewCat()" title="Add new category" style="flex-shrink:0;height:35px;width:35px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s">+</button>
+        </div>
+        <div id="sf-new-cat-row" style="display:none;align-items:center;gap:7px;margin-top:4px">
+          <input id="sf-new-cat-inp" type="text" placeholder="New category name..." onkeydown="if(event.key==='Enter')sfAddCategory();if(event.key==='Escape')sfToggleNewCat()" style="flex:1;min-width:0;background:var(--bg3);border:1px solid rgba(40,97,253,.35);border-radius:7px;color:var(--txt);font:13px var(--F);padding:8px 11px;outline:none"/>
+          <button type="button" onclick="sfAddCategory()" style="flex-shrink:0;height:35px;padding:0 14px;border-radius:7px;border:none;background:var(--acc);color:#fff;font:600 11px var(--FD);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .15s">Add</button>
+        </div>
+      </div>
       <div class="fg"><label>Sub-Group</label><select id="sf-group"></select></div>
       <div class="fg sf-full"><label>Description</label><textarea id="sf-desc" rows="2" placeholder="Brief description of this format..."></textarea></div>
       <div class="fg sf-full">
@@ -1241,8 +1255,12 @@ function initData() {
       try { var im = localStorage.getItem('pi_images'); if(im){ var imgs=JSON.parse(im); Object.keys(imgs).forEach(function(k){ if(SPECS[k] && imgs[k] && !SPECS[k].p) SPECS[k].p=imgs[k]; }); } } catch(e){}
       renderNav();
       updateNotifBadge();
+      var _hk = location.hash.slice(1); if (_hk && SPECS[_hk]) openSpec(_hk);
     })
-    .catch(function(){ renderNav(); updateNotifBadge(); });
+    .catch(function(){
+      renderNav(); updateNotifBadge();
+      var _hk = location.hash.slice(1); if (_hk && SPECS[_hk]) openSpec(_hk);
+    });
 }
 
 function saveCats() {
@@ -1338,7 +1356,7 @@ function renderNav() {
 }
 
 /* ═══ STATE ════════════════════════════════════════════════════════ */
-var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfImgRemoved = false, sfPdfFiles = [], sfExistingPdfs = [], admCurTab = 'specs';
+var openSec = null, curSpec = null, isAdmin = false, editingKey = null, sfImgData = null, sfImgFile = null, sfImgRemoved = false, sfPdfFiles = [], sfExistingPdfs = [], admCurTab = 'specs', _handlingPop = false;
 var NOTIFICATIONS = [];
 var ARCHIVED = {};
 
@@ -1359,6 +1377,7 @@ function openSpec(key) {
   var s = SPECS[key];
   if (!s) { showToast('Spec coming soon','err'); return; }
   curSpec = key;
+  if (!_handlingPop && location.hash.slice(1) !== key) history.pushState({ spec: key }, '', '#' + key);
   document.querySelectorAll('.nav-item,.sub-item').forEach(function(b){ b.classList.remove('selected'); });
   var nb = document.querySelector('[data-key="' + key + '"]');
   if (nb) nb.classList.add('selected');
@@ -1430,6 +1449,7 @@ function closeMobNav() {
 
 function goHome() {
   curSpec = null;
+  if (!_handlingPop && location.hash) history.replaceState(null, '', location.pathname + location.search);
   document.getElementById('home').classList.remove('out');
   document.getElementById('specview').classList.remove('in');
   document.getElementById('bc-spec').style.display = 'none';
@@ -2253,8 +2273,10 @@ function openSpecForm(key) {
   editingKey = key;
   sfImgData = null; sfImgFile = null; sfImgRemoved = false; sfPdfFiles = [];
   sfExistingPdfs = key && SPECS[key] ? (SPECS[key].dl_files || (SPECS[key].dl_name ? [SPECS[key].dl_name] : [])) : [];
+  document.getElementById('sf-new-cat-row').style.display = 'none';
+  document.getElementById('sf-new-cat-inp').value = '';
   var catSel = document.getElementById('sf-cat');
-  catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('');
+  catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('') + '<option value="__new__" style="color:var(--acc)">+ Add new category…</option>';
   var s = key ? SPECS[key] : null;
   document.getElementById('sf-title').textContent = key ? 'Edit Spec' : 'Add Spec';
   document.getElementById('sf-name').value = s ? s.t : '';
@@ -2287,7 +2309,13 @@ function openSpecForm(key) {
 }
 
 function sfUpdateGroups(selectedGroup) {
-  var catId = document.getElementById('sf-cat').value;
+  var catSel = document.getElementById('sf-cat');
+  var catId = catSel.value;
+  if (catId === '__new__') {
+    catSel.value = CATS.length ? CATS[0].id : '';
+    sfToggleNewCat();
+    return;
+  }
   var cat = CATS.find(function(c){ return c.id===catId; });
   var opts = '<option value="">— None (standalone) —</option>';
   if (cat) cat.groups.forEach(function(g){ opts += '<option value="' + g.id + '"' + (selectedGroup===g.id?' selected':'') + '>' + escH(g.label) + '</option>'; });
@@ -2434,6 +2462,29 @@ function duplicateSpec(key) {
   showToast('Duplicated: ' + s.t, 'ok');
 }
 
+
+function sfToggleNewCat() {
+  var row = document.getElementById('sf-new-cat-row');
+  var open = row.style.display === 'none' || row.style.display === '';
+  row.style.display = open ? 'flex' : 'none';
+  if (open) document.getElementById('sf-new-cat-inp').focus();
+}
+
+function sfAddCategory() {
+  var inp = document.getElementById('sf-new-cat-inp');
+  var label = inp.value.trim();
+  if (!label) { showToast('Enter a category name', 'err'); return; }
+  var id = 'cat-' + label.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+  CATS.push({ id: id, label: label, groups: [] });
+  saveCats(); renderNav(); renderAdminCats();
+  var catSel = document.getElementById('sf-cat');
+  catSel.innerHTML = CATS.map(function(c){ return '<option value="' + c.id + '">' + escH(c.label) + '</option>'; }).join('') + '<option value="__new__" style="color:var(--acc)">+ Add new category…</option>';
+  catSel.value = id;
+  sfUpdateGroups(null);
+  document.getElementById('sf-new-cat-row').style.display = 'none';
+  inp.value = '';
+  showToast('Category "' + label + '" added', 'ok');
+}
 
 /* ═══ CATEGORY CRUD ════════════════════════════════════════════════ */
 function addCategory() {
@@ -2603,6 +2654,24 @@ document.addEventListener('click', function(e) {
   var panel = document.getElementById('notif-panel');
   if (!panel || !panel.classList.contains('open')) return;
   if (!e.target.closest('#notif-panel') && !e.target.closest('#notif-btn')) closeNotifPanel();
+});
+
+function copySpecLink() {
+  if (!curSpec) return;
+  var url = location.origin + location.pathname + '#' + curSpec;
+  navigator.clipboard.writeText(url).then(function() {
+    showToast('Link copied!', 'ok');
+  }).catch(function() {
+    showToast('Could not copy link', 'err');
+  });
+}
+
+window.addEventListener('popstate', function() {
+  _handlingPop = true;
+  var key = location.hash.slice(1);
+  if (key && SPECS[key]) openSpec(key);
+  else if (curSpec) goHome();
+  _handlingPop = false;
 });
 
 /* ═══ INIT ══════════════════════════════════════════════════════════ */
