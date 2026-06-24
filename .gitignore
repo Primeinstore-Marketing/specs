@@ -7,3 +7,10 @@ bg.png
 logo-100.jpg
 pi_store.jpg
 .DS_Store
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
